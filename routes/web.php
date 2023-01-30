@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 
 /*
@@ -15,9 +15,7 @@ use App\Http\Controllers\HomeController;
 |
 */
 
-Route::get('/', function () {
-    return view('auth.login');
-});
+Route::get('/', [HomeController::class, 'login']);
 
 Auth::routes();
 
@@ -38,15 +36,15 @@ All Admin Routes List
 --------------------------------------------*/
 Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(function () {
 
-    Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.home');
+    Route::get('/home', [HomeController::class, 'adminHome'])->name('admin.home');
 });
 
 /*------------------------------------------
 --------------------------------------------
-All Admin Routes List
+All Manager Routes List
 --------------------------------------------
 --------------------------------------------*/
 Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(function () {
 
-    Route::get('/manager/home', [HomeController::class, 'managerHome'])->name('manager.home');
+    Route::get('/home', [HomeController::class, 'managerHome'])->name('manager.home');
 });
