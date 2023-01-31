@@ -9,6 +9,8 @@
 
                 <div class="card-body">
                     You are a Admin User.
+                    <br>
+                    {{ Auth::user()->email }}
                 </div>
             </div>
         </div>
