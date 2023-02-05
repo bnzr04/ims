@@ -25,11 +25,8 @@
 
 <body>
     <div id="app" class="container-fluid">
-        <div class="row">
-            <main class="fluid-container m-0 p-0 border border-primary min-vh-100 flex-column flex-md-row">
-                @include('layouts.sidebar')
-                @yield('content')
-            </main>
+        <div class="row min-vh-100 flex-column flex-md-row ">
+            @yield('content')
         </div>
     </div>
 

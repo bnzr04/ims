@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('item_cost');
             $table->string('item_salvage_cost');
             $table->smallInteger('item_useful_life');
+            $table->timestamps();
 
             //Add foreign key categoryId from categories table
             $table->foreign('category_id')
