@@ -4,35 +4,38 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Item;
-use App\Models\Category;
+use App\Models\User;
 
 class AdminController extends Controller
 {
-    public function adminHome()
+
+    //This will show the homepage as dashboard
+    public function dashboard()
     {
         return view('admin.dashboard');
     }
 
-    public function showItems()
+    public function adminHome()
     {
-        //This will get the category_name from categories table
-        $items = Item::with('category')->get();
-
-        return view('admin.items')->with(compact('items'));
+        return view('admin.main');
     }
 
-    public function showCategory()
+    public function editItem($id)
     {
-        $categories = Category::all();
+        $item = Item::find($id);
+        return view('admin.modals.edit-item')->with('item', $item);
+    }
 
-        return view('admin.modals.new-item')->with('category', $categories);
+    public function deleteItem($id)
+    {
+        $item = Item::find($id);
+        $item->delete();
+        return back();
     }
 
     public function stocks()
     {
-        //This will get the category_name from categories table
-        $items = Item::with('category')->get();
-
+        $items = Item::all();
         return view('admin.stocks')->with(compact('items'));
     }
 
@@ -49,6 +52,12 @@ class AdminController extends Controller
     public function users()
     {
         return view('admin.users');
+    }
+
+    public function editUser($id)
+    {
+        $user = User::find($id);
+        return print($user);
     }
 
     public function log()

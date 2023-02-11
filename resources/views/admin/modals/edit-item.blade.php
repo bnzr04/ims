@@ -9,29 +9,45 @@
             <div class="modal-body">
                 <form action="">
                     @csrf
-                    <div class="container-sm mb-2">
+                    <div class="container-sm mb-1">
                         <label for="item-id">Item ID</label>
-                        <input type="text" class="form-control" name="item-id" id="item-id" disabled>
+                        <input type="text" class="form-control" name="item-id" id="item-id" disabled value="{{ $item->id }}">
                     </div>
 
-                    <div class="container-sm mb-2">
+                    <div class="container-sm mb-1">
                         <label for="item-name">Item name</label>
-                        <input type="text" class="form-control" name="item-name" id="item-name">
+                        <input type="text" class="form-control" name="itemName" id="item-name" required value="{{ $item->item_name }}">
                     </div>
 
-                    <div class="container-sm mb-2">
+                    <div class="container-sm mb-1">
                         <label for="category">Item category</label>
-                        <input id="category" type="text" class="form-control" name="category" list="categories">
-                        <datalist id="categories">
-                            <option value="Medical Supplies">
-                            <option value="Equipment">
-                        </datalist>
+                        <input type="text" class="form-control" name="category" id="category" required value="{{ $item->category }}">
                     </div>
-                </form>
+
+                    <div class="container-sm mb-1">
+                        <label for="item-description">Item description</label>
+                        <input type="text" class="form-control" name="itemDescription" id="item-description" required value="{{ $item->item_description }}">
+                    </div>
+
+                    <div class="container-sm mb-1">
+                        <label for="item-cost">Cost</label>
+                        <input type="text" class="form-control" name="cost" id="item-cost" required value="{{ $item->item_cost }}">
+                    </div>
+
+                    <div class="container-sm mb-1">
+                        <label for="salvage-cost">Salvage cost</label>
+                        <input type="text" class="form-control" name="salvageCost" id="salvage-cost" required value="{{ $item->item_salvage_cost }}">
+                    </div>
+
+                    <div class="container-sm">
+                        <label for="useful-life">Useful life</label>
+                        <input type="number" min='0' class="form-control" name="usefulLife" id="useful-life" required value="{{ $item->item_useful_life }}">
+                    </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Edit</button>
+                <button type="submit" class="btn btn-primary">Edit</button>
+                </form>
             </div>
         </div>
     </div>

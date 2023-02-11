@@ -17,17 +17,11 @@ return new class extends Migration
             $table->id();
             $table->string('item_name');
             $table->text('item_description');
-            $table->unsignedBigInteger('category_id');
+            $table->string('category');
             $table->string('item_cost');
             $table->string('item_salvage_cost');
             $table->smallInteger('item_useful_life');
             $table->timestamps();
-
-            //Add foreign key categoryId from categories table
-            $table->foreign('category_id')
-                ->references('id')
-                ->on('categories')
-                ->onDelete('cascade');
         });
     }
 

@@ -1,16 +1,16 @@
-<aside class="border border-danger" style="width:12.5rem;">
-    <nav class="navbar navbar-expand navbar-dark flex-md-column flex-row align-items-start py-2">
-        <ul class="mb-0 p-0" style="list-style:none;color:white">
+<aside>
+    <nav class="navbar navbar-expand navbar-dark flex-md-column align-items-start py-2">
+        <ul class="mb-0 p-0 text-white px-3" style="list-style:none">
 
             {{--Admin links--}}
             @if( Auth::user()->type == 'admin' )
-            <li><a href="{{ route('admin.home') }}">Dashboard</a></li>
-            <li><a href="{{ route('admin.users') }}">Users</a></li>
-            <li><a href="{{ route('admin.items') }}">Items</a></li>
-            <li><a href="{{ route('admin.stocks') }}">Stocks</a></li>
-            <li><a href="{{ route('admin.deployment') }}">Deployment</a></li>
-            <li><a href="{{ route('admin.requests') }}">Requests</a></li>
-            <li><a href="{{ route('admin.log') }}">Log</a></li>
+            <li><a href="" class="nav-link" data-view-name="admin.dashboard">Dashboard</a></li>
+            <li><a href="" class="nav-link" data-view-name="admin.users">Users</a></li>
+            <li><a href="" class="nav-link" data-view-name="admin.items">Items</a></li>
+            <li><a href="" class="nav-link" data-view-name="admin.stocks">Stocks</a></li>
+            <li><a href="" class="nav-link" data-view-name="admin.deployment">Deployment</a></li>
+            <li><a href="" class="nav-link" data-view-name="admin.userRequest">Requests</a></li>
+            <li><a href="" class="nav-link" data-view-name="admin.log">Log</a></li>
             @endif
 
             {{--Manager links--}}

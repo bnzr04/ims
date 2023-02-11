@@ -1,5 +1,6 @@
 @extends('layouts.app')
 
+@include('layouts.header')
 @section('content')
 <div class="container py-4">
     <div class="row justify-content-center">
@@ -17,7 +18,7 @@
                             <div class="col-md-6">
                                 <input id="username" type="text" class="form-control @error('email') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="username" autofocus>
 
-                                @error('email')
+                                @error('username')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>

@@ -6,9 +6,9 @@
                 <h5 class="modal-title" id="staticBackdropLabel">Add new item</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form action="{{ route('admin.saveItem') }}" method="post">
-                    @csrf
+            <form action="{{ route('admin.saveItem') }}" method="POST" id="itemForm">
+                @csrf
+                <div class="modal-body">
                     <div class="container-sm mb-2">
                         <label for="item-name">Item name</label>
                         <input type="text" class="form-control" name="itemName" id="item-name" required>
@@ -16,12 +16,7 @@
 
                     <div class="container-sm mb-2">
                         <label for="category">Item category</label>
-                        <input id="category" type="text" class="form-control" name="category" list="categories" required>
-                        <datalist id="categories">
-                            @foreach($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->category_name }}</option>
-                            @endforeach
-                        </datalist>
+                        <input type="text" class="form-control" name="category" id="category" required>
                     </div>
 
                     <div class="container-sm mb-2">
@@ -30,17 +25,29 @@
                     </div>
 
                     <div class="container-sm mb-2">
-                        <label for="quantity">Quantity</label>
-                        <input type="number" min="0" class="form-control" name="quantity" id="quantity" required>
+                        <label for="item-cost">Cost</label>
+                        <input type="text" class="form-control" name="cost" id="item-cost" required>
                     </div>
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Item</button>
-                </form>
-            </div>
+                    <div class="container-sm mb-2">
+                        <label for="salvage-cost">Salvage cost</label>
+                        <input type="text" class="form-control" name="salvageCost" id="salvage-cost" required>
+                    </div>
 
+                    <div class="container-sm mb-2">
+                        <label for="useful-life">Useful life</label>
+                        <input type="number" min='0' class="form-control" name="usefulLife" id="useful-life" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
         </div>
+
     </div>
+
+</div>
+</div>
 </div>

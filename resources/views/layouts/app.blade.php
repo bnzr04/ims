@@ -21,15 +21,75 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
+
 </head>
 
 <body>
-    <div id="app" class="container-fluid">
-        <div class="row min-vh-100 flex-column flex-md-row ">
+    <div id="app">
+        <div>
             @yield('content')
         </div>
     </div>
 
+    <!--Jquery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            adminSidebar();
+            adminHome();
+
+            /* ADMIN FUNCTIONS START */
+
+            function adminSidebar() {
+                $('.nav-link').click(function(event) {
+                    event.preventDefault();
+
+                    var viewName = $(this).data('view-name');
+                    var url = '/admin/sidebar/' + viewName;
+
+                    $.get(url, function(data) {
+                        $('#content').html(data);
+                    });
+                });
+            }
+
+            function adminHome() {
+                $.get("{{ route('admin.dashboard')}}", function(data) {
+                    $('#content').html(data);
+                });
+            }
+
+            $('#itemForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var url = $(this).attr('action');
+                var form = $(this).serialize();
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: form,
+                    success: function(response) {
+                        console.log(response)
+                        $('#newItem').modal('hide');
+                        $('#itemForm')[0].reset();
+                        alert('Item added');
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        alert('Data not inserted');
+                    }
+                });
+            });
+
+        });
+    </script>
 </body>
 
 </html>

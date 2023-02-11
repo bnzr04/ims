@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\SidebarController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -19,7 +20,7 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/', [HomeController::class, 'login']);
+Route::get('/', [HomeController::class, 'login'])->name('login');
 
 Auth::routes();
 
@@ -42,14 +43,19 @@ All Admin Routes List
 
 Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(function () {
 
+    Route::get('/sidebar/{view_name}', [SidebarController::class, 'showView']);
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/home', [AdminController::class, 'adminHome'])->name('admin.home');
-    Route::get('/items', [AdminController::class, 'showItems', 'showCategory'])->name('admin.items');
+    Route::get('/items', [ItemController::class, 'showItems'])->name('admin.items');
     Route::get('/item-stocks', [AdminController::class, 'stocks'])->name('admin.stocks');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'userRequest'])->name('admin.requests');
-    Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::get('/users', [AdminController::class, 'showUser'])->name('admin.users');
+    Route::get('/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.edit-user');
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
+    Route::get('/edit-item/{id}', [AdminController::class, 'editItem'])->name('admin.edit-item');
+    Route::get('/delete-item/{id}', [AdminController::class, 'deleteItem'])->name('admin.delete-item');
 });
 
 /*------------------------------------------
