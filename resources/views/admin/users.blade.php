@@ -1,6 +1,7 @@
 <h1>Users</h1>
 <div class="mt-3 mb-3 d-flex justify-content-between">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newItem">New User</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new-user-modal">New User</button>
+    @include('admin.modals.user.new-user')
 
     <div class="input-group flex-nowrap" style="width: 270px;">
         <span class="input-group-text" id="addon-wrapping">Search</span>

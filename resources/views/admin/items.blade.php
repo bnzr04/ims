@@ -1,15 +1,17 @@
 <h2>ITEMS</h2>
 <div class="mt-3 d-flex justify-content-between">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newItem">New Item</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new_item">New Item</button>
+    @include('admin.modals.new-item')
 
     <div class="input-group flex-nowrap" style="width: 270px;">
         <span class="input-group-text" id="addon-wrapping">Search</span>
         <input type="text" class="form-control bg-white" placeholder="" aria-label="search" aria-describedby="addon-wrapping">
     </div>
-    @include('admin.modals.new-item')
+
 </div>
 
-<table class="table mt-2">
+
+<table class="table mt-2 overflow-x-auto">
     <thead>
         <tr>
             <th scope="col">Item ID</th>

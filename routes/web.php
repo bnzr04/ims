@@ -20,7 +20,7 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/', [HomeController::class, 'login'])->name('login');
+Route::get('/', [HomeController::class, 'login'])->name('home');
 
 Auth::routes();
 
@@ -50,7 +50,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/item-stocks', [AdminController::class, 'stocks'])->name('admin.stocks');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'userRequest'])->name('admin.requests');
-    Route::get('/users', [AdminController::class, 'showUser'])->name('admin.users');
+    Route::get('/users', [UserController::class, 'showUser'])->name('admin.users');
     Route::get('/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.edit-user');
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');

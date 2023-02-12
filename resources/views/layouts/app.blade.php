@@ -17,6 +17,8 @@
     <!-- CSS Link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -31,10 +33,15 @@
         </div>
     </div>
 
+    <!-- Bootstrap css -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
     <!--Jquery-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha512-YUkaLm+KJ5lQXDBdqBqk7EVhJAdxRnVdT2vtCzwPHSweCzyMgYV/tgGF4/dCyqtCC2eCphz0lRQgatGVdfR0ww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -43,6 +50,7 @@
 
             adminSidebar();
             adminHome();
+
 
             /* ADMIN FUNCTIONS START */
 
@@ -65,28 +73,7 @@
                 });
             }
 
-            $('#itemForm').on('submit', function(event) {
-                event.preventDefault();
 
-                var url = $(this).attr('action');
-                var form = $(this).serialize();
-
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    data: form,
-                    success: function(response) {
-                        console.log(response)
-                        $('#newItem').modal('hide');
-                        $('#itemForm')[0].reset();
-                        alert('Item added');
-                    },
-                    error: function(error) {
-                        console.log(error);
-                        alert('Data not inserted');
-                    }
-                });
-            });
 
         });
     </script>
