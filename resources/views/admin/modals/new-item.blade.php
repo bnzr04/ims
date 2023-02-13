@@ -60,9 +60,13 @@
                 url: "/admin/save-item",
                 data: $("#item_form").serialize(),
                 success: function(response) {
-                    $("#new_item").modal('hide');
-                    $(".modal-backdrop").hide();
-                    $("#item_form")[0].reset();
+                    $('#new_item').on('hidden.bs.modal', function () {
+                        $('.modal-backdrop').remove(); 
+                        $('body').css('overflow', 'auto');
+                    });
+
+                    $('#new_item').modal('hide');
+                    $('#item_form')[0].reset();
                     alert('Item saved');
                 },
                 error: function(error) {
