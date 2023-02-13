@@ -26,13 +26,6 @@ class AdminController extends Controller
         return view('admin.modals.edit-item')->with('item', $item);
     }
 
-    public function deleteItem($id)
-    {
-        $item = Item::find($id);
-        $item->delete();
-        return back();
-    }
-
     public function stocks()
     {
         $items = Item::all();

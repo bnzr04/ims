@@ -28,4 +28,12 @@ class ItemController extends Controller
 
         $item->save();
     }
+
+    //This will delete the item
+    public function deleteItem($id)
+    {
+        $item = Item::find($id);
+        $item->delete();
+        return back();
+    }
 }

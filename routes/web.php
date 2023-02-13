@@ -55,7 +55,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
     Route::get('/edit-item/{id}', [AdminController::class, 'editItem'])->name('admin.edit-item');
-    Route::get('/delete-item/{id}', [AdminController::class, 'deleteItem'])->name('admin.delete-item');
+    Route::get('/delete-item/{id}', [ItemController::class, 'deleteItem'])->name('admin.delete-item');
 });
 
 /*------------------------------------------
