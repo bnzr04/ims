@@ -1,6 +1,6 @@
 <aside>
     <nav class="navbar navbar-expand navbar-dark flex-md-column align-items-start py-2">
-        <ul class="mb-0 p-0 text-white px-3" style="list-style:none">
+        <ul class="mb-0 p-0 text-white px-3" style="list-style:none;text-decoration:none;">
 
             {{--Admin links--}}
             @if( Auth::user()->type == 'admin' )
@@ -15,10 +15,10 @@
 
             {{--Manager links--}}
             @if( Auth::user()->type == 'manager' )
-            <li><a href="{{ route('manager.home') }}">Dashboard</a></li>
-            <li><a href="{{ route('manager.stocks') }}">Stocks</a></li>
-            <li><a href="{{ route('manager.deployment') }}">Deployment</a></li>
-            <li><a href="{{ route('manager.requests') }}">Requests</a></li>
+            <li><a href="{{ route('manager.home') }}" class="nav-link">Dashboard</a></li>
+            <li><a href="{{ route('manager.stocks') }}" class="nav-link">Stocks</a></li>
+            <li><a href="{{ route('manager.deployment') }}" class="nav-link">Deployment</a></li>
+            <li><a href="{{ route('manager.requests') }}" class="nav-link">Requests</a></li>
             @endif
 
             {{--User links--}}
@@ -27,7 +27,12 @@
             <li><a href="{{ route('user.request') }}">My Requests</a></li>
             @endif
 
-
+            @if(Auth::user())
+            <li><a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                    {{ __('Logout') }}
+                </a></li>
+            @endif
         </ul>
     </nav>
 </aside>

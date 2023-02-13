@@ -61,6 +61,7 @@
                 data: $("#item_form").serialize(),
                 success: function(response) {
                     $("#new_item").modal('hide');
+                    $(".modal-backdrop").hide();
                     $("#item_form")[0].reset();
                     alert('Item saved');
                 },
