@@ -21,7 +21,7 @@ use App\Http\Controllers\UserController;
 */
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', [HomeController::class, 'login'])->name('home');
+    Route::get('/', [HomeController::class, 'login'])->name('login');
 });
 
 
