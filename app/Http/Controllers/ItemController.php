@@ -29,11 +29,16 @@ class ItemController extends Controller
         $item->save();
     }
 
+    public function showItem($id)
+    {
+        $data = Item::find($id);
+        return view("admin.modals.edit-item")->with("item", $data);
+    }
+
     //This will delete the item
     public function deleteItem($id)
     {
         $item = Item::find($id);
         $item->delete();
-        return back();
     }
 }

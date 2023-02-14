@@ -52,27 +52,33 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#item_form').on('submit', function(event) {
-            event.preventDefault();
 
-            $.ajax({
-                type: "POST",
-                url: "/admin/save-item",
-                data: $("#item_form").serialize(),
-                success: function(response) {
-                    $('#new_item').on('hidden.bs.modal', function () {
-                        $('.modal-backdrop').remove(); 
-                        $('body').css('overflow', 'auto');
-                    });
+        storeNewItem();
 
-                    $('#new_item').modal('hide');
-                    $('#item_form')[0].reset();
-                    alert('Item saved');
-                },
-                error: function(error) {
-                    alert('Data not inserted');
-                }
+        function storeNewItem() {
+            $('#item_form').on('submit', function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/save-item",
+                    data: $("#item_form").serialize(),
+                    success: function(response) {
+                        $('#new_item').on('hidden.bs.modal', function() {
+                            $('.modal-backdrop').remove();
+                            $('body').css('overflow', 'auto');
+                        });
+
+                        $('#new_item').modal('hide');
+                        $('#item_form')[0].reset();
+                        alert('Item saved');
+                    },
+                    error: function(error) {
+                        alert('Data not inserted');
+                    }
+                });
             });
-        });
+        }
+
     });
 </script>

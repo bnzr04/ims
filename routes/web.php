@@ -20,7 +20,10 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/', [HomeController::class, 'login'])->name('home');
+Route::middleware('guest')->group(function () {
+    Route::get('/', [HomeController::class, 'login'])->name('home');
+});
+
 
 Auth::routes();
 
@@ -29,7 +32,7 @@ Auth::routes();
 All Normal Users Routes List
 --------------------------------------------
 --------------------------------------------*/
-Route::middleware(['auth', 'user-access:user'])->group(function () {
+Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function () {
 
     Route::get('/home', [UserController::class, 'userHome'])->name('user.home');
     Route::get('/my-requests', [UserController::class, 'userRequest'])->name('user.request');
