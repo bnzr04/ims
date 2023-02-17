@@ -4,13 +4,13 @@
 
             {{--Admin links--}}
             @if( Auth::user()->type == 'admin' )
-            <li><a href="" class="nav-link" data-view-name="admin.dashboard">Dashboard</a></li>
-            <li><a href="" class="nav-link" data-view-name="admin.users">Users</a></li>
-            <li><a href="" class="nav-link" data-view-name="admin.items">Items</a></li>
-            <li><a href="" class="nav-link" data-view-name="admin.stocks">Stocks</a></li>
-            <li><a href="" class="nav-link" data-view-name="admin.deployment">Deployment</a></li>
-            <li><a href="" class="nav-link" data-view-name="admin.userRequest">Requests</a></li>
-            <li><a href="" class="nav-link" data-view-name="admin.log">Log</a></li>
+            <li><a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
+            <li><a href="{{ route('admin.users') }}" class="nav-link">Users</a></li>
+            <li><a href="{{ route('admin.items') }}" class="nav-link">Items</a></li>
+            <li><a href="{{ route('admin.stocks') }}" class="nav-link">Stocks</a></li>
+            <li><a href="{{ route('admin.deployment') }}" class="nav-link">Deployment</a></li>
+            <li><a href="{{ route('admin.requests') }}" class="nav-link">Requests</a></li>
+            <li><a href="{{ route('admin.log') }}" class="nav-link">Log</a></li>
             @endif
 
             {{--Manager links--}}
@@ -36,3 +36,23 @@
         </ul>
     </nav>
 </aside>
+<!-- <script type="text/javascript">
+    $(document).ready(function() {
+
+        adminSidebar();
+
+        function adminSidebar() {
+            $('.nav-link').click(function(event) {
+                event.preventDefault();
+
+                var viewName = $(this).data('view-name');
+                var url = '/admin/sidebar/' + viewName;
+
+                $.get(url, function(data) {
+                    $('#content').html(data);
+                });
+            });
+        }
+
+    });
+</script> -->

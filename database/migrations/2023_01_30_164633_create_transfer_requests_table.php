@@ -16,8 +16,6 @@ return new class extends Migration
         Schema::create('transfer_requests', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('item_id');
-            $table->unsignedBigInteger('from_dept_id');
-            $table->unsignedBigInteger('to_dept_id');
             $table->integer('transfer_qty');
             $table->string('transfer_type');
             $table->string('approval_status')->default('pending');
@@ -26,16 +24,6 @@ return new class extends Migration
             $table->foreign('item_id')
                 ->references('id')
                 ->on('items')
-                ->onDelete('cascade');
-
-            $table->foreign('from_dept_id')
-                ->references('id')
-                ->on('departments')
-                ->onDelete('cascade');
-
-            $table->foreign('to_dept_id')
-                ->references('id')
-                ->on('departments')
                 ->onDelete('cascade');
         });
     }

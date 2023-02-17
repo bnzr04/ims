@@ -4,9 +4,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Add new user</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearForm()"></button>
             </div>
-            <form id="user_form">
+            <form action="{{ route('admin.save-user') }}" method="POST" id="user_form">
+                @csrf
                 <div class="modal-body">
                     <div class="container-sm mb-2">
                         <label for="name">Name</label>
@@ -20,7 +21,7 @@
 
                     <div class="container-sm mb-2">
                         <label for="password">Password</label>
-                        <input type="text" class="form-control" name="password" id="password" required>
+                        <input type="password" class="form-control" name="password" id="password" required>
                     </div>
 
                     <div class="container-sm mb-2">
@@ -33,21 +34,39 @@
                         </select>
                     </div>
 
-                    <div class="container-sm mb-2" id="department_div">
-                        <label for="user_dept">Department</label>
-                        <select name="user_dept" class="form-control" id="user_dept">
-                            <option value="">Select</option>
-                            <option value="0">Department 1</option>
-                            <option value="1">Department 2</option>
-                            <option value="2">Department 3</option>
+                    <div class="container-sm mb-2" id="department_div" style="display: none;">
+                        <label for="userdept">Department</label>
+                        <select name="userdept" class="form-control" id="userdept">
+                            <option value="0">Pharmacy</option>
+                            <option value="1">Csr</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearForm()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add user</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    deptShow();
+
+    function deptShow() {
+        const userTypeSelect = document.getElementById("usertype");
+        const departmentDiv = document.getElementById("department_div");
+
+        userTypeSelect.addEventListener("change", function() {
+            if (userTypeSelect.value === "0") {
+                departmentDiv.style.display = "block";
+            } else {
+                departmentDiv.style.display = "none";
+            }
+        });
+    }
+
+    function clearForm() {
+        document.getElementById("user_form").reset();
+    }
+</script>

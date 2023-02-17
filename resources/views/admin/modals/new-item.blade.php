@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="staticBackdropLabel">Add new item</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="item_form">
+            <form action="{{ route('admin.saveItem') }}" method="post">
                 @csrf
                 <div class="modal-body">
                     <div class="container-sm mb-2">
@@ -49,36 +49,3 @@
     </div>
 
 </div>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-
-        storeNewItem();
-
-        function storeNewItem() {
-            $('#item_form').on('submit', function(event) {
-                event.preventDefault();
-
-                $.ajax({
-                    type: "POST",
-                    url: "/admin/save-item",
-                    data: $("#item_form").serialize(),
-                    success: function(response) {
-                        $('#new_item').on('hidden.bs.modal', function() {
-                            $('.modal-backdrop').remove();
-                            $('body').css('overflow', 'auto');
-                        });
-
-                        $('#new_item').modal('hide');
-                        $('#item_form')[0].reset();
-                        alert('Item saved');
-                    },
-                    error: function(error) {
-                        alert('Data not inserted');
-                    }
-                });
-            });
-        }
-
-    });
-</script>

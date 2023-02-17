@@ -39,7 +39,7 @@
     <!--Jquery-->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha512-YUkaLm+KJ5lQXDBdqBqk7EVhJAdxRnVdT2vtCzwPHSweCzyMgYV/tgGF4/dCyqtCC2eCphz0lRQgatGVdfR0ww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="text/javascript">
+    <!-- <script type="text/javascript">
         $(document).ready(function() {
 
             $.ajaxSetup({
@@ -47,9 +47,6 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-
-            adminSidebar();
-            adminHome();
 
 
             /* ADMIN FUNCTIONS START */
@@ -67,16 +64,10 @@
                 });
             }
 
-            function adminHome() {
-                $.get("{{ route('admin.dashboard')}}", function(data) {
-                    $('#content').html(data);
-                });
-            }
-
 
 
         });
-    </script>
+    </script> -->
 </body>
 
 </html>

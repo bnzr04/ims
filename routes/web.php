@@ -7,7 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\SidebarController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\UsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,15 +49,17 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/sidebar/{view_name}', [SidebarController::class, 'showView']);
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/home', [AdminController::class, 'adminHome'])->name('admin.home');
-    Route::get('/items', [ItemController::class, 'showItems'])->name('admin.items');
+    Route::get('/show-items', [ItemController::class, 'showAllItems'])->name('admin.items');
     Route::get('/item-stocks', [AdminController::class, 'stocks'])->name('admin.stocks');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'userRequest'])->name('admin.requests');
-    Route::get('/users', [UserController::class, 'showUser'])->name('admin.users');
+    Route::get('/users', [UsersController::class, 'users'])->name('admin.users');
+    Route::post('/save-user', [UsersController::class, 'saveUser'])->name('admin.save-user');
     Route::get('/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.edit-user');
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
-    Route::get('/edit-item/{id}', [AdminController::class, 'editItem'])->name('admin.edit-item');
+    Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.showItem');
+    Route::post('/update-item/{id}', [ItemController::class, 'updateItem'])->name('admin.update-item');
     Route::get('/delete-item/{id}', [ItemController::class, 'deleteItem'])->name('admin.delete-item');
 });
 

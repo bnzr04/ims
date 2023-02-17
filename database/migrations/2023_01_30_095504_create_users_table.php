@@ -18,17 +18,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('username')->unique();
             $table->string('password');
-            $table->unsignedBigInteger('dept_id')->nullable();
-            /* Users: 0=>User, 1=>Admin, 2=>COntroller */
+            /* Departments: 0=>Pharmacy, 1=>Csr */
+            $table->tinyInteger('department')->nullable();
+            /* Users: 0=>User, 1=>Admin, 2=>Manager */
             $table->tinyInteger('type')->default(0);
             $table->rememberToken();
             $table->timestamps();
-
-            /* Foreign Key from department table */
-            $table->foreign('dept_id')
-                ->references('id')
-                ->on('departments')
-                ->onDelete('cascade');
         });
     }
 

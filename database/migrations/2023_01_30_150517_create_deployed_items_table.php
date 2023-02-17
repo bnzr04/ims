@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('deployed_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('item_id'); //foreign key from items table 'id'
-            $table->unsignedBigInteger('dept_id'); //foreign key from department table 'id'
             $table->integer('deployed_qty');
             $table->integer('available_qty');
             $table->timestamps();
@@ -25,10 +24,6 @@ return new class extends Migration
             $table->foreign('item_id')
                 ->references('id')
                 ->on('items')
-                ->onDelete('cascade');
-            $table->foreign('dept_id')
-                ->references('id')
-                ->on('departments')
                 ->onDelete('cascade');
         });
     }
