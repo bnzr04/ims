@@ -34,11 +34,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if($items === 0)
-                        <tr id="no_data_row" style="display: none;">
-                            <td colspan="8">No data saved...</td>
-                        </tr>
-                        @endif
                         @forelse($items as $item)
                         <tr>
                             <th>{{ $item->id }}</th>
@@ -49,7 +44,7 @@
                             <td>{{ $item->item_salvage_cost }}</td>
                             <td>{{ $item->item_useful_life }}</td>
                             <td>
-                                <a href="{{route('admin.showItem', $item->id)}}" class="btn btn-success">Edit</a>
+                                <a href="{{route('admin.show-user', $item->id)}}" class="btn btn-success">Edit</a>
                                 <a href="{{route('admin.delete-item', $item->id)}}" class="btn btn-danger">Delete</a>
                             </td>
                         </tr>

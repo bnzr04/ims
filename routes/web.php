@@ -8,6 +8,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\SidebarController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +47,7 @@ All Admin Routes List
 
 Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(function () {
 
-    Route::get('/sidebar/{view_name}', [SidebarController::class, 'showView']);
+    // Route::get('/sidebar/{view_name}', [SidebarController::class, 'showView']);
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/home', [AdminController::class, 'adminHome'])->name('admin.home');
     Route::get('/show-items', [ItemController::class, 'showAllItems'])->name('admin.items');
@@ -54,8 +55,10 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'userRequest'])->name('admin.requests');
     Route::get('/users', [UsersController::class, 'users'])->name('admin.users');
+    Route::get('/new-user', [UsersController::class, 'newUser'])->name('admin.new-user');
+    Route::get('/show-user/{id}', [UsersController::class, 'showUser'])->name('admin.show-user');
     Route::post('/save-user', [UsersController::class, 'saveUser'])->name('admin.save-user');
-    Route::get('/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.edit-user');
+    Route::post('/update-user/{id}', [UsersController::class, 'updateUser'])->name('admin.update-user');
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
     Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.showItem');

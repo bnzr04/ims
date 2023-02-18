@@ -20,8 +20,9 @@ return new class extends Migration
             $table->string('password');
             /* Departments: 0=>Pharmacy, 1=>Csr */
             $table->tinyInteger('department')->nullable();
+
             /* Users: 0=>User, 1=>Admin, 2=>Manager */
-            $table->tinyInteger('type')->default(0);
+            $table->tinyInteger('type');
             $table->rememberToken();
             $table->timestamps();
         });

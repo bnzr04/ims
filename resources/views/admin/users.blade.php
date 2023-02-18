@@ -10,13 +10,20 @@
             <div id="content" class="px-2 py-1">
                 <h1>Users</h1>
                 <div class="mt-3 mb-3 d-flex justify-content-between">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new-user-modal">New User</button>
-                    @include('admin.modals.user.new-user')
+                    <a href="{{ route('admin.new-user') }}" class="btn btn-primary">New User</a>
 
                     <div class="input-group flex-nowrap" style="width: 270px;">
                         <span class="input-group-text" id="addon-wrapping">Search</span>
                         <input type="text" class="form-control bg-white" placeholder="" aria-label="search" aria-describedby="addon-wrapping">
                     </div>
+                </div>
+                <div class="container-lg p-0 mb-2">
+                    <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item"><a href="">All</a></li>
+                        <li class="list-group-item"><a href="">Admins</a></li>
+                        <li class="list-group-item"><a href="">Managers</a></li>
+                        <li class="list-group-item"><a href="">Users</a></li>
+                    </ul>
                 </div>
                 <table class="table">
                     <thead>
@@ -45,7 +52,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($users as $user)
+                        @forelse($users as $user)
                         <tr>
                             <th scope="row">
                                 {{ $user->id }}
@@ -67,12 +74,16 @@
                             </td>
                             <td>
                                 <div class="d-grid gap-2 d-md-block">
-                                    <a href="{{ route('admin.edit-user', ['id' => $user->id]) }}" class="btn btn-success" type="button">Edit</a>
+                                    <a href="{{ route('admin.show-user', ['id' => $user->id]) }}" class="btn btn-success">Edit</a>
                                     <button class="btn btn-danger" type="button">Delete</button>
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr colspan="7">
+                            No User data
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 </td>

@@ -27,47 +27,11 @@
 </head>
 
 <body>
-    <div id="app">
-        <div>
-            @yield('content')
-        </div>
-    </div>
+
+    @yield('content')
 
     <!-- Bootstrap css -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-    <!--Jquery-->
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha512-YUkaLm+KJ5lQXDBdqBqk7EVhJAdxRnVdT2vtCzwPHSweCzyMgYV/tgGF4/dCyqtCC2eCphz0lRQgatGVdfR0ww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- <script type="text/javascript">
-        $(document).ready(function() {
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-
-            /* ADMIN FUNCTIONS START */
-
-            function adminSidebar() {
-                $('.nav-link').click(function(event) {
-                    event.preventDefault();
-
-                    var viewName = $(this).data('view-name');
-                    var url = '/admin/sidebar/' + viewName;
-
-                    $.get(url, function(data) {
-                        $('#content').html(data);
-                    });
-                });
-            }
-
-
-
-        });
-    </script> -->
 </body>
 
 </html>
