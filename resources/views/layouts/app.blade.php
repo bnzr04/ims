@@ -23,6 +23,11 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 
 </head>
 

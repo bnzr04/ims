@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Session;
 
                             <div class="container-sm mb-2">
                                 <label for="type">User type</label>
-                                <select name="type" class="form-control" id="type">
+                                <select name="type" class="form-control" id="type" style="text-transform:capitalize;">
                                     <!-- if $user->type is equal to user value = 0 else if $user->type is equal to admin value = 1 else if the $user->type is manager the value = 2 -->
                                     <option value="{{ $user->type == 'user' ? 0 : ( $user->type == 'admin' ? 1 : ( $user->type == 'manager' ? 2 : '') )  }}">{{ $user->type }}</option>
                                     <option value="0">User</option>
@@ -42,10 +42,10 @@ use Illuminate\Support\Facades\Session;
                                 @enderror
                             </div>
 
-                            <div class="container-sm mb-4" id="department_div">
+                            <div class="container-sm mb-4" id="department_div" style="display: none;">
                                 <label for="department">Department</label>
-                                <select name="department" class="form-control" id="department">
-                                    <option value="{{ $user->department == 'pharmacy' ? 0 : ( $user->department == 'csr' ? 1 : '' ) }}">{{ $user->department }}</option>
+                                <select name="department" class="form-control" id="department" style="text-transform:capitalize;">
+                                    <option value="{{ $user->department == 'pharmacy' ? 0 : ( $user->department == 'csr' ? 1 : '' ) }}">{{ $user->type == 'user' ? $user->department : '' }}</option>
                                     <option value="0">Pharmacy</option>
                                     <option value="1">Csr</option>
                                 </select>
@@ -104,14 +104,16 @@ use Illuminate\Support\Facades\Session;
         </div>
     </div>
 </div>
-@endsection
-
-<script type="text/javascript">
+<script>
     deptShow();
 
     function deptShow() {
-        const userTypeSelect = document.getElementById("usertype");
+        const userTypeSelect = document.getElementById("type");
         const departmentDiv = document.getElementById("department_div");
+
+        if (userTypeSelect.value === '0') {
+            departmentDiv.style.display = "block";
+        }
 
         userTypeSelect.addEventListener("change", function() {
             if (userTypeSelect.value === "0") {
@@ -122,3 +124,4 @@ use Illuminate\Support\Facades\Session;
         });
     }
 </script>
+@endsection

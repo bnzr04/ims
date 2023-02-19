@@ -14,6 +14,11 @@ class ItemController extends Controller
         return view("admin.items")->with("items", $items);
     }
 
+    public function newItem()
+    {
+        return view("admin.sub-page.items.new-item");
+    }
+
     //This will add new item in database
     public function saveItem(Request $request)
     {

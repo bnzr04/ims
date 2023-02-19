@@ -47,19 +47,29 @@ All Admin Routes List
 
 Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(function () {
 
-    // Route::get('/sidebar/{view_name}', [SidebarController::class, 'showView']);
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/home', [AdminController::class, 'adminHome'])->name('admin.home');
-    Route::get('/show-items', [ItemController::class, 'showAllItems'])->name('admin.items');
     Route::get('/item-stocks', [AdminController::class, 'stocks'])->name('admin.stocks');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'userRequest'])->name('admin.requests');
+    Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
+
+    //User module routes
     Route::get('/users', [UsersController::class, 'users'])->name('admin.users');
     Route::get('/new-user', [UsersController::class, 'newUser'])->name('admin.new-user');
     Route::get('/show-user/{id}', [UsersController::class, 'showUser'])->name('admin.show-user');
     Route::post('/save-user', [UsersController::class, 'saveUser'])->name('admin.save-user');
     Route::post('/update-user/{id}', [UsersController::class, 'updateUser'])->name('admin.update-user');
-    Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
+    Route::get('/to-delete-user/{id}', [UsersController::class, 'toDeleteUser'])->name('admin.to-delete-user');
+    Route::post('/delete-user/{id}', [UsersController::class, 'deleteUser'])->name('admin.delete-user');
+
+    //Item module routes
+    Route::get('/show-items', [ItemController::class, 'showAllItems'])->name('admin.items');
+    Route::get('/new-item', [ItemController::class, 'newItem'])->name('admin.new-item');
+
+
+
+
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
     Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.showItem');
     Route::post('/update-item/{id}', [ItemController::class, 'updateItem'])->name('admin.update-item');

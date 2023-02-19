@@ -10,8 +10,7 @@
             <div id="content" class="px-2 py-1">
                 <h2>ITEMS</h2>
                 <div class="mt-3 d-flex justify-content-between">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new_item">New Item</button>
-                    @include('admin.modals.new-item')
+                    <a href="{{ route('admin.new-item') }}" class="btn btn-primary">New Item</a>
 
                     <div class="input-group flex-nowrap" style="width: 270px;">
                         <span class="input-group-text" id="addon-wrapping">Search</span>

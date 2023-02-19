@@ -7,7 +7,9 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 py-1"></div>
+            <div id="content" class="px-2 py-1">
+                <!--content must be inserted here-->
+            </div>
         </div>
     </div>
 </div>

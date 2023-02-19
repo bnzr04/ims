@@ -8,7 +8,7 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <h2>ITEM STOCKS</h2>
+                <h2>STOCKS</h2>
                 <div class="mt-3 d-flex justify-content-between">
                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newItem">New Item</button>
                     @include('admin.modals.new-item')
