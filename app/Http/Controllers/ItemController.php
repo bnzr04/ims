@@ -4,16 +4,48 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Item;
+use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
     //This will show all the saved items
-    public function showAllItems()
+    public function showAllItems(Request $request)
     {
-        $items = Item::all();
-        return view("admin.items")->with("items", $items);
+        //This will get the request from input category
+        $category = $request->input('category');
+
+        //This will get the database table item
+        $items = Item::query();
+
+        if ($category) {
+            $items = $items->where('category', $category);
+        }
+
+        if ($category === 'medicine') {
+            $items = $items->select(
+                'id',
+                'name',
+                'description',
+                'category',
+                'price',
+            );
+        } elseif ($category === 'medical supplies') {
+            $items = $items->select(
+                'id',
+                'name',
+                'description',
+                'category',
+                'price',
+            );
+        } else {
+            $items = $items->select('*');
+        }
+
+        $items = $items->get();
+        return view('admin.items', ['items' => $items, 'category' => $category]);
     }
 
+    //This will view new item page
     public function newItem()
     {
         return view("admin.sub-page.items.new-item");
@@ -24,34 +56,44 @@ class ItemController extends Controller
     {
         $item = new Item;
 
-        $item->item_name = $request->name;
-        $item->item_description = $request->description;
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'description' => 'required',
+            'category' => 'required',
+            'price' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        };
+
+        $item->name = $request->name;
+        $item->description = $request->description;
         $item->category = $request->category;
-        $item->item_cost = $request->cost;
-        $item->item_salvage_cost = $request->salvage_cost;
-        $item->item_useful_life = $request->useful_life;
+        $item->price = $request->price;
         $item->save();
-        return back();
+        return back()->with('success', 'Item successfully added.');
     }
 
     //This will show the item depending on id
     public function showItem($id)
     {
-        $data = Item::find($id);
-        return view("admin.modals.edit-item")->with("data", $data);
+        $item = Item::find($id);
+        return view("admin.sub-page.items.edit-item")->with("item", $item);
     }
 
+    //This will update the details of item
     public function updateItem(Request $request, $id)
     {
         $item = Item::find($id);
-        $item->item_name = $request->itemName;
-        $item->item_description = $request->itemDescription;
+        $item->name = $request->name;
+        $item->description = $request->description;
         $item->category = $request->category;
-        $item->item_cost = $request->cost;
-        $item->item_salvage_cost = $request->salvageCost;
-        $item->item_useful_life = $request->usefulLife;
+        $item->price = $request->price;
         $item->save();
-        return redirect()->route('admin.items');
+        return back()->with('success', 'Details updated.');
     }
 
     //This will delete the item

@@ -43,7 +43,7 @@ class UsersController extends Controller
             'username' => 'required|unique:users',
             'password' => 'required|min:6',
             'type' => 'required|in:0,1,2',
-            'department' => $request->usertype == 0 ? 'required|in:0,1' : '',
+            'department' => $request->type == 0 ? 'required|in:0,1' : '',
         ]);
 
         if ($validator->fails()) {

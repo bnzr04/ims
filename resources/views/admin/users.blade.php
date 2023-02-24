@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Session;
             <div id="content" class="px-2 py-1">
                 <h2>Users</h2>
                 <div class="mt-3 mb-3 d-flex justify-content-between">
-                    <a href="{{ route('admin.new-user') }}" class="btn btn-primary">Add User</a>
+                    <a href="{{ route('admin.new-user') }}" class="btn btn-success">Add User</a>
 
                     <div class="input-group flex-nowrap" style="width: 270px;">
                         <span class="input-group-text" id="addon-wrapping">Search</span>
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Session;
                     </ul>
                 </div>
                 <table class="table">
-                    <thead>
+                    <thead class="bg-success text-white">
                         <tr>
                             <th scope="col">
                                 User ID

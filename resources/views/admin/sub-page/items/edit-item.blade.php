@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Facades\Session
+@endphp
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
@@ -9,48 +12,58 @@
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 <h1 class="mb-2">Edit Item</h1>
-                <form action="{{ route('admin.update-item', ['id' => $data->id]) }}" method="post" class="container-sm">
+                <form action="{{ route('admin.update-item', ['id' => $item->id]) }}" method="post" class="container-sm">
                     @csrf
                     <div class="container-sm mb-1">
-                        <label for="item-id">Item ID</label>
-                        <input type="text" class="form-control" name="item-id" id="item-id" disabled value="{{ $data->id }}">
+                        <label for="id">Item ID</label>
+                        <input type="text" class="form-control" name="id" id="id" disabled value="{{ $item->id }}">
                     </div>
 
                     <div class="container-sm mb-1">
-                        <label for="item-name">Item name</label>
-                        <input type="text" class="form-control" name="itemName" id="item-name" required value="{{ $data->item_name }}">
+                        <label for="name">Item name</label>
+                        <input type="text" class="form-control" name="name" id="name" required value="{{ $item->name }}">
+                    </div>
+
+                    <div class="container-sm mb-1">
+                        <label for="description">Item description</label>
+                        <textarea class="form-control" name="description" id="description" required>{{ $item->description }}</textarea>
                     </div>
 
                     <div class="container-sm mb-1">
                         <label for="category">Item category</label>
-                        <input type="text" class="form-control" name="category" id="category" required value="{{ $data->category }}">
+                        <select name="category" class="text-capitalize form-select" id="category">
+                            @if($item->category === 'medicine')
+                            <option value="medicine" selected>Medicine</option>
+                            <option value="medical supply">Medical Supply</option>
+                            @endif
+                            @if($item->category === 'medical supply')
+                            <option value="medical supply" selected>Medical Supply</option>
+                            <option value="medicine">Medicine</option>
+                            @endif
+                        </select>
                     </div>
 
                     <div class="container-sm mb-1">
-                        <label for="item-description">Item description</label>
-                        <textarea class="form-control" name="itemDescription" id="item-description" required>{{ $data->item_description }}</textarea>
+                        <label for="price">Cost</label>
+                        <input type="text" class="form-control" name="price" id="price" required value="{{ $item->price }}">
                     </div>
 
-                    <div class="container-sm mb-1">
-                        <label for="item-cost">Cost</label>
-                        <input type="text" class="form-control" name="cost" id="item-cost" required value="{{ $data->item_cost }}">
+                    @if(session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
                     </div>
+                    @endif
 
-                    <div class="container-sm mb-1">
-                        <label for="salvage-cost">Salvage cost</label>
-                        <input type="text" class="form-control" name="salvageCost" id="salvage-cost" required value="{{ $data->item_salvage_cost }}">
+                    @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
                     </div>
-
-                    <div class="container-sm mb-2">
-                        <label for="useful-life">Useful life</label>
-                        <input type="number" min='0' class="form-control" name="usefulLife" id="useful-life" required value="{{ $data->item_useful_life }}">
-                    </div>
+                    @endif
 
                     <div class="container-sm">
                         <a href="{{ route('admin.items') }}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </div>
-
                 </form>
             </div>
         </div>

@@ -5,8 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Item extends Model
+class Stock extends Model
 {
     use HasFactory;
+    protected $table = "item_stocks";
     protected $fillable = [];
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
 }

@@ -23,13 +23,7 @@ class AdminController extends Controller
     public function editItem($id)
     {
         $item = Item::find($id);
-        return view('admin.modals.edit-item')->with('item', $item);
-    }
-
-    public function stocks()
-    {
-        $items = Item::all();
-        return view('admin.stocks')->with(compact('items'));
+        return view('admin.sub-page.items.edit-item')->with('item', $item);
     }
 
     public function deployment()

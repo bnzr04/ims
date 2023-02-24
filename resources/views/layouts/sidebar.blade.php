@@ -7,7 +7,6 @@
             <li><a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
             <li><a href="{{ route('admin.users') }}" class="nav-link">Users</a></li>
             <li><a href="{{ route('admin.items') }}" class="nav-link">Items</a></li>
-            <li><a href="{{ route('admin.stocks') }}" class="nav-link">Stocks</a></li>
             <li><a href="{{ route('admin.deployment') }}" class="nav-link">Deployment</a></li>
             <li><a href="{{ route('admin.requests') }}" class="nav-link">Requests</a></li>
             <li><a href="{{ route('admin.log') }}" class="nav-link">Log</a></li>

@@ -10,41 +10,67 @@
             <div id="content" class="px-2 py-1">
                 <h2>ITEMS</h2>
                 <div class="mt-3 d-flex justify-content-between">
-                    <a href="{{ route('admin.new-item') }}" class="btn btn-primary">New Item</a>
+                    <div class="container-sm">
+                        <a href="{{ route('admin.new-item') }}" class="btn btn-success">New Item</a>
+                        <a href="{{ route('admin.stocks') }}" class="btn btn-secondary">Stocks</a>
+                    </div>
 
-                    <div class="input-group flex-nowrap" style="width: 270px;">
-                        <span class="input-group-text" id="addon-wrapping">Search</span>
+                    <div class="input-group flex-nowrap">
                         <input type="text" class="form-control bg-white" placeholder="" aria-label="search" aria-describedby="addon-wrapping">
+                        <button class="btn btn-secondary">Search</button>
                     </div>
 
                 </div>
 
+                <div class="container-sm mt-2">
+                    <form action="{{ route('admin.items') }}" method="get">
+                        <label for="category">Item Category</label>
+                        <div class="container-sm p-0 d-flex input-group">
+                            <select name="category" class="form-select text-capitalize" id="category">
+                                @if(!$category == true)
+                                <option value="" selected>All</option>
+                                <option value="medicine">Medicine</option>
+                                <option value="medical supply">Medical Supply</option>
+                                @endif
+                                @if($category === 'medicine')
+                                <option value="medicine" selected>Medicine</option>
+                                <option value="">All</option>
+                                <option value="medical supply">Medical Supply</option>
+                                @endif
+                                @if($category === 'medical supply')
+                                <option value="medical supply" selected>Medical Supply</option>
+                                <option value="">All</option>
+                                <option value="medicine">Medicine</option>
+                                @endif
+                            </select>
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                        </div>
+                    </form>
+                </div>
+
                 <table class="table mt-2 overflow-x-auto" id="items_table">
-                    <thead>
+                    <thead class="bg-success text-white">
                         <tr>
                             <th scope="col">Item ID</th>
                             <th scope="col">Item Name</th>
                             <th scope="col">Description</th>
+                            <th scope="col">Price</th>
                             <th scope="col">Category</th>
-                            <th scope="col">Cost</th>
-                            <th scope="col">S. Cost</th>
-                            <th scope="col">Useful Life</th>
-                            <th scope="col">Actions</th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($items as $item)
                         <tr>
                             <th>{{ $item->id }}</th>
-                            <td>{{ $item->item_name }}</td>
-                            <td>{{ $item->item_description }}</td>
-                            <td>{{ $item->category }}</td>
-                            <td>{{ $item->item_cost }}</td>
-                            <td>{{ $item->item_salvage_cost }}</td>
-                            <td>{{ $item->item_useful_life }}</td>
+                            <td class="text-capitalize">{{ $item->name }}</td>
+                            <td class="text-capitalize">{{ $item->description }}</td>
+                            <td>{{ $item->price }}</td>
+                            <td class="text-capitalize">{{ $item->category }}</td>
                             <td>
-                                <a href="{{route('admin.show-user', $item->id)}}" class="btn btn-success">Edit</a>
-                                <a href="{{route('admin.delete-item', $item->id)}}" class="btn btn-danger">Delete</a>
+                                <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary" title="Add to stocks">+</a>
+                                <a href="{{route('admin.show-item', ['id' => $item->id])}}" class="btn btn-success">Edit</a>
+                                <a href="{{route('admin.delete-item', ['id' => $item->id])}}" class="btn btn-danger" onclick="deleteUser()">Delete</a>
                             </td>
                         </tr>
                         @empty
@@ -61,4 +87,11 @@
         </div>
     </div>
 </div>
+<script>
+    function deleteUser() {
+        if (!confirm("Are you sure you want to delete this item?\nThis item will be deleted even in the stocks if it's added.")) {
+            event.preventDefault();
+        };
+    }
+</script>
 @endsection

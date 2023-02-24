@@ -8,11 +8,9 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
+                <a href="{{ route('admin.items') }}" class="btn btn-secondary mt-2 mb-4">Back</a>
                 <h2>STOCKS</h2>
                 <div class="mt-3 d-flex justify-content-between">
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newItem">New Item</button>
-                    @include('admin.modals.new-item')
-
                     <div class="input-group flex-nowrap" style="width: 270px;">
                         <span class="input-group-text" id="addon-wrapping">Search</span>
                         <input type="text" class="form-control bg-white" placeholder="" aria-label="search" aria-describedby="addon-wrapping">
@@ -20,31 +18,42 @@
                 </div>
 
                 <table class="table mt-2">
-                    <thead>
+                    <thead class="bg-success text-white">
                         <tr>
+                            <th scope="col">ID</th>
                             <th scope="col">Item ID</th>
                             <th scope="col">Item Name</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Category</th>
                             <th scope="col">Stocks</th>
-                            <th scope="col">Last Stocked</th>
+                            <th scope="col">Exp Date</th>
+                            <th scope="col">Stock Date</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse( $stocks as $stock )
                         <tr>
-                            <th scope="row">1</th>
-                            <td>sample</td>
-                            <td>description</td>
-                            <td>sample</td>
-                            <td>5.</td>
-                            <td>01-25-2023.</td>
+                            <th scope="row">{{ $stock->id }}</th>
+                            <th scope="row">{{ $stock->item_id }}</th>
+                            <td>{{ $stock->name }}</td>
+                            <td>{{ $stock->description }}</td>
+                            <th>{{ $stock->stock_qty }}</th>
+                            <th>{{ $stock->exp_date }}</th>
+                            <td>{{ $stock->created_at}}</td>
                             <td>
                                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addStocks">Add Stocks</button>
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editItem">Edit</button>
                                 <button type="button" class="btn btn-danger">Delete</button>
                             </td>
                         </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7">
+                                No Item stock...
+                            </td>
+
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

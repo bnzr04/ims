@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Session;
                             <div class="container-sm mb-2">
                                 <label for="type">User type</label>
                                 <select name="type" class="form-control" id="type">
-                                    <option value="">Select</option>
+                                    <option value="{{ old('type') }}">{{ old('type') == '' ? 'Select' : ( old('type') == '0' ? 'User' : ( old('type') == '1' ? 'Admin' : ( old('type') == '2' ? 'Manager' : '' )) ) }}</option>
                                     <option value="0">User</option>
                                     <option value="1">Admin</option>
                                     <option value="2">Manager</option>
@@ -100,6 +100,10 @@ use Illuminate\Support\Facades\Session;
         const userTypeSelect = document.getElementById("type");
         const departmentDiv = document.getElementById("department_div");
 
+        if (userTypeSelect.value === '0') {
+            departmentDiv.style.display = "block";
+        }
+
         userTypeSelect.addEventListener("change", function() {
             if (userTypeSelect.value === "0") {
                 departmentDiv.style.display = "block";
@@ -107,10 +111,6 @@ use Illuminate\Support\Facades\Session;
                 departmentDiv.style.display = "none";
             }
         });
-    }
-
-    function click() {
-        alert("clicked");
     }
 </script>
 @endsection

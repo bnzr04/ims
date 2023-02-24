@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
 
      */
-    protected $fillable = ['name', 'username', 'password', 'department', 'type'];
+    protected $fillable = ['name', 'username', 'password', 'type'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -40,19 +40,6 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    /**
-     * Interact with the department
-     *
-     * @param  string  $value
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
-     */
-    protected function department(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) =>  $value === 0 ? "pharmacy" : ($value === 1 ? "csr" : ""),
-        );
-    }
 
     /**
      * Interact with the user's type

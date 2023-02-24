@@ -14,9 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('item_stocks', function (Blueprint $table) {
+            $table->id('id');
             $table->unsignedBigInteger('item_id');
             $table->integer('stock_qty');
-            $table->integer('reoder_qty');
+            $table->date('exp_date')->nullable();
             $table->timestamps();
 
             //Foreign key itemId from item table

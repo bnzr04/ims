@@ -18,9 +18,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('username')->unique();
             $table->string('password');
-            /* Departments: 0=>Pharmacy, 1=>Csr */
-            $table->tinyInteger('department')->nullable();
-
             /* Users: 0=>User, 1=>Admin, 2=>Manager */
             $table->tinyInteger('type');
             $table->rememberToken();

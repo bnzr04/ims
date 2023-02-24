@@ -15,36 +15,53 @@
                         <div class="modal-body">
                             <div class="container-sm mb-2">
                                 <label for="name">Item name</label>
-                                <input type="text" class="form-control" name="name" id="name" required>
-                            </div>
-
-                            <div class="container-sm mb-2">
-                                <label for="category">Item category</label>
-                                <input type="text" class="form-control" name="category" id="category" required>
+                                <input type="text" class="form-control" name="name" id="name" value="{{ old('name') }}">
+                                @error('name')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="container-sm mb-2">
                                 <label for="description">Item description</label>
-                                <textarea class="form-control" name="description" id="description" required></textarea>
+                                <textarea class="form-control" name="description" id="description">{{ old('description') }}</textarea>
+                                @error('description')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="container-sm mb-2">
-                                <label for="cost">Cost</label>
-                                <input type="text" class="form-control" name="cost" id="cost" required>
+                                <label for="category">Item category</label>
+                                <select name="category" class="form-select" id="category">
+                                    <option value="{{ old('name') }}">{{ old('name') == true ? old('category') : 'Select' }}</option>
+                                    <option value="medicine">Medicine</option>
+                                    <option value="medical supply">Medical Supply</option>
+                                </select>
+                                @error('category')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="container-sm mb-2">
-                                <label for="salvage_cost">Salvage cost</label>
-                                <input type="text" class="form-control" name="salvage_cost" id="salvage_cost" required>
-                            </div>
-
-                            <div class="container-sm mb-2">
-                                <label for="useful_life">Useful life</label>
-                                <input type="number" min='0' class="form-control" name="useful_life" id="useful_life" required>
+                                <label for="price">Item Price</label>
+                                <input type="number" class="form-control" name="price" id="price" value="{{ old('price') }}">
+                                @error('price')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
+                        @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                        @endif
+
+                        @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                        @endif
                         <div class="container-sm">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                            <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
                             <button type="submit" class="btn btn-primary" id="unique">Add Item</button>
                         </div>
                     </form>

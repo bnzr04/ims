@@ -31,14 +31,7 @@ class CreateUsersSeeder extends Seeder
             [
                 'name' => 'User',
                 'username' => 'user',
-                'department' => 1,
                 'type' => 0,
-                'password' => bcrypt('123456'),
-            ],
-            [
-                'name' => 'Admin User 2',
-                'username' => 'admin1',
-                'type' => 1,
                 'password' => bcrypt('123456'),
             ],
         ];

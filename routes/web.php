@@ -6,7 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ManagerController;
-use App\Http\Controllers\SidebarController;
+use App\Http\Controllers\StocksController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UserController;
 
@@ -49,7 +49,6 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/home', [AdminController::class, 'adminHome'])->name('admin.home');
-    Route::get('/item-stocks', [AdminController::class, 'stocks'])->name('admin.stocks');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'userRequest'])->name('admin.requests');
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
@@ -64,16 +63,17 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::post('/delete-user/{id}', [UsersController::class, 'deleteUser'])->name('admin.delete-user');
 
     //Item module routes
-    Route::get('/show-items', [ItemController::class, 'showAllItems'])->name('admin.items');
+    Route::get('/items', [ItemController::class, 'showAllItems'])->name('admin.items');
     Route::get('/new-item', [ItemController::class, 'newItem'])->name('admin.new-item');
-
-
-
-
+    Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.show-item');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
-    Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.showItem');
     Route::post('/update-item/{id}', [ItemController::class, 'updateItem'])->name('admin.update-item');
     Route::get('/delete-item/{id}', [ItemController::class, 'deleteItem'])->name('admin.delete-item');
+
+    //Stocks module routes
+    Route::get('/stocks', [StocksController::class, 'stocks'])->name('admin.stocks');
+    Route::get('/add-to-stocks/{id}', [StocksController::class, 'addToStocks'])->name('admin.add-to-stocks');
+    Route::post('/save-stock', [StocksController::class, 'saveStock'])->name('admin.save-stock');
 });
 
 /*------------------------------------------

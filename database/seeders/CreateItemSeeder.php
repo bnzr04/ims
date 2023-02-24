@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Item;
+use Carbon\Carbon;
 use GuzzleHttp\Promise\Create;
 
 class CreateItemSeeder extends Seeder
@@ -16,32 +17,33 @@ class CreateItemSeeder extends Seeder
      */
     public function run()
     {
-        $items = [
+        $items =
             [
-                'item_name' => 'Rgb Mouse',
-                'item_description' => 'Mouse Computer with rgb lights',
-                'category' => 'Computer Equipment',
-                'item_cost' => 550,
-                'item_salvage_cost' => 30,
-                'item_useful_life' => 1
-            ],
-            [
-                'item_name' => 'Computer Monitor',
-                'item_description' => '24 inch Computer monitor',
-                'category' => 'Computer Equipment',
-                'item_cost' => 3450,
-                'item_salvage_cost' => 500,
-                'item_useful_life' => 2
-            ],
-            [
-                'item_name' => 'HDMI Cable',
-                'item_description' => '6 meters hdmi cable',
-                'category' => 'Computer Equipment',
-                'item_cost' => 250,
-                'item_salvage_cost' => 20,
-                'item_useful_life' => 2
-            ],
-        ];
+                [
+                    'name' => 'Metronidazole',
+                    'description' => '500mg',
+                    'category' => 'medicine',
+                    'price' => 45.99,
+                ],
+                [
+                    'name' => 'Ethyl Alcohol',
+                    'description' => '70% solution, 150ml',
+                    'category' => 'medical supply',
+                    'price' => 25,
+                ],
+                [
+                    'name' => 'Dextrose',
+                    'description' => '1 liter',
+                    'category' => 'medical supply',
+                    'price' => 100,
+                ],
+                [
+                    'name' => 'Omeprazole',
+                    'description' => '500mg',
+                    'category' => 'medicine',
+                    'price' => 24.50,
+                ],
+            ];
 
         foreach ($items as $key => $item) {
             Item::create($item);
