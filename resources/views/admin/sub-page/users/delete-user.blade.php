@@ -51,12 +51,15 @@ use Illuminate\Support\Facades\Session;
                                             {{ $user->type }}
                                         </td>
                                         <td>
-                                            {{ $user->department }}
+                                            {{ $user->dept }}
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
 
+                            <div class="container-sm">
+                                <div class="alert alert-warning">Deleting this account will be removed to database.</div>
+                            </div>
                             <div class="container-sm mb-2">
                                 <label for="admin_password">Admin Password</label>
                                 <input type="password" class="form-control" name="admin_password" id="admin_password">

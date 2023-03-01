@@ -27,7 +27,14 @@
                         <label for="category">Item Category</label>
                         <div class="container-sm p-0 d-flex input-group">
                             <select name="category" class="form-select text-capitalize" id="category">
-                                @if(!$category == true)
+                                @if($category)
+                                <option value="{{ $category }}">{{ $category }}</option>
+                                @endif
+                                <option value="">All</option>
+                                @foreach($categories as $category)
+                                <option value="{{ $category }}">{{ $category }}</option>
+                                @endforeach
+                                <!-- @if(!$category == true)
                                 <option value="" selected>All</option>
                                 <option value="medicine">Medicine</option>
                                 <option value="medical supply">Medical Supply</option>
@@ -41,7 +48,7 @@
                                 <option value="medical supply" selected>Medical Supply</option>
                                 <option value="">All</option>
                                 <option value="medicine">Medicine</option>
-                                @endif
+                                @endif -->
                             </select>
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>
@@ -54,8 +61,8 @@
                             <th scope="col">Item ID</th>
                             <th scope="col">Item Name</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Price</th>
                             <th scope="col">Category</th>
+                            <th scope="col">Unit</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -65,10 +72,10 @@
                             <th>{{ $item->id }}</th>
                             <td class="text-capitalize">{{ $item->name }}</td>
                             <td class="text-capitalize">{{ $item->description }}</td>
-                            <td>{{ $item->price }}</td>
                             <td class="text-capitalize">{{ $item->category }}</td>
+                            <td>{{ $item->unit }}</td>
                             <td>
-                                <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary" title="Add to stocks">+</a>
+                                <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary" title="Add stocks">+</a>
                                 <a href="{{route('admin.show-item', ['id' => $item->id])}}" class="btn btn-success">Edit</a>
                                 <a href="{{route('admin.delete-item', ['id' => $item->id])}}" class="btn btn-danger" onclick="deleteUser()">Delete</a>
                             </td>

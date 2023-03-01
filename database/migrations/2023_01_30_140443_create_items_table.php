@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->string('category');
-            $table->decimal('price');
-            $table->timestamps();
+            $table->string('unit');
+            $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
+            $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
         });
     }
 

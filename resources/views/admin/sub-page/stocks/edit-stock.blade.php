@@ -8,7 +8,7 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <h1>Request</h1>
+                <h2>Edit stock</h2>
             </div>
         </div>
     </div>

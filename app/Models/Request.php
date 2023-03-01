@@ -5,13 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Item extends Model
+class Request extends Model
 {
     use HasFactory;
+
+    protected $table = 'request';
     protected $fillable = [];
 
-    public function itemStock()
+    public function items()
     {
-        return $this->hasOne(Stock::class);
+
+        return $this->hasMany(Request_Item::class);
     }
 }

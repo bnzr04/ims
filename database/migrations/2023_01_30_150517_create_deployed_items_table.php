@@ -18,8 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('item_id'); //foreign key from items table 'id'
             $table->integer('deployed_qty');
             $table->integer('available_qty');
-            $table->timestamps();
-
+            $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
+            $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
 
             $table->foreign('item_id')
                 ->references('id')

@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Session
                             <th scope="col">ID</th>
                             <th scope="col">Name</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Price</th>
                             <th scope="col">Category</th>
+                            <th scope="col">Unit</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,8 +27,8 @@ use Illuminate\Support\Facades\Session
                             <th>{{ $item->id }}</th>
                             <td class="text-capitalize">{{ $item->name }}</td>
                             <td class="text-capitalize">{{ $item->description }}</td>
-                            <td>{{ $item->price }}</td>
                             <td class="text-capitalize">{{ $item->category }}</td>
+                            <td>{{ $item->unit }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -37,9 +37,15 @@ use Illuminate\Support\Facades\Session
                     <h4>STOCKS:</h4>
                 </div>
                 <table class="table mt-2 mb-4 overflow-x-auto">
+
+                    @if($stocks->isEmpty())
+                    <tr>
+                        <td colspan="6" class="text-danger">No Stocks...</td>
+                    </tr>
+                    @else
                     <thead class="bg-secondary text-white">
                         <tr>
-                            <th scope="col">ID</th>
+                            <th scope="col">Stock ID</th>
                             <th scope="col">Create Date</th>
                             <th scope="col">Update Date</th>
                             <th scope="col">Quantity</th>
@@ -48,21 +54,16 @@ use Illuminate\Support\Facades\Session
                         </tr>
                     </thead>
                     <tbody>
-                        @if($stocks->isEmpty())
-                        <tr>
-                            <td colspan="6" class="text-danger">No Stocks...</td>
-                        </tr>
-                        @else
                         @foreach($stocks as $stock)
                         <tr>
-                            <td>{{ $stock->id }}</td>
+                            <th>{{ $stock->id }}</th>
                             <td>{{ $stock->created_at }}</td>
                             <td>{{ $stock->updated_at }}</td>
                             <td>{{ $stock->stock_qty }}</td>
                             <td>{{ $stock->exp_date }}</td>
                             <td>
-                                <a href="" class="btn btn-primary">+</a>
-                                <a href="" class="btn btn-secondary">-</a>
+                                <a href="{{ route('admin.add-stock', ['id' => $stock->id]) }}" class="btn btn-secondary">+ / -</a>
+                                <a href="{{ route('admin.edit-stock', ['id' => $stock->id]) }}" class="btn btn-success">Edit</a>
                                 <a href="" class="btn btn-danger">Remove</a>
                             </td>
                         </tr>
@@ -72,12 +73,13 @@ use Illuminate\Support\Facades\Session
                 </table>
                 <form action="{{ route('admin.save-stock') }}" method="post">
                     @csrf
-                    <div class="modal-body">
+                    <div class="modal-body p-2">
+                        <h5>NEW STOCK BATCH:</h5>
                         <input type="hidden" class="form-control" name="item_id" id="item_id" value="{{ $item->id }}">
 
                         <div class="container-sm mb-1">
                             <label for="stock_qty">Quantity</label>
-                            <input type="number" min="1" class="form-control" name="stock_qty" id="stock_qty">
+                            <input type="number" min="1" class="form-control" name="stock_qty" id="stock_qty" required>
                         </div>
 
                         <div class="container-sm mb-1">

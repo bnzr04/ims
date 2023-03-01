@@ -43,13 +43,13 @@ use Illuminate\Support\Facades\Session;
                             </div>
 
                             <div class="container-sm mb-4" id="department_div" style="display: none;">
-                                <label for="department">Department</label>
-                                <select name="department" class="form-control" id="department" style="text-transform:capitalize;">
-                                    <option value="{{ $user->department == 'pharmacy' ? 0 : ( $user->department == 'csr' ? 1 : '' ) }}">{{ $user->type == 'user' ? $user->department : '' }}</option>
+                                <label for="dept">Department</label>
+                                <select name="dept" class="form-control" id="dept" style="text-transform:capitalize;">
+                                    <option value="{{ $user->dept == 'pharmacy' ? 0 : ( $user->dept == 'csr' ? 1 : '' ) }}">{{ $user->type == 'manager' ? $user->dept : '' }}</option>
                                     <option value="0">Pharmacy</option>
                                     <option value="1">Csr</option>
                                 </select>
-                                @error('userdept')
+                                @error('dept')
                                 <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -65,9 +65,9 @@ use Illuminate\Support\Facades\Session;
                                 </div>
 
                                 <div class="container-sm mb-2">
-                                    <label for="password">New Password</label>
+                                    <label for="password">New Password (optional)</label>
                                     <input type="password" class="form-control" name="password" id="password">
-                                    @error('new_password')
+                                    @error('password')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -110,16 +110,20 @@ use Illuminate\Support\Facades\Session;
     function deptShow() {
         const userTypeSelect = document.getElementById("type");
         const departmentDiv = document.getElementById("department_div");
+        const departmentSelect = document.getElementById('dept');
 
-        if (userTypeSelect.value === '0') {
+        if (userTypeSelect.value === '2') {
             departmentDiv.style.display = "block";
+        } else {
+            departmentSelect.value = '';
         }
 
         userTypeSelect.addEventListener("change", function() {
-            if (userTypeSelect.value === "0") {
+            if (userTypeSelect.value === "2") {
                 departmentDiv.style.display = "block";
             } else {
                 departmentDiv.style.display = "none";
+                departmentSelect.value = '';
             }
         });
     }

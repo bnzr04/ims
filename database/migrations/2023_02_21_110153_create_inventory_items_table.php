@@ -25,7 +25,8 @@ return new class extends Migration
             $table->decimal('depreciation_rate', 5, 2)->nullable();
             $table->decimal('current_value', 10, 2)->nullable();
             $table->decimal('depreciation_expense', 10, 2)->default(0);
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
+            $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
         });
     }
 

@@ -67,7 +67,7 @@ use Illuminate\Support\Facades\Session;
                                 {{ $user->type }}
                             </td>
                             <td>
-                                {{ $user->department == '' ? '------' : $user->department }}
+                                {{ $user->dept == '' ? '------' : $user->dept }}
                             </td>
                             <td>
                                 <div class="d-grid gap-2 d-md-block">

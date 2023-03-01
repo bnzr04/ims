@@ -19,7 +19,8 @@ return new class extends Migration
             $table->integer('transfer_qty');
             $table->string('transfer_type');
             $table->string('approval_status')->default('pending');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
+            $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
 
             $table->foreign('item_id')
                 ->references('id')

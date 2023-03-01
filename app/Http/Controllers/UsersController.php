@@ -43,7 +43,7 @@ class UsersController extends Controller
             'username' => 'required|unique:users',
             'password' => 'required|min:6',
             'type' => 'required|in:0,1,2',
-            'department' => $request->type == 0 ? 'required|in:0,1' : '',
+            'dept' => $request->type == 2 ? 'required|in:0,1' : '',
         ]);
 
         if ($validator->fails()) {
@@ -56,8 +56,8 @@ class UsersController extends Controller
         $model->name = $request->name;
         $model->username = $request->username;
         $model->password = Hash::make($request->password);
-        $model->department = $request->department;
         $model->type = $request->type;
+        $model->dept = $request->dept;
         $model->save();
 
         return redirect()->back()->with('success', 'User is Added');
@@ -80,11 +80,26 @@ class UsersController extends Controller
             return redirect()->back()->with('error', 'Admin password is incorrect.');
         }
 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'username' => 'required',
+            'type' => 'required|in:0,1,2',
+            'dept' => $request->type == 2 ? 'required|in:0,1' : '',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()->with('error', 'Account update Failed!');
+        }
+
         $user->name = $request->name;
         $user->type = $request->type;
-        $user->department = $request->department;
+        $user->dept = $request->dept;
         $user->username = $request->username;
-        $user->password = Hash::make($request->password);
+        if (!empty($request->password)) {
+            $user->password = Hash::make($request->password);
+        }
         $user->save();
 
         return redirect()->back()->with('success', 'Account successfully updated.');

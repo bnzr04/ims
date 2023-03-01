@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('item_id');
             $table->integer('stock_qty');
             $table->date('exp_date')->nullable();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
+            $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
 
             //Foreign key itemId from item table
             $table->foreign('item_id')

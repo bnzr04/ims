@@ -29,23 +29,52 @@ use Illuminate\Support\Facades\Session
                         <textarea class="form-control" name="description" id="description" required>{{ $item->description }}</textarea>
                     </div>
 
-                    <div class="container-sm mb-1">
-                        <label for="category">Item category</label>
-                        <select name="category" class="text-capitalize form-select" id="category">
-                            @if($item->category === 'medicine')
-                            <option value="medicine" selected>Medicine</option>
-                            <option value="medical supply">Medical Supply</option>
+                    <div class="container-sm mb-2">
+                        <label for="category"><b>Item category</b></label>
+                        <select name="category" class="form-select text-capitalize" id="category">
+                            @if($item->category)
+                            <option value="{{ $item->category }}">{{ $item->category }}</option>
                             @endif
-                            @if($item->category === 'medical supply')
-                            <option value="medical supply" selected>Medical Supply</option>
-                            <option value="medicine">Medicine</option>
-                            @endif
+                            @foreach($categories as $category)
+                            <option value="{{ $category }}">{{ $category }}</option>
+                            @endforeach
+                            <option value="other">Other</option>
                         </select>
+                        @error('category')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        <div class="container-sm mt-2 mb-2" id="new_category_div" style="display:none;">
+                            <label for="new_category">Add new category</label>
+                            <input type="text" name="new_category" class="form-control" id="new_category">
+                            @error('new_category')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
-                    <div class="container-sm mb-1">
-                        <label for="price">Cost</label>
-                        <input type="text" class="form-control" name="price" id="price" required value="{{ $item->price }}">
+                    <div class="container-sm mb-2">
+                        <label for="unit"><b>Unit</b></label>
+                        <select name="unit" class="form-select text-capitalize" id="unit">
+                            @if($item->category)
+                            <option value="{{ $item->unit }}">{{ $item->unit }}</option>
+                            @endif
+                            @foreach($units as $unit)
+                            <option value="{{ $unit }}">{{ $unit }}</option>
+                            @endforeach
+                            <option value="other">Other</option>
+                        </select>
+                        @error('unit')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        <div class="container-sm mt-2 mb-2" id="new_unit_div" style="display:none;">
+                            <label for="new_unit">Add new unit</label>
+                            <input type="text" name="new_unit" class="form-control" id="new_unit">
+                            @error('new_unit')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
                     @if(session('success'))
@@ -69,4 +98,41 @@ use Illuminate\Support\Facades\Session
         </div>
     </div>
 </div>
+<script>
+    category();
+    unit();
+
+    function category() {
+        var category = document.getElementById('category');
+        var newCategoryDiv = document.getElementById('new_category_div');
+
+        if (category.value === 'other') {
+            newCategoryDiv.style.display = 'block';
+        }
+        category.addEventListener("change", function() {
+            if (category.value === "other") {
+                newCategoryDiv.style.display = "block";
+            } else {
+                newCategoryDiv.style.display = "none";
+            }
+        });
+    }
+
+    function unit() {
+        var unit = document.getElementById('unit');
+        var newUnitDiv = document.getElementById('new_unit_div');
+
+        if (unit.value === 'other') {
+            newUnitDiv.style.display = 'block';
+        }
+
+        unit.addEventListener('change', function() {
+            if (unit.value === 'other') {
+                newUnitDiv.style.display = 'block';
+            } else {
+                newUnitDiv.style.display = 'none';
+            }
+        });
+    }
+</script>
 @endsection

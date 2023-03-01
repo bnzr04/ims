@@ -20,7 +20,7 @@
                 <table class="table mt-2">
                     <thead class="bg-success text-white">
                         <tr>
-                            <th scope="col">ID</th>
+                            <th scope="col">Stock ID</th>
                             <th scope="col">Item ID</th>
                             <th scope="col">Item Name</th>
                             <th scope="col">Description</th>
@@ -41,8 +41,8 @@
                             <th>{{ $stock->exp_date }}</th>
                             <td>{{ $stock->created_at}}</td>
                             <td>
-                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addStocks">Add Stocks</button>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editItem">Edit</button>
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addStocks">+</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editItem">-</button>
                                 <button type="button" class="btn btn-danger">Delete</button>
                             </td>
                         </tr>

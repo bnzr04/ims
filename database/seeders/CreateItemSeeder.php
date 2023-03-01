@@ -23,25 +23,25 @@ class CreateItemSeeder extends Seeder
                     'name' => 'Metronidazole',
                     'description' => '500mg',
                     'category' => 'medicine',
-                    'price' => 45.99,
+                    'unit' => 'pcs',
                 ],
                 [
                     'name' => 'Ethyl Alcohol',
-                    'description' => '70% solution, 150ml',
+                    'description' => '70% solution',
                     'category' => 'medical supply',
-                    'price' => 25,
+                    'unit' => 'gal',
                 ],
                 [
                     'name' => 'Dextrose',
-                    'description' => '1 liter',
+                    'description' => '500ml',
                     'category' => 'medical supply',
-                    'price' => 100,
+                    'unit' => 'pcs',
                 ],
                 [
                     'name' => 'Omeprazole',
                     'description' => '500mg',
                     'category' => 'medicine',
-                    'price' => 24.50,
+                    'unit' => 'pcs',
                 ],
             ];
 

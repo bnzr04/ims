@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
 
      */
-    protected $fillable = ['name', 'username', 'password', 'type'];
+    protected $fillable = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -51,6 +51,17 @@ class User extends Authenticatable
     {
         return new Attribute(
             get: fn ($value) =>  ["user", "admin", "manager"][$value],
+        );
+    }
+    protected function dept(): Attribute
+    {
+        return new Attribute(
+            get: function ($value) {
+                if ($value === '' || $value === null) {
+                    return $value = null;
+                }
+                return ["pharmacy", "csr"][$value];
+            }
         );
     }
 }

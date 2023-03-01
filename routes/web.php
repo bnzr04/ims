@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\StocksController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UserController;
@@ -22,9 +23,8 @@ use App\Http\Controllers\UserController;
 */
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', [HomeController::class, 'login'])->name('login');
+    Route::get('/', [HomeController::class, 'login'])->name('home');
 });
-
 
 Auth::routes();
 
@@ -36,7 +36,12 @@ All Normal Users Routes List
 Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function () {
 
     Route::get('/home', [UserController::class, 'userHome'])->name('user.home');
+
+    //Request routes
+    Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
     Route::get('/my-requests', [UserController::class, 'userRequest'])->name('user.request');
+    Route::post('/save-requests', [RequestController::class, 'saveRequest'])->name('user.save-request');
+    Route::get('/item-requests/{id}', [UserController::class, 'itemRequest'])->name('user.item-request');
 });
 
 /*------------------------------------------
@@ -50,7 +55,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/home', [AdminController::class, 'adminHome'])->name('admin.home');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
-    Route::get('/requests', [AdminController::class, 'userRequest'])->name('admin.requests');
+    Route::get('/requests', [AdminController::class, 'request'])->name('admin.requests');
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
 
     //User module routes
@@ -74,6 +79,9 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/stocks', [StocksController::class, 'stocks'])->name('admin.stocks');
     Route::get('/add-to-stocks/{id}', [StocksController::class, 'addToStocks'])->name('admin.add-to-stocks');
     Route::post('/save-stock', [StocksController::class, 'saveStock'])->name('admin.save-stock');
+    Route::get('/add-stock/{id}', [StocksController::class, 'addStock'])->name('admin.add-stock');
+    Route::post('/update-stock/{id}', [StocksController::class, 'updateStock'])->name('admin.update-stock');
+    Route::get('/edit-stock/{id}', [StocksController::class, 'editStock'])->name('admin.edit-stock');
 });
 
 /*------------------------------------------

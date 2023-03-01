@@ -50,4 +50,36 @@ class StocksController extends Controller
 
         return back()->with('success', 'Item is successfully added to stocks.');
     }
+
+    public function editStock($id)
+    {
+        return view('admin.sub-page.stocks.edit-stock');
+    }
+
+    public function addStock($id)
+    {
+        $stock = Stock::find($id);
+        $item = $stock->item_id;
+
+        return view('admin.sub-page.stocks.add-stock')->with(['stock' => $stock, 'item' => $item]);
+    }
+
+    public function updateStock(Request $request, $id)
+    {
+        $stock = Stock::find($id);
+
+        $operation = $request->operation;
+        $currentStockQty = $stock->stock_qty;
+        $toStockQty = $request->new_stock;
+        if ($operation == 'remove') {
+            $newStockQty = $currentStockQty - $toStockQty;
+        } else {
+            $newStockQty = $currentStockQty + $toStockQty;
+        }
+
+        $stock->stock_qty = $newStockQty;
+        $stock->save();
+
+        return back()->with('success', 'Stock Successfully Updated');
+    }
 }

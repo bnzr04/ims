@@ -11,6 +11,9 @@ class ItemController extends Controller
     //This will show all the saved items
     public function showAllItems(Request $request)
     {
+        //This will initiate all the categories available
+        $categories = Item::distinct('category')->pluck('category');
+
         //This will get the request from input category
         $category = $request->input('category');
 
@@ -21,34 +24,19 @@ class ItemController extends Controller
             $items = $items->where('category', $category);
         }
 
-        if ($category === 'medicine') {
-            $items = $items->select(
-                'id',
-                'name',
-                'description',
-                'category',
-                'price',
-            );
-        } elseif ($category === 'medical supplies') {
-            $items = $items->select(
-                'id',
-                'name',
-                'description',
-                'category',
-                'price',
-            );
-        } else {
-            $items = $items->select('*');
-        }
-
         $items = $items->get();
-        return view('admin.items', ['items' => $items, 'category' => $category]);
+        return view('admin.items', ['items' => $items, 'category' => $category, 'categories' => $categories]);
     }
 
     //This will view new item page
     public function newItem()
     {
-        return view("admin.sub-page.items.new-item");
+        $units = Item::distinct('unit')->pluck('unit');
+        $categories = Item::distinct('category')->pluck('category');
+        return view("admin.sub-page.items.new-item")->with([
+            'categories' => $categories,
+            'units' => $units
+        ]);
     }
 
     //This will add new item in database
@@ -60,7 +48,7 @@ class ItemController extends Controller
             'name' => 'required',
             'description' => 'required',
             'category' => 'required',
-            'price' => 'required',
+            'unit' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -71,8 +59,17 @@ class ItemController extends Controller
 
         $item->name = $request->name;
         $item->description = $request->description;
-        $item->category = $request->category;
-        $item->price = $request->price;
+        if ($request->category === 'other') {
+            $item->category = $request->new_category;
+        } else {
+            $item->category = $request->category;
+        }
+
+        if ($request->unit === 'other') {
+            $item->unit = $request->new_unit;
+        } else {
+            $item->unit = $request->unit;
+        }
         $item->save();
         return back()->with('success', 'Item successfully added.');
     }
@@ -81,7 +78,13 @@ class ItemController extends Controller
     public function showItem($id)
     {
         $item = Item::find($id);
-        return view("admin.sub-page.items.edit-item")->with("item", $item);
+        $categories = Item::distinct('category')->pluck('category');
+        $units = Item::distinct('unit')->pluck('unit');
+        return view("admin.sub-page.items.edit-item")->with([
+            "item" => $item,
+            'categories' => $categories,
+            'units' => $units
+        ]);
     }
 
     //This will update the details of item
@@ -90,8 +93,17 @@ class ItemController extends Controller
         $item = Item::find($id);
         $item->name = $request->name;
         $item->description = $request->description;
-        $item->category = $request->category;
-        $item->price = $request->price;
+        if ($request->category === 'other') {
+            $item->category = $request->new_category;
+        } else {
+            $item->category = $request->category;
+        }
+
+        if ($request->unit === 'other') {
+            $item->unit = $request->new_unit;
+        } else {
+            $item->unit = $request->unit;
+        }
         $item->save();
         return back()->with('success', 'Details updated.');
     }

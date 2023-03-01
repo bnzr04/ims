@@ -23,9 +23,17 @@ class CreateUsersSeeder extends Seeder
                 'password' => bcrypt('123456'),
             ],
             [
-                'name' => 'Manager User',
-                'username' => 'manager',
+                'name' => 'Pharmacy Manager',
+                'username' => 'pharmacy',
                 'type' => 2,
+                'dept' => 0,
+                'password' => bcrypt('123456'),
+            ],
+            [
+                'name' => 'Csr Manager',
+                'username' => 'csr',
+                'type' => 2,
+                'dept' => 1,
                 'password' => bcrypt('123456'),
             ],
             [
