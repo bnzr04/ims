@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Item;
+use App\Models\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
+    //
     //This will show all the saved items
+    //
     public function showAllItems(Request $request)
     {
         //This will initiate all the categories available
@@ -28,20 +33,29 @@ class ItemController extends Controller
         return view('admin.items', ['items' => $items, 'category' => $category, 'categories' => $categories]);
     }
 
+    //
     //This will view new item page
+    //
+
     public function newItem()
     {
         $units = Item::distinct('unit')->pluck('unit');
         $categories = Item::distinct('category')->pluck('category');
+
+
         return view("admin.sub-page.items.new-item")->with([
             'categories' => $categories,
             'units' => $units
         ]);
     }
 
+    //
     //This will add new item in database
+    //
     public function saveItem(Request $request)
     {
+        // Enable query logging
+        DB::enableQueryLog();
         $item = new Item;
 
         $validator = Validator::make($request->all(), [
@@ -71,6 +85,40 @@ class ItemController extends Controller
             $item->unit = $request->unit;
         }
         $item->save();
+
+        //QUERY LOG
+        $user = auth()->user();
+
+        $user_id = $user->id; // Get the ID of the authenticated user
+        $dept = $user->dept; // Get the depart if the user is manager
+
+        if ($user->type === "manager") {
+            $user_type = $user->type . " (" . $dept . ")"; // Get the dept of the authenticated manager
+        } else {
+            $user_type = $user->type;
+        }
+
+        // Get the SQL query being executed
+        $sql = DB::getQueryLog();
+        if (is_array($sql) && count($sql) > 0) {
+            $last_query = end($sql)['query'];
+        } else {
+            $last_query = 'No query log found.';
+        }
+
+        //Log Message
+        $message = "Item inserted.";
+
+        // Log the data to the logs table
+        Log::create([
+            'user_id' => $user_id,
+            'user_type' => $user_type,
+            'message' => $message,
+            'query' => $last_query,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
         return back()->with('success', 'Item successfully added.');
     }
 
@@ -90,6 +138,9 @@ class ItemController extends Controller
     //This will update the details of item
     public function updateItem(Request $request, $id)
     {
+        // Enable query logging
+        DB::enableQueryLog();
+
         $item = Item::find($id);
         $item->name = $request->name;
         $item->description = $request->description;
@@ -105,14 +156,32 @@ class ItemController extends Controller
             $item->unit = $request->unit;
         }
         $item->save();
-        return back()->with('success', 'Details updated.');
-    }
 
-    //This will delete the item
-    public function deleteItem($id)
-    {
-        $item = Item::find($id);
-        $item->delete();
-        return back();
+        //QUERY LOG
+        $user_id = Auth::id(); // Get the ID of the authenticated user
+        $user_type = Auth::user()->type; // Get the Type of the authenticated user
+
+        // Get the SQL query being executed
+        $sql = DB::getQueryLog();
+        if (is_array($sql) && count($sql) > 0) {
+            $last_query = end($sql)['query'];
+        } else {
+            $last_query = 'No query log found.';
+        }
+
+        //Log Message
+        $message = "Item updated.";
+
+        // Log the data to the logs table
+        Log::create([
+            'user_id' => $user_id,
+            'user_type' => $user_type,
+            'message' => $message,
+            'query' => $last_query,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return back()->with('success', 'Details updated.');
     }
 }

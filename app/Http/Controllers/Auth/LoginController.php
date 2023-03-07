@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
+use App\Models\Log;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
@@ -27,7 +29,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    // protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -41,6 +43,9 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
+        // Enable query logging
+        DB::enableQueryLog();
+
         $input = $request->all();
 
         $this->validate($request, [
@@ -49,11 +54,48 @@ class LoginController extends Controller
         ]);
 
         if (auth()->attempt(array('username' => $input['username'], 'password' => $input['password']))) {
-            if (auth()->user()->type == 'admin') {
-                return redirect()->route('admin.dashboard');
-            } else if (auth()->user()->type == 'manager') {
-                return redirect()->route('manager.home');
+            //QUERY LOG
+
+            $user = auth()->user();
+
+            $user_id = $user->id; // Get the ID of the authenticated user
+            $dept = $user->dept; // Get the depart if the user is manager
+
+            if ($user->type === "manager") {
+                $user_type = $user->type . " (" . $dept . ")"; // Get the Type of the authenticated user
             } else {
+                $user_type = $user->type;
+            }
+
+
+
+            // Get the SQL query being executed
+            $sql = DB::getQueryLog();
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = "No query log found.";
+            }
+
+            //Log Message
+            $message = $user_type . " logged in.";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $user_id,
+                'user_type' => $user_type,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            if ($user->type == 'admin') {
+
+                return redirect()->route('admin.dashboard');
+            } else if ($user->type == 'manager') {
+                return redirect()->route('manager.home');
+            } else if ($user->type == 'user') {
                 return redirect()->route('user.home');
             }
         } else {
@@ -62,5 +104,55 @@ class LoginController extends Controller
                     'username' => 'Username or password is incorrect.',
                 ]);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        //QUERY LOG
+
+        // Enable query logging
+        DB::enableQueryLog();
+
+        $user = auth()->user();
+
+        $user_id = $user->id; // Get the ID of the authenticated user
+        $dept = $user->dept; // Get the depart if the user is manager
+
+        if ($user->type === "manager") {
+            $user_type = $user->type . " (" . $dept . ")"; // Get the dept of the authenticated manager
+        } else {
+            $user_type = $user->type;
+        }
+
+
+
+        // Get the SQL query being executed
+        $sql = DB::getQueryLog();
+        if (is_array($sql) && count($sql) > 0) {
+            $last_query = end($sql)['query'];
+        } else {
+            $last_query = "No query log found.";
+        }
+
+        //Log Message
+        $message = $user_type . " logged out.";
+
+        // Log the data to the logs table
+        Log::create([
+            'user_id' => $user_id,
+            'user_type' => $user_type,
+            'message' => $message,
+            'query' => $last_query,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }

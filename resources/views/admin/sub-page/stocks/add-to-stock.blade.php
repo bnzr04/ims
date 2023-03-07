@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Session
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 py-1">
+            <div class="container-sm pt-2">
+                <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
+            </div>
+
+            <div id="content" class="p-3">
                 <h4>ITEM DESCRIPTION:</h4>
                 <table class="table mt-2 mb-4 overflow-x-auto">
                     <thead class="bg-success text-white">
@@ -54,6 +58,7 @@ use Illuminate\Support\Facades\Session
                         </tr>
                     </thead>
                     <tbody>
+
                         @foreach($stocks as $stock)
                         <tr>
                             <th>{{ $stock->id }}</th>
@@ -62,19 +67,19 @@ use Illuminate\Support\Facades\Session
                             <td>{{ $stock->stock_qty }}</td>
                             <td>{{ $stock->exp_date }}</td>
                             <td>
-                                <a href="{{ route('admin.add-stock', ['id' => $stock->id]) }}" class="btn btn-secondary">+ / -</a>
-                                <a href="{{ route('admin.edit-stock', ['id' => $stock->id]) }}" class="btn btn-success">Edit</a>
-                                <a href="" class="btn btn-danger">Remove</a>
+                                <a href="{{ route('admin.delete-stock', ['id' => $stock->id]) }}" class="btn btn-danger" onclick="deleteStock()">Remove</a>
                             </td>
                         </tr>
                         @endforeach
                         @endif
                     </tbody>
                 </table>
+
+                @if(empty($stock))
                 <form action="{{ route('admin.save-stock') }}" method="post">
                     @csrf
                     <div class="modal-body p-2">
-                        <h5>NEW STOCK BATCH:</h5>
+                        <h5>ADD STOCK:</h5>
                         <input type="hidden" class="form-control" name="item_id" id="item_id" value="{{ $item->id }}">
 
                         <div class="container-sm mb-1">
@@ -101,12 +106,41 @@ use Illuminate\Support\Facades\Session
                     @endif
 
                     <div class="container-sm mt-4">
-                        <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
                         <button type="submit" class="btn btn-primary" id="unique">Add Stock</button>
                     </div>
                 </form>
+                @endif
+
+                @if(!empty($stock))
+                <form action="{{ route('admin.update-stock', ['id' => $stock->id]) }}" method="post">
+                    @csrf
+                    <div class="container-sm mb-3">
+                        <label for="operation">Operation</label>
+                        <select name="operation" id="operation" class="form-select" style="width: 200px;">
+                            <option value="add">To add</option>
+                            <option value="remove">To remove</option>
+                        </select>
+                    </div>
+
+                    <div class="container-sm">
+                        <label for="new_stock">Quantity:</label>
+                        <input type="number" class="form-control" min="0" name="new_stock" id="new_stock" style="width: 200px;">
+                    </div>
+
+                    <div class="container-sm mt-3">
+                        <button class="btn btn-primary">Add</button>
+                    </div>
+                </form>
+                @endif
             </div>
         </div>
     </div>
 </div>
+<script>
+    function deleteStock() {
+        if (!confirm('Are you want to delete this stock?\nThis will remove permanently to our database.')) {
+            event.preventDefault();
+        }
+    }
+</script>
 @endsection

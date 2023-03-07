@@ -4,17 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Request as ModelsRequest;
+use App\Models\Request_Item;
 use Illuminate\Http\Request;
 
 class RequestController extends Controller
 {
 
-    public function newRequest()
+    public function newRequest(Request $request)
     {
-        $items = Item::join('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-            ->select('items.*', 'item_stocks.*')
-            ->get();
-        return view('user.sub-page.new-request')->with(['items' => $items]);
+        $items = Item::query();
+        $searchItem = $request->search_item;
+
+        if ($searchItem !== null) {
+            $items = $items->where('name', 'like', '%' . $searchItem . '%');
+        }
+
+        $items = $items->get();
+        return view('user.sub-page.new-request')->with(['items' => $items, 'search_item' => $searchItem]);
     }
 
     public function saveRequest(Request $request)
@@ -27,6 +33,28 @@ class RequestController extends Controller
         $model->request_to = $request->request_to;
         $model->save();
 
+        foreach ($request->items as $itemId => $itemData) {
+            if (isset($itemData['selected']) && $itemData['selected']) {
+                $newItem = new Request_Item();
+                $newItem->request_id = $model->id;
+                $newItem->item_id = $itemId;
+                $newItem->quantity = $itemData['quantity'];
+                $newItem->save();
+            }
+        }
+
         return back()->with('success', 'Request successfully created');
+    }
+
+    public function deleteRequest($id)
+    {
+        $request = ModelsRequest::find($id);
+        $request->delete();
+
+        if ($request == true) {
+            return back()->with('success', 'Request successfully deleted.');
+        } else {
+            return back()->with('error', 'Request failed to deleted.');
+        }
     }
 }

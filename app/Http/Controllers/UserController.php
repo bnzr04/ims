@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
 use Illuminate\Http\Request;
@@ -29,5 +30,20 @@ class UserController extends Controller
             ->where('request_id', $id)
             ->get();
         return view('user.sub-page.view-items')->with(['items' => $items, 'request' => $request]);
+    }
+
+    public function searchItem(Request $request)
+    {
+
+        $searchItem = $request->search_item;
+
+
+        if ($searchItem) {
+            $search = Item::where('name', 'like', '%' . $searchItem . '%')->get();
+        }
+
+
+
+        return back()->with('items', $search);
     }
 }

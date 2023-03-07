@@ -77,7 +77,6 @@
                             <td>
                                 <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary" title="Add stocks">+</a>
                                 <a href="{{route('admin.show-item', ['id' => $item->id])}}" class="btn btn-success">Edit</a>
-                                <a href="{{route('admin.delete-item', ['id' => $item->id])}}" class="btn btn-danger" onclick="deleteUser()">Delete</a>
                             </td>
                         </tr>
                         @empty

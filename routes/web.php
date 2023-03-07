@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\RequestController;
@@ -22,11 +23,12 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::middleware('guest')->group(function () {
-    Route::get('/', [HomeController::class, 'login'])->name('home');
-});
-
 Auth::routes();
+
+Route::get('/', [HomeController::class, 'login'])->name('home');
+Route::get('/login', [HomeController::class, 'login'])->name('login');
+
+
 
 /*------------------------------------------
 --------------------------------------------
@@ -41,7 +43,9 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
     Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
     Route::get('/my-requests', [UserController::class, 'userRequest'])->name('user.request');
     Route::post('/save-requests', [RequestController::class, 'saveRequest'])->name('user.save-request');
-    Route::get('/item-requests/{id}', [UserController::class, 'itemRequest'])->name('user.item-request');
+    Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');
+    Route::get('/request-items/{id}', [UserController::class, 'itemRequest'])->name('user.request-items');
+    Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
 });
 
 /*------------------------------------------
@@ -53,7 +57,6 @@ All Admin Routes List
 Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(function () {
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/home', [AdminController::class, 'adminHome'])->name('admin.home');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'request'])->name('admin.requests');
     Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
@@ -73,7 +76,6 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.show-item');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
     Route::post('/update-item/{id}', [ItemController::class, 'updateItem'])->name('admin.update-item');
-    Route::get('/delete-item/{id}', [ItemController::class, 'deleteItem'])->name('admin.delete-item');
 
     //Stocks module routes
     Route::get('/stocks', [StocksController::class, 'stocks'])->name('admin.stocks');
@@ -82,6 +84,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/add-stock/{id}', [StocksController::class, 'addStock'])->name('admin.add-stock');
     Route::post('/update-stock/{id}', [StocksController::class, 'updateStock'])->name('admin.update-stock');
     Route::get('/edit-stock/{id}', [StocksController::class, 'editStock'])->name('admin.edit-stock');
+    Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('admin.delete-stock');
 });
 
 /*------------------------------------------
@@ -96,3 +99,8 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
     Route::get('/requests', [ManagerController::class, 'userRequest'])->name('manager.requests');
 });
+
+//Logout
+Route::get('/logout', [LoginController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');

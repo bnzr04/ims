@@ -59,9 +59,14 @@ class StocksController extends Controller
     public function addStock($id)
     {
         $stock = Stock::find($id);
-        $item = $stock->item_id;
+        $item = Item::find($id);
+        $stockItem = $stock->item_id;
 
-        return view('admin.sub-page.stocks.add-stock')->with(['stock' => $stock, 'item' => $item]);
+        if ($stock !== null) {
+            return view('admin.sub-page.stocks.add-stock')->with(['stock' => $stock, 'item' => $stockItem]);
+        }
+
+        return view('admin.sub-page.stocks.add-stock')->with(['item' => $item]);
     }
 
     public function updateStock(Request $request, $id)
@@ -81,5 +86,17 @@ class StocksController extends Controller
         $stock->save();
 
         return back()->with('success', 'Stock Successfully Updated');
+    }
+
+    public function deleteStock($id)
+    {
+        $item = Stock::find($id);
+        $item->delete();
+
+        if ($item) {
+            return back()->with('success', 'Stock successfully deleted.');
+        } else {
+            return back()->with('error', 'Stock failed to delete.');
+        }
     }
 }

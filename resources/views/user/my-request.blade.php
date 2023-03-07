@@ -1,3 +1,7 @@
+@php
+use Illuminate\Support\Facades\Session
+@endphp
+
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
@@ -32,7 +36,7 @@
                             <tr>
                                 <th scope="col">{{ $request->id }}</th>
                                 <td>
-                                    <a href="{{ route('user.item-request', ['id' => $request->id]) }}" class="text-decoration-none">View</a>
+                                    <a href="{{ route('user.request-items', ['id' => $request->id]) }}" class="text-decoration-none">View</a>
                                 </td>
                                 <td scope="col" class="text-capitalize">{{ $request->office }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_by }}</td>
@@ -40,7 +44,7 @@
                                 <td scope="col" class="text-capitalize">{{ $request->created_at }}</td>
                                 <td scope="col">{{ $request->status }}</td>
                                 <td>
-                                    <a href="" class="btn btn-danger">Delete</a>
+                                    <a href="{{ route('user.delete-request', ['id' => $request->id]) }}" class="btn btn-danger" onclick="deleteRequest()">Delete</a>
                                 </td>
                             </tr>
                             @empty
@@ -53,8 +57,26 @@
                         </tbody>
                     </table>
                 </div>
+                @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+                @endif
+
+                @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
+<script>
+    function deleteRequest() {
+        if (!confirm("Are you sure you want to delete this request?")) {
+            event.preventDefault();
+        };
+    }
+</script>
 @endsection

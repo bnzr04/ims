@@ -51,6 +51,13 @@ return [
     */
 
     'channels' => [
+        'monolog' => [
+            'driver' => 'monolog',
+            'handler' => Monolog\Handler\StreamHandler::class,
+            'handler_with' => [
+                'stream' => storage_path('logs/monolog.log'),
+            ],
+        ],
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
@@ -85,7 +92,7 @@ return [
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
         ],
 
@@ -116,6 +123,12 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+        ],
+
+        'query' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/query.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
         ],
     ],
 

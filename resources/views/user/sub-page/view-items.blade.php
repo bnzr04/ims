@@ -19,9 +19,9 @@
                 </div>
                 <hr>
                 <div class="container-md">
-                    <h4>Requested Items</h4>
-                    <a href="" class="btn btn-secondary mb-2">Add item</a>
+                    <a href="" class="btn btn-success mb-2">Add new item</a>
                     <div class="container-lg p-0 shadow p-3 mb-5 bg-body rounded" style="height:300px;overflow-y: auto;">
+                        <h4>Requested Items</h4>
                         <table class="table">
                             <thead class="bg-success text-white">
                                 <tr>
@@ -46,7 +46,7 @@
                                     <td scope="col" class="text-capitalize">{{ $item->quantity }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->remarks == '' ? '------' :  $item->remarks }}</td>
                                     <td scope="col">
-                                        <button class="btn btn-danger">Remove</button>
+                                        <a href="" class="btn btn-danger">Remove</a>
                                     </td>
                                 </tr>
                                 @empty
