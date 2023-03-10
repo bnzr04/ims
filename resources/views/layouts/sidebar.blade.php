@@ -9,7 +9,7 @@
             <li><a href="{{ route('admin.items') }}" class="nav-link">Items</a></li>
             <li><a href="{{ route('admin.deployment') }}" class="nav-link">Deployment</a></li>
             <li><a href="{{ route('admin.requests') }}" class="nav-link">Requests</a></li>
-            <li><a href="{{ route('admin.log') }}" class="nav-link">Log</a></li>
+            <li><a href="{{ route('admin.log-index') }}" class="nav-link">Log</a></li>
             @endif
 
             {{--Manager links--}}

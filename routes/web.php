@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\StocksController;
@@ -25,9 +26,10 @@ use App\Http\Controllers\UserController;
 
 Auth::routes();
 
-Route::get('/', [HomeController::class, 'login'])->name('home');
-Route::get('/login', [HomeController::class, 'login'])->name('login');
-
+Route::middleware('guest')->group(function () {
+    Route::get('/', [HomeController::class, 'login'])->name('home');
+    Route::get('/login', [HomeController::class, 'login'])->name('login');
+});
 
 
 /*------------------------------------------
@@ -59,7 +61,9 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
     Route::get('/requests', [AdminController::class, 'request'])->name('admin.requests');
-    Route::get('/log', [AdminController::class, 'log'])->name('admin.log');
+
+    //Users Log Activity
+    Route::get('/log', [LogController::class, 'index'])->name('admin.log-index');
 
     //User module routes
     Route::get('/users', [UsersController::class, 'users'])->name('admin.users');
@@ -94,7 +98,7 @@ All Manager Routes List
 --------------------------------------------*/
 Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(function () {
 
-    Route::get('/home', [ManagerController::class, 'managerHome'])->name('manager.home');
+    Route::get('/dashboard', [ManagerController::class, 'managerHome'])->name('manager.home');
     Route::get('/item-stocks', [ManagerController::class, 'stocks'])->name('manager.stocks');
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
     Route::get('/requests', [ManagerController::class, 'userRequest'])->name('manager.requests');

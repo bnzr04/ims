@@ -63,7 +63,7 @@ use Illuminate\Support\Facades\Session
 
                         <div class="container-sm mt-3">
                             <a href="{{ route('admin.add-to-stocks', ['id' => $item]) }}" class="btn btn-secondary">Back</a>
-                            <button class="btn btn-primary">Add</button>
+                            <button class="btn btn-primary">Proceed</button>
                         </div>
                     </form>
                 </div>

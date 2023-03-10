@@ -14,11 +14,12 @@ use Illuminate\Support\Facades\Session
                 <a href="{{ route('user.request') }}" class="btn btn-secondary">Back</a>
                 <div class="container-lg shadow rounded p-3 mt-3 mb-4">
                     <div class="container-sm p-2 mb-2 d-flex justify-content-between text-white rounded" style="align-items:center;background-color:#8905f5;">
-                        <h4 class="m-0">List of items</h4>
-                        <form action="{{ route('user.newRequest') }}" method="get" class="mb-0">
+                        <h4 class="m-0">Search Item</h4>
+                        <form action="{{ route('user.newRequest') }}" method="get" class="mb-0 d-flex">
+                            <a href="" class="btn text-white" style="background-color:#dbc3de;">↻</a>
                             <div class="input-group flex-nowrap rounded" style="width: 350px;align-items:center;">
-                                <input type="text" class="form-control" name="search_item" id="search_item" placeholder="Search item name" aria-label="search" aria-describedby="addon-wrapping" value="{{ $search_item }}">
-                                <button type="submit" class="btn text-white" style="background-color: #dc03fc;">Search</button>
+                                <input type="text" class="form-control" name="search_item" id="search_item" placeholder="Search item name or id" aria-label="search" aria-describedby="addon-wrapping" value="{{ $search_item }}">
+                                <button type="submit" class="btn text-white" style="background-color: #f063ff;">Search</button>
                             </div>
                         </form>
                     </div>
@@ -44,14 +45,12 @@ use Illuminate\Support\Facades\Session
                                     <td scope="col">{{ $item->category }}</td>
                                     <td scope="col">{{ $item->unit }}</td>
                                     <td scope="col">
-                                        <!-- <input type="checkbox" name="items[{{ $item->id }}][selected]" value="{{ $item->id }}">
-                                                <input type="number" min="1" name="items[{{ $item->id }}][quantity]" id="quantity" style="width: 90px;"> -->
                                         <button class="btn btn-primary" id="add-btn-{{ $item->id }}" onclick="addItem({{$item->id}})">+</button>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6">Item not found...</td>
+                                    <td colspan="6">No item found...</td>
                                 </tr>
                                 @endforelse
                             </tbody>

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Session
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div class="container-sm pt-2">
-                <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
+                <a href="{{ route('admin.stocks') }}" class="btn btn-secondary">Back</a>
             </div>
 
             <div id="content" class="p-3">
@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\Session
                 </table>
 
                 <div class="container-lg p-0">
-                    <h4>STOCKS:</h4>
+                    <h4>STOCKS: <span class="text-danger">{{ $total_stocks }}</span></h4>
                 </div>
                 <table class="table mt-2 mb-4 overflow-x-auto">
 
@@ -67,7 +67,8 @@ use Illuminate\Support\Facades\Session
                             <td>{{ $stock->stock_qty }}</td>
                             <td>{{ $stock->exp_date }}</td>
                             <td>
-                                <a href="{{ route('admin.delete-stock', ['id' => $stock->id]) }}" class="btn btn-danger" onclick="deleteStock()">Remove</a>
+                                <a href="{{ route('admin.add-stock', ['id' => $stock->id]) }}" class="btn btn-primary">+</a>
+                                <a href="{{ route('admin.delete-stock', ['id' => $stock->id]) }}" class="btn btn-danger" onclick="deleteStock()">Dispose</a>
                             </td>
                         </tr>
                         @endforeach
@@ -75,11 +76,11 @@ use Illuminate\Support\Facades\Session
                     </tbody>
                 </table>
 
-                @if(empty($stock))
+
                 <form action="{{ route('admin.save-stock') }}" method="post">
                     @csrf
                     <div class="modal-body p-2">
-                        <h5>ADD STOCK:</h5>
+                        <h5>ADD NEW STOCKS BATCH:</h5>
                         <input type="hidden" class="form-control" name="item_id" id="item_id" value="{{ $item->id }}">
 
                         <div class="container-sm mb-1">
@@ -89,7 +90,7 @@ use Illuminate\Support\Facades\Session
 
                         <div class="container-sm mb-1">
                             <label for="exp_date">Expiration Date</label>
-                            <input type="date" class="form-control" name="exp_date" id="exp_date">
+                            <input type="date" class="form-control" name="exp_date" id="exp_date" required>
                         </div>
                     </div>
 
@@ -109,36 +110,13 @@ use Illuminate\Support\Facades\Session
                         <button type="submit" class="btn btn-primary" id="unique">Add Stock</button>
                     </div>
                 </form>
-                @endif
-
-                @if(!empty($stock))
-                <form action="{{ route('admin.update-stock', ['id' => $stock->id]) }}" method="post">
-                    @csrf
-                    <div class="container-sm mb-3">
-                        <label for="operation">Operation</label>
-                        <select name="operation" id="operation" class="form-select" style="width: 200px;">
-                            <option value="add">To add</option>
-                            <option value="remove">To remove</option>
-                        </select>
-                    </div>
-
-                    <div class="container-sm">
-                        <label for="new_stock">Quantity:</label>
-                        <input type="number" class="form-control" min="0" name="new_stock" id="new_stock" style="width: 200px;">
-                    </div>
-
-                    <div class="container-sm mt-3">
-                        <button class="btn btn-primary">Add</button>
-                    </div>
-                </form>
-                @endif
             </div>
         </div>
     </div>
 </div>
 <script>
     function deleteStock() {
-        if (!confirm('Are you want to delete this stock?\nThis will remove permanently to our database.')) {
+        if (!confirm('Are you sure that you want to dispose this stock batch?\nThis will remove permanently to our database.')) {
             event.preventDefault();
         }
     }

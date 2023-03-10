@@ -10,40 +10,62 @@
             <div id="content" class="px-2 py-1">
                 <a href="{{ route('admin.items') }}" class="btn btn-secondary mt-2 mb-4">Back</a>
                 <h2>STOCKS</h2>
-                <div class="mt-3 d-flex justify-content-between">
-                    <div class="input-group flex-nowrap" style="width: 270px;">
-                        <span class="input-group-text" id="addon-wrapping">Search</span>
-                        <input type="text" class="form-control bg-white" placeholder="" aria-label="search" aria-describedby="addon-wrapping">
+                <div class="mt-3 d-inline-block justify-content-between">
+                    <div class="container-sm p-0">
+                        <label for="category">Item Category</label>
+                        <form action="" method="get">
+                            <div class="container-sm p-0 d-flex input-group" style="width: 400px;">
+                                <select name="category" class="form-select text-capitalize" id="category">
+                                    @if($category !== null)
+                                    <option value="{{ $category }}" class="text-capitalize">{{ $category }}</option>
+                                    <option value="">All</option>
+                                    @else
+                                    <option value="">All</option>
+                                    @endif
+                                    @foreach($categories as $category)
+                                    <option value="{{ $category }}">{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="input-group" style="width: 400px;">
+                        <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search">
+                        <button type="submit" class="input-group-text btn btn-secondary">Search</button>
                     </div>
                 </div>
 
                 <table class="table mt-2">
                     <thead class="bg-success text-white">
                         <tr>
-                            <th scope="col">Stock ID</th>
                             <th scope="col">Item ID</th>
                             <th scope="col">Item Name</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Stocks</th>
-                            <th scope="col">Exp Date</th>
-                            <th scope="col">Stock Date</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Batches</th>
+                            <th scope="col">Total Stocks</th>
+                            <th scope="col">Latest Date Stocked</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse( $stocks as $stock )
                         <tr>
-                            <th scope="row">{{ $stock->id }}</th>
                             <th scope="row">{{ $stock->item_id }}</th>
-                            <td>{{ $stock->name }}</td>
+                            <th>{{ $stock->name }}</th>
                             <td>{{ $stock->description }}</td>
-                            <th>{{ $stock->stock_qty }}</th>
-                            <th>{{ $stock->exp_date }}</th>
-                            <td>{{ $stock->created_at}}</td>
+                            <td>{{ $stock->category }}</td>
+                            <td>{{ $stock->stocks_batch}}</td>
+                            @if($stock->total_quantity !== null)
+                            <th class="{{ $stock->total_quantity <= 100 ? 'text-warning' : 'text-success' }}">{{ $stock->total_quantity }}</th>
+                            @else
+                            <th class="text-danger">No stocks</th>
+                            @endif
+                            <th>{{ $stock->latest_stock }}</th>
                             <td>
-                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addStocks">+</button>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editItem">-</button>
-                                <button type="button" class="btn btn-danger">Delete</button>
+                                <a href="{{ route('admin.add-to-stocks', ['id' => $stock->item_id]) }}" class="btn btn-secondary">View batches</a>
                             </td>
                         </tr>
                         @empty

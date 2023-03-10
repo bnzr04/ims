@@ -12,20 +12,22 @@
                 <div class="mt-3 d-flex justify-content-between">
                     <div class="container-sm">
                         <a href="{{ route('admin.new-item') }}" class="btn btn-success">New Item</a>
-                        <a href="{{ route('admin.stocks') }}" class="btn btn-secondary">Stocks</a>
+                        <a href="{{ route('admin.stocks') }}" class="btn btn-secondary">All Stocks</a>
                     </div>
 
-                    <div class="input-group flex-nowrap">
-                        <input type="text" class="form-control bg-white" placeholder="" aria-label="search" aria-describedby="addon-wrapping">
-                        <button class="btn btn-secondary">Search</button>
-                    </div>
+                    <form action="" method="get">
+                        <div class="input-group flex-nowrap" style="width: 30rem;">
+                            <input type="text" class="form-control bg-white" placeholder="Search name..." aria-label="search" aria-describedby="addon-wrapping" name="search" id="search" value="{{ $search == true ? $search : ''}}">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </form>
 
                 </div>
 
-                <div class="container-sm mt-2">
+                <div class="container-sm mt-2 d-flex">
                     <form action="{{ route('admin.items') }}" method="get">
                         <label for="category">Item Category</label>
-                        <div class="container-sm p-0 d-flex input-group">
+                        <div class="container-sm p-0 d-flex input-group" style="width: 400px;">
                             <select name="category" class="form-select text-capitalize" id="category">
                                 @if($category)
                                 <option value="{{ $category }}">{{ $category }}</option>
@@ -34,21 +36,6 @@
                                 @foreach($categories as $category)
                                 <option value="{{ $category }}">{{ $category }}</option>
                                 @endforeach
-                                <!-- @if(!$category == true)
-                                <option value="" selected>All</option>
-                                <option value="medicine">Medicine</option>
-                                <option value="medical supply">Medical Supply</option>
-                                @endif
-                                @if($category === 'medicine')
-                                <option value="medicine" selected>Medicine</option>
-                                <option value="">All</option>
-                                <option value="medical supply">Medical Supply</option>
-                                @endif
-                                @if($category === 'medical supply')
-                                <option value="medical supply" selected>Medical Supply</option>
-                                <option value="">All</option>
-                                <option value="medicine">Medicine</option>
-                                @endif -->
                             </select>
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>
@@ -63,6 +50,7 @@
                             <th scope="col">Description</th>
                             <th scope="col">Category</th>
                             <th scope="col">Unit</th>
+                            <th scope="col">Current Stock</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -74,8 +62,14 @@
                             <td class="text-capitalize">{{ $item->description }}</td>
                             <td class="text-capitalize">{{ $item->category }}</td>
                             <td>{{ $item->unit }}</td>
+                            @if($item->total_quantity !== null)
+                            <th class="{{ $item->total_quantity <= 100 ? 'text-warning' : ( $item->total_quantity < 1 ? 'text-danger' : 'text-success') }}">{{ $item->total_quantity }}</th>
+                            @else
+                            <th class="text-danger">No stocks</th>
+                            @endif
+
                             <td>
-                                <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary" title="Add stocks">+</a>
+                                <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary" title="Add stocks">Stocks</a>
                                 <a href="{{route('admin.show-item', ['id' => $item->id])}}" class="btn btn-success">Edit</a>
                             </td>
                         </tr>

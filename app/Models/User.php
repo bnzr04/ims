@@ -64,4 +64,9 @@ class User extends Authenticatable
             }
         );
     }
+
+    public function hasRole($types)
+    {
+        return $this->type == $types;
+    }
 }

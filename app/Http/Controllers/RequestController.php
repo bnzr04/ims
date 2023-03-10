@@ -16,10 +16,13 @@ class RequestController extends Controller
         $searchItem = $request->search_item;
 
         if ($searchItem !== null) {
-            $items = $items->where('name', 'like', '%' . $searchItem . '%');
+            $items =
+                $items->where(function ($query) use ($searchItem) {
+                    $query->where('name', 'like', '%' . $searchItem . '%')
+                        ->orWhere('id', $searchItem);
+                })->get();
         }
 
-        $items = $items->get();
         return view('user.sub-page.new-request')->with(['items' => $items, 'search_item' => $searchItem]);
     }
 

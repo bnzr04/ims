@@ -22,15 +22,25 @@ class ItemController extends Controller
         //This will get the request from input category
         $category = $request->input('category');
 
-        //This will get the database table item
-        $items = Item::query();
+        //This will will get the request from search input
+        $search = $request->input('search');
+
+
+
+        //This will get the all items and will know if there is a stocks or none
+        $items = DB::table('items')
+            ->leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',);
 
         if ($category) {
             $items = $items->where('category', $category);
+        } else if ($search) {
+            $items = $items->where('name', 'like', "%" . $search . "%");
         }
-
         $items = $items->get();
-        return view('admin.items', ['items' => $items, 'category' => $category, 'categories' => $categories]);
+
+        return view('admin.items', ['items' => $items, 'category' => $category, 'categories' => $categories, 'search' => $search]);
     }
 
     //

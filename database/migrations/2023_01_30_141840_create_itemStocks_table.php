@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id('id');
             $table->unsignedBigInteger('item_id');
             $table->integer('stock_qty');
+            $table->date('exp_date');
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
             $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
 
