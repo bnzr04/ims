@@ -30,10 +30,6 @@ class AdminController extends Controller
         return view('admin.deployment');
     }
 
-    public function request()
-    {
-        return view('admin.request');
-    }
 
     public function editUser($id)
     {

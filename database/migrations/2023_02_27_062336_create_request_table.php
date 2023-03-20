@@ -19,8 +19,9 @@ return new class extends Migration
             $table->string('office');
             $table->string('request_by');
             $table->string('request_to');
-            $table->string('status')->default('pending');
-            $table->timestamps();
+            $table->string('status')->default('not completed');
+            $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
+            $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
 
             $table->foreign('user_id')
                 ->references('id')
@@ -31,6 +32,7 @@ return new class extends Migration
         Schema::create('request_items', function (Blueprint $table) {
             $table->unsignedBigInteger('request_id');
             $table->unsignedBigInteger('item_id');
+            $table->unsignedBigInteger('stock_id');
             $table->integer('quantity');
             $table->string('remarks')->nullable();
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
@@ -44,6 +46,11 @@ return new class extends Migration
             $table->foreign('item_id')
                 ->references('id')
                 ->on('items')
+                ->onDelete('cascade');
+
+            $table->foreign('stock_id')
+                ->references('id')
+                ->on('item_stocks')
                 ->onDelete('cascade');
         });
     }

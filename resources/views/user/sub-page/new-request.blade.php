@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Session
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 <a href="{{ route('user.request') }}" class="btn btn-secondary">Back</a>
-                <div class="container-lg shadow rounded p-3 mt-3 mb-4">
+                <!-- <div class="container-lg shadow rounded p-3 mt-3 mb-4">
                     <div class="container-sm p-2 mb-2 d-flex justify-content-between text-white rounded" style="align-items:center;background-color:#8905f5;">
                         <h4 class="m-0">Search Item</h4>
                         <form action="{{ route('user.newRequest') }}" method="get" class="mb-0 d-flex">
@@ -56,7 +56,7 @@ use Illuminate\Support\Facades\Session
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="container-lg mt-4">
                     <form action="{{ route('user.save-request') }}" method="post">
@@ -64,9 +64,9 @@ use Illuminate\Support\Facades\Session
                         <div class="container-sm shadow p-4 mb-5 bg-body rounded">
                             <h4>Request Details</h4>
                             <div class="container-sm">
-                                <input type="text" class="form-control" name="user_id" id="user_id" value="{{ auth()->user()->id }}" hidden>
+                                <input type="text" class="form-control" name="user_id" id="user_id" value="{{ Auth::user()->id }}" hidden>
                                 <label for="office"><b>Office Name:</b></label>
-                                <input type="text" class="form-control" name="office" id="office" required>
+                                <input type="text" class="form-control text-capitalize" name="office" id="office" value="{{ Auth::user()->name }}" readonly>
                             </div>
 
                             <div class="container-sm">
@@ -83,61 +83,61 @@ use Illuminate\Support\Facades\Session
                                 </select>
                             </div>
 
-                            <div class="container-sm p-3">
-                                @if(session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
-                                @endif
-
-                                @if(session('error'))
-                                <div class="alert alert-danger">
-                                    {{ session('error') }}
-                                </div>
-                                @endif
-                            </div>
-
-                            <div class="container-sm overflow-auto mb-2 shadow-sm rounded" style="height:300px;padding: 0 0 10px 0;">
-                                <h4 class="p-2 bg-success rounded text-white">Selected Items:</h4>
-                                <table class="table">
-                                    <thead class="bg-success text-white">
-                                        <tr>
-                                            <th scope="col">Item ID</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Description</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Unit</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td scope="col">1</td>
-                                            <td scope="col">Name</td>
-                                            <td scope="col">Description</td>
-                                            <td scope="col">Category</td>
-                                            <td scope="col">Unit</td>
-                                            <td scope="col">
-                                                <input type="number" name="quantity" id="quantity" style="width: 100px;">
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-danger">-</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
                             <div class="container-sm mt-5">
-                                <button type="submit" class="btn btn-success" style="letter-spacing: 3px;">CONFIRM</button>
+                                <button type="submit" class="btn btn-success" style="letter-spacing: 3px;">Proceed</button>
                             </div>
-                        </div>
                     </form>
+                    <div class="container-sm p-3">
+                        @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                        @endif
 
+                        @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                        @endif
+                    </div>
+
+                    <!-- <div class="container-sm overflow-auto mb-2 shadow-sm rounded" style="height:300px;padding: 0 0 10px 0;">
+                        <h4 class="p-2 bg-success rounded text-white">Selected Items:</h4>
+                        <table class="table">
+                            <thead class="bg-success text-white">
+                                <tr>
+                                    <th scope="col">Item ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Unit</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td scope="col">1</td>
+                                    <td scope="col">Name</td>
+                                    <td scope="col">Description</td>
+                                    <td scope="col">Category</td>
+                                    <td scope="col">Unit</td>
+                                    <td scope="col">
+                                        <input type="number" name="quantity" id="quantity" style="width: 100px;">
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger">-</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> -->
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 </div>
 </div>
 @endsection

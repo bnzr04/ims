@@ -14,7 +14,6 @@ class Request extends Model
 
     public function items()
     {
-
         return $this->hasMany(Request_Item::class);
     }
 }

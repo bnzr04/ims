@@ -36,10 +36,10 @@ class LoginController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('guest')->except('logout');
+    // }
 
     public function login(Request $request)
     {
@@ -59,6 +59,7 @@ class LoginController extends Controller
             $user = auth()->user();
 
             $user_id = $user->id; // Get the ID of the authenticated user
+            $userName = $user->name; // Get user name
             $dept = $user->dept; // Get the depart if the user is manager
 
             if ($user->type === "manager") {
@@ -66,7 +67,6 @@ class LoginController extends Controller
             } else {
                 $user_type = $user->type;
             }
-
 
 
             // Get the SQL query being executed
@@ -78,7 +78,11 @@ class LoginController extends Controller
             }
 
             //Log Message
-            $message = $user_type . " logged in.";
+            if ($user_type === 'user') {
+                $message = $user_type . " (" . $userName . ") logged in.";
+            } else {
+                $message = $user_type . " logged in.";
+            }
 
             // Log the data to the logs table
             Log::create([
@@ -133,8 +137,17 @@ class LoginController extends Controller
             $last_query = "No query log found.";
         }
 
+
+        $userName = $user->name; // Get user name
+
         //Log Message
-        $message = $user_type . " logged out.";
+        if (
+            $user_type === 'user'
+        ) {
+            $message = $user_type . " (" . $userName . ") logged out.";
+        } else {
+            $message = $user_type . " logged out.";
+        }
 
         // Log the data to the logs table
         Log::create([

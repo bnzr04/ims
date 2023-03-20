@@ -25,11 +25,67 @@ class ItemController extends Controller
         //This will will get the request from search input
         $search = $request->input('search');
 
+        //Get authenticated user credential
+        $user = Auth::user();
 
+        //Check the user if manager type
+        if ($user->type === 'manager') {
+            //If the user is manager type, manager has department to assign
+            //the condition will return the 
+            if ($user->dept === 'pharmacy') {
+                $categories = Item::where('category', '!=', 'medical supply')
+                    ->distinct('category')
+                    ->pluck('category');
+
+                $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+                    ->where('items.category', '!=', 'medical supply');
+
+                if ($category) {
+                    $items = $items->where('category', $category);
+                } else if ($search) {
+                    $items = $items->where('name', 'like', "%" . $search . "%");
+                }
+
+                $items = $items->get();
+
+                return view('manager.stocks')->with([
+                    'items' => $items,
+                    'categories' => $categories,
+                    'category' => $category,
+                    'search' => $search,
+                ]);
+            } elseif ($user->dept === 'csr') {
+                // $categories = Item::where('category', '!=', 'medical supply')
+                //     ->distinct('category')
+                //     ->pluck('category');
+
+                $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+                    ->where('items.category', '=', 'medical supply');
+
+                if ($category) {
+                    $items = $items->where('category', $category);
+                } else if ($search) {
+                    $items = $items->where('name', 'like', "%" . $search . "%");
+                }
+
+                $items = $items->get();
+
+                return view('manager.stocks')->with([
+                    'items' => $items,
+                    'categories' => $categories,
+                    'category' => $category,
+                    'search' => $search,
+                ]);
+            }
+        }
 
         //This will get the all items and will know if there is a stocks or none
-        $items = DB::table('items')
-            ->leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+        //This portion will execute if the user is admin
+        $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',);
 

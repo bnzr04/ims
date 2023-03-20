@@ -32,6 +32,7 @@ class StocksController extends Controller
                 ->get();
         }
 
+
         return view('admin.stocks')->with(['stocks' => $stocks, 'categories' => $categories, 'category' => $category]);
     }
 

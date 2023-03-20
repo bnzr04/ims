@@ -39,7 +39,7 @@ class LogController extends Controller
             ->orderByDesc('created_at')
             ->get()
             ->each(function ($log) {
-                $log->formatted_created_at = Carbon::parse($log->created_at)->format('F j, Y, g:i a');
+                $log->formatted_created_at = Carbon::parse($log->created_at)->format('F j, Y, g:i:s a');
             });
 
 

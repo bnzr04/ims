@@ -8,7 +8,7 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <h1>Log</h1>
+                <h1>Logs</h1>
                 <div class="container-md mb-3">
                     <div class="btn-group" role="group" aria-label="Basic outlined example">
                         <button type="button" onclick="window.location.href='{{ route('admin.log-index', ['date' => 'today']) }}'" class="btn btn-outline-dark">Today</button>
@@ -18,7 +18,7 @@
                     <button type="button" class="btn btn-outline-primary" onclick="window.location.href=''">↻</button>
                 </div>
                 <div class="container-lg m-0">
-                    <h5><span class="text-capitalize">{{ $requestDate == 'this_month' ? 'This month' : $requestDate}}</span> <span>( {{$dateAndTime}} )</span></h5>
+                    <h5><span class="text-capitalize">{{ $requestDate == 'this_month' ? 'This month' : ( $requestDate == null ? 'Today' : ($requestDate == 'yesterday' ? 'Yesterday' : $requestDate))}}</span> <span>( {{$dateAndTime}} )</span></h5>
                 </div>
                 <div class="table-responsive border border-dark" style="max-height: 30rem;">
                     <table class="table table-striped m-0">
@@ -41,8 +41,8 @@
                                 <td>{{ $log->query }}</td>
                             </tr>
                             @empty
-                            <tr colspan="6">
-                                <td>
+                            <tr>
+                                <td colspan="5">
                                     No log...
                                 </td>
                             </tr>

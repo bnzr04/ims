@@ -1,4 +1,4 @@
-<aside>
+<aside style="position:fixed;">
     <nav class="navbar navbar-expand navbar-dark flex-md-column align-items-start py-2">
         <ul class="mb-0 p-0 text-white px-3" style="list-style:none;text-decoration:none;">
 

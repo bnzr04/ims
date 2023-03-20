@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Session
 
                 <div class="container-lg mt-3">
                     <table class="table">
-                        <thead class="bg-success text-white">
+                        <thead class="bg-secondary text-white">
                             <tr>
                                 <th scope="col">Request ID</th>
                                 <th scope="col">Items</th>
@@ -41,11 +41,22 @@ use Illuminate\Support\Facades\Session
                                 <td scope="col" class="text-capitalize">{{ $request->office }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_by }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_to }}</td>
-                                <td scope="col" class="text-capitalize">{{ $request->created_at }}</td>
-                                <td scope="col">{{ $request->status }}</td>
+                                <td scope="col">{{ $request->formatted_created_at }}</td>
+                                <td scope="col" class="text-capitalize">{{ $request->status }}</td>
+                                @if($request->status == 'pending')
                                 <td>
-                                    <a href="{{ route('user.delete-request', ['id' => $request->id]) }}" class="btn btn-danger" onclick="deleteRequest()">Delete</a>
+                                    <a href="{{ route('user.delete-request', ['id' => $request->id]) }}" class="btn btn-danger" onclick="cancelRequest()">Cancel</a>
                                 </td>
+                                @endif
+                                @if($request->status == 'delivered')
+                                <td>
+                                    <form action="{{ route('user.receive-request', ['rid' => $request->id]) }}" method="post">
+                                        @csrf
+                                        <button type="submit" class="btn btn-warning">Received</button>
+                                    </form>
+                                </td>
+                                @endif
+
                             </tr>
                             @empty
                             <tr>
@@ -73,8 +84,8 @@ use Illuminate\Support\Facades\Session
     </div>
 </div>
 <script>
-    function deleteRequest() {
-        if (!confirm("Are you sure you want to delete this request?")) {
+    function cancelRequest() {
+        if (!confirm("Are you sure you want to cancel this request?")) {
             event.preventDefault();
         };
     }

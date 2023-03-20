@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminRequestController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LogController;
@@ -43,11 +44,15 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
 
     //Request routes
     Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
-    Route::get('/my-requests', [UserController::class, 'userRequest'])->name('user.request');
+    Route::get('/my-requests', [RequestController::class, 'userRequest'])->name('user.request');
     Route::post('/save-requests', [RequestController::class, 'saveRequest'])->name('user.save-request');
     Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');
-    Route::get('/request-items/{id}', [UserController::class, 'itemRequest'])->name('user.request-items');
+    Route::get('/request-items/{id}', [RequestController::class, 'itemRequest'])->name('user.request-items');
     Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
+    Route::post('/add-item', [RequestController::class, 'addItem'])->name('user.add-item');
+    Route::get('/remove-item/{sid}/{id}', [RequestController::class, 'removeItem'])->name('user.remove-item');
+    Route::post('/submit-request/{rid}', [RequestController::class, 'submitRequest'])->name('user.submit-request');
+    Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request');
 });
 
 /*------------------------------------------
@@ -60,7 +65,6 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
-    Route::get('/requests', [AdminController::class, 'request'])->name('admin.requests');
 
     //Users Log Activity
     Route::get('/log', [LogController::class, 'index'])->name('admin.log-index');
@@ -89,6 +93,12 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::post('/update-stock/{id}', [StocksController::class, 'updateStock'])->name('admin.update-stock');
     Route::get('/edit-stock/{id}', [StocksController::class, 'editStock'])->name('admin.edit-stock');
     Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('admin.delete-stock');
+
+    //Request module routes
+    Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
+    Route::get('/requested-items/{id}', [AdminRequestController::class, 'requestedItems'])->name('admin.requested-items');
+    Route::post('/accept-request/{rid}', [AdminRequestController::class, 'acceptRequest'])->name('admin.accept-request');
+    Route::post('/deliver-request/{rid}', [AdminRequestController::class, 'deliverRequest'])->name('admin.deliver-request');
 });
 
 /*------------------------------------------
@@ -99,7 +109,7 @@ All Manager Routes List
 Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(function () {
 
     Route::get('/dashboard', [ManagerController::class, 'managerHome'])->name('manager.home');
-    Route::get('/item-stocks', [ManagerController::class, 'stocks'])->name('manager.stocks');
+    Route::get('/item-stocks', [ItemController::class, 'showAllItems'])->name('manager.stocks');
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
     Route::get('/requests', [ManagerController::class, 'userRequest'])->name('manager.requests');
 });
@@ -107,4 +117,4 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
 //Logout
 Route::get('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
-    ->name('logout');
+    ->name('logout1');
