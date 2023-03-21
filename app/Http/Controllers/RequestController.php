@@ -34,15 +34,30 @@ class RequestController extends Controller
         return view('user.sub-page.new-request')->with(['items' => $items, 'search_item' => $searchItem]);
     }
 
-    public function userRequest()
+    public function userRequest(Request $request)
     {
+        $status = $request->query('request');
         $userId = Auth::id();
-        $request = ModelsRequest::where('user_id', $userId)
-            ->get()
-            ->each(function ($request) {
-                $request->formatted_created_at = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
-            });
-        return view('user.my-request')->with(['requests' => $request]);
+
+        if ($status) {
+            $requests = ModelsRequest::where('user_id', $userId)
+                ->where('status', $status)
+                ->orderByDesc('created_at')
+                ->get()
+                ->each(function ($request) {
+                    $request->formatted_created_at = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
+                });
+        } else {
+            $requests = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'pending')
+                ->orderByDesc('created_at')
+                ->get()
+                ->each(function ($request) {
+                    $request->formatted_created_at = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
+                });
+        }
+
+        return view('user.my-request')->with(['requests' => $requests, 'status' => $status]);
     }
 
     public function itemRequest(Request $request, $id)
@@ -53,9 +68,9 @@ class RequestController extends Controller
         $requested->formatted_date = Carbon::parse($requested->created_at)->format('F j, Y, g:i:s a');
 
         $requestItems = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            ->join('item_stocks', 'request_items.stock_id', '=', 'item_stocks.id')
-            ->select('request_items.*', 'items.*', 'item_stocks.*')
-            ->where('request_id', $id)
+            // ->join('item_stocks', 'request_items.stock_id', '=', 'item_stocks.id')
+            ->select('request_items.*', 'items.*')
+            ->where('request_items.request_id', $id)
             ->orderBy('request_items.created_at', 'asc')
             ->get();
 
@@ -86,7 +101,7 @@ class RequestController extends Controller
 
         foreach ($items as $item) {
             $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
-            $item->exp_date = $exp_date->format('m-d-Y');
+            $item->formatted_exp_date = $exp_date->format('m-d-Y');
         }
 
 
@@ -161,6 +176,7 @@ class RequestController extends Controller
             $table->request_id = $request->request_id;
             $table->item_id = $request->nameSearch;
             $table->stock_id = $request->stock_id;
+            $table->exp_date = $request->exp_date;
             $table->quantity = $request->quantity;
 
             $quantity = $request->quantity;

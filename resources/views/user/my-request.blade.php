@@ -17,6 +17,18 @@ use Illuminate\Support\Facades\Session
                     <a href="{{ route('user.newRequest') }}" class="btn btn-success">New request</a>
                 </div>
 
+                <div class="container-lg my-3">
+                    <div class="btn-group" role="group">
+                        <a href="{{ route('user.request',['request' => 'pending']) }}" class="btn btn-outline-primary">Pending</a>
+                        <a href="{{ route('user.request',['request' => 'accepted']) }}" class="btn btn-outline-primary">Accepted</a>
+                        <a href="{{ route('user.request',['request' => 'delivered']) }}" class="btn btn-outline-primary">Delivered</a>
+                        <a href="{{ route('user.request',['request' => 'completed']) }}" class="btn btn-outline-primary">Completed</a>
+                        <a href="{{ route('user.request',['request' => 'not completed']) }}" class="btn btn-outline-primary">Not completed</a>
+                    </div>
+                </div>
+                <div class="container-lg">
+                    <h5 class="text-capitalize">{{ $status == true ? $status : 'pending' }} Requests</h5>
+                </div>
                 <div class="container-lg mt-3">
                     <table class="table">
                         <thead class="bg-secondary text-white">
@@ -69,13 +81,13 @@ use Illuminate\Support\Facades\Session
                     </table>
                 </div>
                 @if(session('success'))
-                <div class="alert alert-success">
+                <div class="alert alert-success" id="alert">
                     {{ session('success') }}
                 </div>
                 @endif
 
                 @if(session('error'))
-                <div class="alert alert-danger">
+                <div class="alert alert-danger" id="alert">
                     {{ session('error') }}
                 </div>
                 @endif
@@ -84,6 +96,10 @@ use Illuminate\Support\Facades\Session
     </div>
 </div>
 <script>
+    setTimeout(function() {
+        document.getElementById('alert').style.display = 'none';
+    }, 3000);
+
     function cancelRequest() {
         if (!confirm("Are you sure you want to cancel this request?")) {
             event.preventDefault();

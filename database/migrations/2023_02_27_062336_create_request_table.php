@@ -32,7 +32,8 @@ return new class extends Migration
         Schema::create('request_items', function (Blueprint $table) {
             $table->unsignedBigInteger('request_id');
             $table->unsignedBigInteger('item_id');
-            $table->unsignedBigInteger('stock_id');
+            $table->integer('stock_id');
+            $table->date('exp_date');
             $table->integer('quantity');
             $table->string('remarks')->nullable();
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
@@ -46,11 +47,6 @@ return new class extends Migration
             $table->foreign('item_id')
                 ->references('id')
                 ->on('items')
-                ->onDelete('cascade');
-
-            $table->foreign('stock_id')
-                ->references('id')
-                ->on('item_stocks')
                 ->onDelete('cascade');
         });
     }

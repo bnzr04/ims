@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\ManagerRequestController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\StocksController;
 use App\Http\Controllers\UsersController;
@@ -111,7 +112,10 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::get('/dashboard', [ManagerController::class, 'managerHome'])->name('manager.home');
     Route::get('/item-stocks', [ItemController::class, 'showAllItems'])->name('manager.stocks');
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
-    Route::get('/requests', [ManagerController::class, 'userRequest'])->name('manager.requests');
+    Route::get('/requests', [ManagerRequestController::class, 'userRequest'])->name('manager.requests');
+    Route::get('/requested-items/{id}', [ManagerRequestController::class, 'requestedItems'])->name('manager.requested-items');
+    Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
+    Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
 });
 
 //Logout

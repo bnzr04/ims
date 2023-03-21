@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Request as ModelsRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ManagerController extends Controller
 {
@@ -19,10 +22,5 @@ class ManagerController extends Controller
     public function deployment()
     {
         return view('manager.deployment');
-    }
-
-    public function userRequest()
-    {
-        return view('manager.userRequest');
     }
 }

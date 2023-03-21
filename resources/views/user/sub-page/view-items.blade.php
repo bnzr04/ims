@@ -50,12 +50,13 @@ use Illuminate\Support\Facades\Session
                             <select id="nameSearch" class="text-capitalize" name="nameSearch" style="width: 280px;" required>
                                 <option></option>
                                 @foreach($items as $item)
-                                <option value="{{ $item->item_id }}" class="text-capitalize" data-stock-id="{{ $item->id }}">{{ $item->name }} ({{ $item->exp_date }})</option>
+                                <option value="{{ $item->item_id }}" class="text-capitalize" data-stock-id="{{ $item->id }}" data-stock-exp="{{ $item->exp_date }}">{{ $item->name }} ({{ $item->formatted_exp_date }})</option>
                                 @endforeach
                             </select>
 
                             <input type="number" id="quantity" name="quantity" min="1" style="min-width:120px;" placeholder="Quantity" required>
                             <input type="hidden" id="stock_id" name="stock_id" style="min-width:120px;">
+                            <input type="hidden" id="exp_date" name="exp_date" style="min-width:120px;">
                             <button type="submit" class="btn btn-secondary py-1 px-2">Add</button>
                         </div>
                     </form>
@@ -174,7 +175,9 @@ use Illuminate\Support\Facades\Session
         $('#nameSearch').on('change', function() {
             var selectedOptionValue = $('#nameSearch option:selected');
             var stockId = selectedOptionValue.data('stock-id');
+            var stockExpDate = selectedOptionValue.data('stock-exp');
             $('#stock_id').val(stockId);
+            $('#exp_date').val(stockExpDate);
         });
     });
 </script>

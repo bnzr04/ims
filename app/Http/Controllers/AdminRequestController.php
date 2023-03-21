@@ -52,9 +52,9 @@ class AdminRequestController extends Controller
         $items = Request_Item::where('request_id', $id)->get();
 
         $requestItems = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            ->join('item_stocks', 'request_items.stock_id', '=', 'item_stocks.id')
-            ->select('request_items.*', 'items.*', 'item_stocks.*')
-            ->where('request_id', $id)
+            // ->join('item_stocks', 'request_items.stock_id', '=', 'item_stocks.id')
+            ->select('request_items.*', 'items.*')
+            ->where('request_items.request_id', $id)
             ->orderBy('request_items.created_at', 'asc')
             ->get();
 
@@ -154,6 +154,28 @@ class AdminRequestController extends Controller
 
                 if ($availableStocksQuery->stock_qty <= 0) {
                     $availableStocksQuery->delete();
+
+                    //Get Query
+                    $sql = DB::getQueryLog();
+
+                    if (is_array($sql) && count($sql) > 0) {
+                        $last_query = end($sql)['query'];
+                    } else {
+                        $last_query = 'No query log found.';
+                    }
+
+                    //Log Message
+                    $message = "Stock id: " . $stock_id . " is fully consumed, batch deleted. ";
+
+                    // Log the data to the logs table
+                    Log::create([
+                        'user_id' => $user_id,
+                        'user_type' => $user_type,
+                        'message' => $message,
+                        'query' => $last_query,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
                 }
 
                 if ($availableStocksQuery == true) {
