@@ -11,8 +11,8 @@
                 <h2>ITEMS & STOCKS</h2>
                 <div class="mt-3 d-flex justify-content-between">
                     <div class="container-sm">
-                        <a href="" class="btn btn-success">New Item</a>
-                        <a href="" class="btn btn-secondary">All Stocks</a>
+                        <a href="{{ route('manager.new-item') }}" class="btn btn-success">New Item</a>
+                        <a href="{{ route('manager.AllStocks') }}" class="btn btn-secondary">All Stocks</a>
                     </div>
 
                     <form action="" method="get">
@@ -57,46 +57,54 @@
                 </div>
                 @endif
 
+                <div class="container-sm">
+                    <form action="{{ route('manager.export-items') }}" method="post">
+                        @csrf
+                        <button class="btn btn-primary">Download excel</button>
+                    </form>
+                </div>
 
-                <table class="table mt-2 overflow-x-auto" id="items_table">
-                    <thead class="bg-success text-white">
-                        <tr>
-                            <th scope="col">Item ID</th>
-                            <th scope="col">Item Name</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Category</th>
-                            <th scope="col">Unit</th>
-                            <th scope="col">Current Stock</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($items as $item)
-                        <tr>
-                            <th>{{ $item->id }}</th>
-                            <td class="text-capitalize">{{ $item->name }}</td>
-                            <td class="text-capitalize">{{ $item->description }}</td>
-                            <td class="text-capitalize">{{ $item->category }}</td>
-                            <th class="">{{ $item->unit }}</th>
-                            @if($item->total_quantity !== null)
-                            <th class="{{ $item->total_quantity <= 100 ? 'text-warning' : ( $item->total_quantity < 1 ? 'text-danger' : 'text-success') }}">{{ $item->total_quantity }}</th>
-                            @else
-                            <th class="text-danger">No stocks</th>
-                            @endif
-                            <td>
-                                <a href="" class="btn btn-secondary" title="Add stocks">Stocks</a>
-                                <a href="" class="btn btn-success">Edit</a>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8">
-                                No data...
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                <div class="container-lg p-0 border border-dark rounded shadow" style="height: 400px;overflow:auto;">
+                    <table class="table">
+                        <thead class="bg-success text-white" style="position: sticky;top: 0;">
+                            <tr>
+                                <th scope="col">Item ID</th>
+                                <th scope="col">Item Name</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Unit</th>
+                                <th scope="col">Current Stock</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($items as $item)
+                            <tr>
+                                <th>{{ $item->id }}</th>
+                                <td class="text-capitalize">{{ $item->name }}</td>
+                                <td class="text-capitalize">{{ $item->description }}</td>
+                                <td class="text-capitalize">{{ $item->category }}</td>
+                                <th class="">{{ $item->unit }}</th>
+                                @if($item->total_quantity !== null)
+                                <th class="{{ $item->total_quantity <= 100 ? 'text-warning' : ( $item->total_quantity < 1 ? 'text-danger' : 'text-success') }}">{{ $item->total_quantity }}</th>
+                                @else
+                                <th class="text-danger">No stocks</th>
+                                @endif
+                                <td>
+                                    <a href="{{ route('manager.add-to-stocks',['id' => $item->id]) }}" class="btn btn-secondary" title="Add stocks">Stocks</a>
+                                    <a href="{{ route('manager.show-item', ['id' => $item->id]) }}" class="btn btn-success">Edit</a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="8">
+                                    No data...
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

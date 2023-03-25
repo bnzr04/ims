@@ -10,8 +10,8 @@
             <div id="content" class="px-2 py-1">
                 <div class="container-md">
                     <div class="container-md py-2">
-                        <h2>NEW ITEM</h2>
-                        <form action="{{ route('admin.insert-items') }}" method="post" enctype="multipart/form-data">
+                        <h2>New item</h2>
+                        <form action="{{ route('manager.insert-items') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="container-lg p-0">
                                 <label for="import_item">Add items file</label>
@@ -23,12 +23,12 @@
                         </form>
                     </div>
                     <div class="container-lg px-0 py-3">
-                        <form action="{{ route('admin.saveItem') }}" method="post">
+                        <form action="{{ route('manager.saveItem') }}" method="post">
                             @csrf
                             <div class="modal-body">
                                 <div class="container-sm mb-2">
                                     <label for="name"><b>Item name</b></label>
-                                    <input type="text" class="form-control" name="name" id="name" value="{{ old('name') }}">
+                                    <input type="text" class="form-control" name="name" id="name" value="{{ old('name') }}" required>
                                     @error('name')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
@@ -36,7 +36,7 @@
 
                                 <div class="container-sm mb-2">
                                     <label for="description"><b>Item description</b></label>
-                                    <textarea class="form-control" name="description" id="description">{{ old('description') }}</textarea>
+                                    <textarea class="form-control" name="description" id="description" required>{{ old('description') }}</textarea>
                                     @error('description')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
@@ -44,7 +44,7 @@
 
                                 <div class="container-sm mb-2">
                                     <label for="category"><b>Item category</b></label>
-                                    <select name="category" class="form-select text-capitalize" id="category">
+                                    <select name="category" class="form-select text-capitalize" id="category" required>
                                         <option value="">Select</option>
                                         @foreach($categories as $category)
                                         <option value="{{ $category }}">{{ $category }}</option>
@@ -66,7 +66,7 @@
 
                                 <div class="container-sm mb-2">
                                     <label for="unit"><b>Unit</b></label>
-                                    <select name="unit" class="form-select text-capitalize" id="unit">
+                                    <select name="unit" class="form-select text-capitalize" id="unit" required>
                                         <option value="">Select</option>
                                         @foreach($units as $unit)
                                         <option value="{{ $unit }}">{{ $unit }}</option>
@@ -87,18 +87,18 @@
                                 </div>
                             </div>
                             @if(session('error'))
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger" id="alert">
                                 {{ session('error') }}
                             </div>
                             @endif
 
                             @if(session('success'))
-                            <div class="alert alert-success">
+                            <div class="alert alert-success" id="alert">
                                 {{ session('success') }}
                             </div>
                             @endif
                             <div class="container-sm">
-                                <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
+                                <a href="{{ route('manager.stocks') }}" class="btn btn-secondary">Back</a>
                                 <button type="submit" class="btn btn-primary" id="unique">Add Item</button>
                             </div>
                         </form>
@@ -111,6 +111,10 @@
 <script>
     category();
     unit();
+
+    setTimeout(function() {
+        document.getElementById('alert').style.display = 'none';
+    }, 3000);
 
     function category() {
         var category = document.getElementById('category');

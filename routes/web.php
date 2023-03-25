@@ -85,6 +85,8 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.show-item');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem');
     Route::post('/update-item/{id}', [ItemController::class, 'updateItem'])->name('admin.update-item');
+    Route::post('/insert-items', [ItemController::class, 'import'])->name('admin.insert-items');
+    Route::post('/export-items', [ItemController::class, 'export'])->name('admin.export-items');
 
     //Stocks module routes
     Route::get('/stocks', [StocksController::class, 'stocks'])->name('admin.stocks');
@@ -111,6 +113,24 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
 
     Route::get('/dashboard', [ManagerController::class, 'managerHome'])->name('manager.home');
     Route::get('/item-stocks', [ItemController::class, 'showAllItems'])->name('manager.stocks');
+
+    //Items module
+    Route::get('/new-item', [ItemController::class, 'newItem'])->name('manager.new-item');
+    Route::post('/save-item', [ItemController::class, 'saveItem'])->name('manager.saveItem');
+    Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('manager.show-item');
+    Route::post('/update-item/{id}', [ItemController::class, 'updateItem'])->name('manager.update-item');
+    Route::post('/insert-items', [ItemController::class, 'import'])->name('manager.insert-items');
+    Route::post('/export-items', [ItemController::class, 'export'])->name('manager.export-items');
+
+    //Stocks module
+    Route::get('/stocks', [StocksController::class, 'stocks'])->name('manager.AllStocks');
+    Route::get('/add-to-stocks/{id}', [StocksController::class, 'addToStocks'])->name('manager.add-to-stocks');
+    Route::post('/save-stock', [StocksController::class, 'saveStock'])->name('manager.save-stock');
+    Route::get('/add-stock/{id}', [StocksController::class, 'addStock'])->name('manager.add-stock');
+    Route::post('/update-stock/{id}', [StocksController::class, 'updateStock'])->name('manager.update-stock');
+    Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('manager.delete-stock');
+
+    //Request module
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
     Route::get('/requests', [ManagerRequestController::class, 'userRequest'])->name('manager.requests');
     Route::get('/requested-items/{id}', [ManagerRequestController::class, 'requestedItems'])->name('manager.requested-items');

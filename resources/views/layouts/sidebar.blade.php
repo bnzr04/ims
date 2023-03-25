@@ -6,7 +6,7 @@
             @if( Auth::user()->type == 'admin' )
             <li><a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
             <li><a href="{{ route('admin.users') }}" class="nav-link">Users</a></li>
-            <li><a href="{{ route('admin.items') }}" class="nav-link">Items</a></li>
+            <li><a href="{{ route('admin.items') }}" class="nav-link">Items & Stocks</a></li>
             <li><a href="{{ route('admin.deployment') }}" class="nav-link">Deployment</a></li>
             <li><a href="{{ route('admin.requests') }}" class="nav-link">Requests</a></li>
             <li><a href="{{ route('admin.log-index') }}" class="nav-link">Log</a></li>
@@ -15,7 +15,7 @@
             {{--Manager links--}}
             @if( Auth::user()->type == 'manager' )
             <li><a href="{{ route('manager.home') }}" class="nav-link">Dashboard</a></li>
-            <li><a href="{{ route('manager.stocks') }}" class="nav-link">Stocks</a></li>
+            <li><a href="{{ route('manager.stocks') }}" class="nav-link">Items & Stocks</a></li>
             <li><a href="{{ route('manager.deployment') }}" class="nav-link">Deployment</a></li>
             <li><a href="{{ route('manager.requests') }}" class="nav-link">Requests</a></li>
             @endif

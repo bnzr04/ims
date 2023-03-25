@@ -19,11 +19,11 @@ use Illuminate\Support\Facades\Session
 
                 <div class="container-lg my-3">
                     <div class="btn-group" role="group">
-                        <a href="{{ route('user.request',['request' => 'pending']) }}" class="btn btn-outline-primary">Pending</a>
-                        <a href="{{ route('user.request',['request' => 'accepted']) }}" class="btn btn-outline-primary">Accepted</a>
-                        <a href="{{ route('user.request',['request' => 'delivered']) }}" class="btn btn-outline-primary">Delivered</a>
-                        <a href="{{ route('user.request',['request' => 'completed']) }}" class="btn btn-outline-primary">Completed</a>
-                        <a href="{{ route('user.request',['request' => 'not completed']) }}" class="btn btn-outline-primary">Not completed</a>
+                        <a href="{{ route('user.request',['request' => 'pending']) }}" class="btn btn-outline-primary">Pending ({{ $pending }})</a>
+                        <a href="{{ route('user.request',['request' => 'accepted']) }}" class="btn btn-outline-primary">Accepted ({{ $accepted }})</a>
+                        <a href="{{ route('user.request',['request' => 'delivered']) }}" class="btn btn-outline-primary">Delivered ({{ $delivered }})</a>
+                        <a href="{{ route('user.request',['request' => 'completed']) }}" class="btn btn-outline-primary">Completed ({{ $completed }})</a>
+                        <a href="{{ route('user.request',['request' => 'not completed']) }}" class="btn btn-outline-primary">Not completed ({{ $notcompleted }})</a>
                     </div>
                 </div>
                 <div class="container-lg">
@@ -40,7 +40,10 @@ use Illuminate\Support\Facades\Session
                                 <th scope="col">Requested To</th>
                                 <th scope="col">Request date</th>
                                 <th scope="col">Status</th>
+                                @if(empty($status) || $status === 'pending' || $status === 'delivered' || $status === 'not completed')
                                 <th scope="col">Actions</th>
+                                @endif
+
                             </tr>
                         </thead>
                         <tbody>
@@ -55,7 +58,7 @@ use Illuminate\Support\Facades\Session
                                 <td scope="col" class="text-capitalize">{{ $request->request_to }}</td>
                                 <td scope="col">{{ $request->formatted_created_at }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->status }}</td>
-                                @if($request->status == 'pending')
+                                @if($request->status == 'pending' || $request->status == 'not completed')
                                 <td>
                                     <a href="{{ route('user.delete-request', ['id' => $request->id]) }}" class="btn btn-danger" onclick="cancelRequest()">Cancel</a>
                                 </td>

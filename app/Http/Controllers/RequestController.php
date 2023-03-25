@@ -47,6 +47,22 @@ class RequestController extends Controller
                 ->each(function ($request) {
                     $request->formatted_created_at = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
                 });
+
+            $pending = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'pending')
+                ->count('user_id');
+            $accepted = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'accepted')
+                ->count('user_id');
+            $delivered = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'delivered')
+                ->count('user_id');
+            $completed = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'completed')
+                ->count('user_id');
+            $notcompleted = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'not completed')
+                ->count('user_id');
         } else {
             $requests = ModelsRequest::where('user_id', $userId)
                 ->where('status', 'pending')
@@ -55,9 +71,33 @@ class RequestController extends Controller
                 ->each(function ($request) {
                     $request->formatted_created_at = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
                 });
+
+            $pending = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'pending')
+                ->count('user_id');
+            $accepted = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'accepted')
+                ->count('user_id');
+            $delivered = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'delivered')
+                ->count('user_id');
+            $completed = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'completed')
+                ->count('user_id');
+            $notcompleted = ModelsRequest::where('user_id', $userId)
+                ->where('status', 'not completed')
+                ->count('user_id');
         }
 
-        return view('user.my-request')->with(['requests' => $requests, 'status' => $status]);
+        return view('user.my-request')->with([
+            'requests' => $requests,
+            'status' => $status,
+            'pending' => $pending,
+            'accepted' => $accepted,
+            'delivered' => $delivered,
+            'completed' => $completed,
+            'notcompleted' => $notcompleted,
+        ]);
     }
 
     public function itemRequest(Request $request, $id)

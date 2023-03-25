@@ -2,15 +2,122 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ItemExport;
 use Illuminate\Http\Request;
 use App\Models\Item;
 use App\Models\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ItemImport;
+use Carbon\Carbon;
 
 class ItemController extends Controller
 {
+    //Import items data
+    public function import()
+    {
+        //Enable query log
+        DB::enableQueryLog();
+
+        $user = Auth::user();
+        $user_id = $user->id;
+        $user_type = $user->type;
+
+        if ($user_type === 'manager') {
+            $user_dept = $user->dept;
+            $user_type = $user_type . "(" . $user_dept . ")";
+        }
+
+        //will import the file
+        $import =
+            Excel::import(new ItemImport, request()->file('import_item'));
+
+        //if the import is true
+        if ($import) {
+            // Get the SQL query being executed
+            $sql = DB::getQueryLog();
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+
+            //Log Message
+            $message = "Items uploaded";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $user_id,
+                'user_type' => $user_type,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            //back to route and show success message
+            return back()->with(['success' => 'Item files successfully inserted']);
+        } else {
+            // Get the SQL query being executed
+            $sql = DB::getQueryLog();
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+
+            //Log Message
+            $message = "Items upload failed";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $user_id,
+                'user_type' => $user_type,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            //back to route and show error message
+            return back()->with(['success' => 'Item uploading failed']);
+        }
+    }
+
+    //Export items data
+    public function export()
+    {
+        $user = Auth::user();
+        $user_type = $user->type;
+
+
+        if ($user_type === 'manager') {
+            $user_dept = $user->dept;
+
+            if ($user_dept === 'pharmacy') {
+                $filename = 'Pharma_ITEMS_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+                return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+                    'Content-Type' => 'application/vnd.ms-excel',
+                ]);
+            } elseif ($user_dept === 'csr') {
+                $filename = 'Csr_ITEMS_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+                return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+                    'Content-Type' => 'application/vnd.ms-excel',
+                ]);
+            }
+        } else {
+            $filename = 'Pharma&Csr_ITEMS_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+            return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+                'Content-Type' => 'application/vnd.ms-excel',
+            ]);
+        }
+    }
+
+
     //
     //This will show all the saved items
     //
@@ -40,12 +147,13 @@ class ItemController extends Controller
                 $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
                     ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
                     ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-                    ->where('items.category', '!=', 'medical supply');
+                    ->where('items.category', '!=', 'medical supply')
+                    ->orderBy('items.name');
 
                 if ($category) {
-                    $items = $items->where('category', $category);
+                    $items = $items->where('category', $category)->orderBy('name');
                 } else if ($search) {
-                    $items = $items->where('name', 'like', "%" . $search . "%");
+                    $items = $items->where('name', 'like', "%" . $search . "%")->orderBy('name');
                 }
 
                 $items = $items->get();
@@ -57,14 +165,12 @@ class ItemController extends Controller
                     'search' => $search,
                 ]);
             } elseif ($user->dept === 'csr') {
-                // $categories = Item::where('category', '!=', 'medical supply')
-                //     ->distinct('category')
-                //     ->pluck('category');
 
                 $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
                     ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
                     ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-                    ->where('items.category', '=', 'medical supply');
+                    ->where('items.category', '=', 'medical supply')
+                    ->orderBy('items.name');
 
                 if ($category) {
                     $items = $items->where('category', $category);
@@ -87,7 +193,8 @@ class ItemController extends Controller
         //This portion will execute if the user is admin
         $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',);
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+            ->orderBy('items.name');
 
         if ($category) {
             $items = $items->where('category', $category);
@@ -105,10 +212,24 @@ class ItemController extends Controller
 
     public function newItem()
     {
+        $user = Auth::user();
+        $user_type = $user->type;
+
         $units = Item::distinct('unit')->pluck('unit');
+
+        if ($user_type === 'manager') {
+            if ($user->dept === 'pharmacy') {
+                $categories = Item::where('category', '!=', 'medical supply')->distinct('category')->pluck('category');
+            } elseif ($user->dept === 'csr') {
+                $categories = Item::where('category', '=', 'medical supply')->distinct('category')->pluck('category');
+            }
+            return view("manager.sub-page.items.new-item")->with([
+                'categories' => $categories,
+                'units' => $units
+            ]);
+        }
+
         $categories = Item::distinct('category')->pluck('category');
-
-
         return view("admin.sub-page.items.new-item")->with([
             'categories' => $categories,
             'units' => $units
@@ -137,12 +258,12 @@ class ItemController extends Controller
                 ->withInput();
         };
 
-        $item->name = $request->name;
-        $item->description = $request->description;
+        $item->name = ucwords($request->name);
+        $item->description = ucfirst($request->description);
         if ($request->category === 'other') {
-            $item->category = $request->new_category;
+            $item->category = ucwords($request->new_category);
         } else {
-            $item->category = $request->category;
+            $item->category = ucwords($request->category);
         }
 
         if ($request->unit === 'other') {
@@ -152,11 +273,10 @@ class ItemController extends Controller
         }
         $item->save();
 
-        //QUERY LOG
         $user = auth()->user();
 
         $user_id = $user->id; // Get the ID of the authenticated user
-        $dept = $user->dept; // Get the depart if the user is manager
+        $dept = $user->dept; // Get the department if the user is manager
 
         if ($user->type === "manager") {
             $user_type = $user->type . " (" . $dept . ")"; // Get the dept of the authenticated manager
@@ -173,7 +293,7 @@ class ItemController extends Controller
         }
 
         //Log Message
-        $message = "Item inserted.";
+        $message = "New item created. Item name: " . $item->name . ", ID: " . $item->id;
 
         // Log the data to the logs table
         Log::create([
@@ -192,13 +312,33 @@ class ItemController extends Controller
     public function showItem($id)
     {
         $item = Item::find($id);
-        $categories = Item::distinct('category')->pluck('category');
+
         $units = Item::distinct('unit')->pluck('unit');
-        return view("admin.sub-page.items.edit-item")->with([
-            "item" => $item,
-            'categories' => $categories,
-            'units' => $units
-        ]);
+        $user = Auth::user();
+        $user_type = $user->type;
+
+        if ($user_type === 'manager') {
+            $user_dept = $user->dept;
+
+            if ($user_dept === 'pharmacy') {
+                $categories = Item::where('category', '!=', 'medical supply')->distinct('category')->pluck('category');
+            } elseif ($user_dept === 'csr') {
+                $categories = Item::where('category', 'medical supply')->distinct('category')->pluck('category');
+            }
+
+            return view("manager.sub-page.items.edit-item")->with([
+                "item" => $item,
+                'categories' => $categories,
+                'units' => $units
+            ]);
+        } else {
+            $categories = Item::distinct('category')->pluck('category');
+            return view("admin.sub-page.items.edit-item")->with([
+                "item" => $item,
+                'categories' => $categories,
+                'units' => $units
+            ]);
+        }
     }
 
     //This will update the details of item
@@ -208,18 +348,18 @@ class ItemController extends Controller
         DB::enableQueryLog();
 
         $item = Item::find($id);
-        $item->name = $request->name;
-        $item->description = $request->description;
+        $item->name = ucwords($request->name);
+        $item->description = ucfirst($request->description);
         if ($request->category === 'other') {
-            $item->category = $request->new_category;
+            $item->category = ucwords($request->new_category);
         } else {
-            $item->category = $request->category;
+            $item->category = ucwords($request->category);
         }
 
         if ($request->unit === 'other') {
-            $item->unit = $request->new_unit;
+            $item->unit = ucwords($request->new_unit);
         } else {
-            $item->unit = $request->unit;
+            $item->unit = ucwords($request->unit);
         }
         $item->save();
 

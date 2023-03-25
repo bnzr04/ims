@@ -8,25 +8,31 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <a href="{{ route('admin.items') }}" class="btn btn-secondary mt-2 mb-4">Back</a>
+                <a href="{{ route('manager.stocks') }}" class="btn btn-secondary mt-2 mb-4">Back</a>
                 <h2>STOCKS</h2>
                 <div class="mt-3 d-inline-block justify-content-between">
                     <div class="container-sm p-0">
                         <label for="category">Item Category</label>
                         <form action="" method="get">
                             <div class="container-sm p-0 d-flex input-group" style="width: 400px;">
-                                <select name="category" class="form-select text-capitalize" id="category">
+                                <select name="category" class="form-select text-capitalize" id="category" {{ Auth::user()->dept === 'csr' ? 'disabled' : '' }}>
+                                    @if(Auth::user()->dept === 'csr')
+                                    <option value="">Medical Supply</option>
+                                    @else
                                     @if($category !== null)
                                     <option value="{{ $category }}" class="text-capitalize">{{ $category }}</option>
                                     <option value="">All</option>
                                     @else
                                     <option value="">All</option>
                                     @endif
+                                    @endif
                                     @foreach($categories as $category)
                                     <option value="{{ $category }}">{{ $category }}</option>
                                     @endforeach
                                 </select>
+                                @if(Auth::user()->dept !== 'csr')
                                 <button type="submit" class="btn btn-primary">Filter</button>
+                                @endif
                             </div>
                         </form>
                     </div>
@@ -65,7 +71,7 @@
                                 @endif
                                 <th>{{ $stock->latest_stock }}</th>
                                 <td>
-                                    <a href="{{ route('admin.add-to-stocks', ['id' => $stock->item_id]) }}" class="btn btn-secondary">View batches</a>
+                                    <a href="{{ route('manager.add-to-stocks', ['id' => $stock->item_id]) }}" class="btn btn-secondary">View batches</a>
                                 </td>
                             </tr>
                             @empty
