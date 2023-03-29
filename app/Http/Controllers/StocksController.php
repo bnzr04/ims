@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StocksExport;
 use App\Models\Item;
 use App\Models\Log;
 use App\Models\Stock;
@@ -9,11 +10,41 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
-use function GuzzleHttp\Promise\all;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StocksController extends Controller
 {
+    //stocks excel download
+    public function export()
+    {
+        $user = Auth::user();
+        $user_type = $user->type;
+
+
+        if ($user_type === 'manager') {
+            $user_dept = $user->dept;
+
+            if ($user_dept === 'pharmacy') {
+                $filename = 'Pharma_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+                return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+                    'Content-Type' => 'application/vnd.ms-excel',
+                ]);
+            } elseif (
+                $user_dept === 'csr'
+            ) {
+                $filename = 'Csr_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+                return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+                    'Content-Type' => 'application/vnd.ms-excel',
+                ]);
+            }
+        } else {
+            $filename = 'Pharma&Csr_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+            return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+                'Content-Type' => 'application/vnd.ms-excel',
+            ]);
+        }
+    }
+
     public function stocks(Request $request)
     {
         $user = Auth::user();

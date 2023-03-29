@@ -96,6 +96,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::post('/update-stock/{id}', [StocksController::class, 'updateStock'])->name('admin.update-stock');
     Route::get('/edit-stock/{id}', [StocksController::class, 'editStock'])->name('admin.edit-stock');
     Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('admin.delete-stock');
+    Route::post('/export-stocks', [StocksController::class, 'export'])->name('admin.export-stocks');
 
     //Request module routes
     Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
@@ -129,6 +130,7 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::get('/add-stock/{id}', [StocksController::class, 'addStock'])->name('manager.add-stock');
     Route::post('/update-stock/{id}', [StocksController::class, 'updateStock'])->name('manager.update-stock');
     Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('manager.delete-stock');
+    Route::post('/export-stocks', [StocksController::class, 'export'])->name('manager.export-stocks');
 
     //Request module
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');

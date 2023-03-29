@@ -31,7 +31,7 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
             ],
             [],
             [
-                'ID', 'Item name', 'Description', 'Category', 'Unit', 'Total Stocks'
+                'Item ID', 'Item name', 'Description', 'Category', 'Unit', 'Total Stocks'
             ]
         ];
     }
@@ -98,7 +98,7 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
                 $row->description,
                 $row->category,
                 $row->unit,
-                ($row->total_quantity !== null) ? $row->total_quantity : '~',
+                ($row->total_quantity !== null) ? $row->total_quantity : 'out of stock',
             ]
         ];
     }

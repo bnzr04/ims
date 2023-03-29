@@ -60,7 +60,7 @@
                 <div class="container-sm">
                     <form action="{{ route('manager.export-items') }}" method="post">
                         @csrf
-                        <button class="btn btn-primary">Download excel</button>
+                        <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                     </form>
                 </div>
 

@@ -108,11 +108,13 @@ class RequestController extends Controller
         $requested->formatted_date = Carbon::parse($requested->created_at)->format('F j, Y, g:i:s a');
 
         $requestItems = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            // ->join('item_stocks', 'request_items.stock_id', '=', 'item_stocks.id')
             ->select('request_items.*', 'items.*')
             ->where('request_items.request_id', $id)
             ->orderBy('request_items.created_at', 'asc')
             ->get();
+
+        //Get today date
+        $today = Carbon::today()->format('Y-m-d');
 
         foreach ($requestItems as $item) {
             $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
@@ -120,12 +122,13 @@ class RequestController extends Controller
         }
 
         if ($requested->request_to === 'csr') {
+
             $items =
                 DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.name', 'item_stocks.*')
                 ->where('items.category', "=", "medical supply")
-                // ->where('item_stocks.stock_qty', "!=", 0)
+                ->where('item_stocks.exp_date', ">", $today)
                 ->orderBy('items.name', 'asc')
                 ->get();
         } else {
@@ -134,7 +137,7 @@ class RequestController extends Controller
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.name', 'item_stocks.*')
                 ->where('items.category', "!=", "medical supply")
-                // ->where('item_stocks.stock_qty', "!=", 0)
+                ->where('item_stocks.exp_date', ">", $today)
                 ->orderBy('items.name', 'asc')
                 ->get();
         }
@@ -149,7 +152,6 @@ class RequestController extends Controller
             'requestItems' => $requestItems,
             'request' => $requested,
             'items' => $items,
-            // 'stockId' => $stockId,
         ]);
     }
 
