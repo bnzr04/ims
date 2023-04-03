@@ -18,7 +18,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <!--icon-->
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-dm3qgztMxZUBc1noYJevrTr+TTBdFl9mqDRFvBZ8Jl+iw3qI3lBIZ/sAZJiY1DpIgOfnLB9+JcTzTtThbTt1fQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-2awGuGgThSCq3zI9o2x/Chz1Sdfl1Y+a0R/yN4N0o4+lNpYaP0lOfnP9O6zCk6odEe2wCinNu+CmkydDuyf6PQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+
 
 
 

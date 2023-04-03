@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Session
                             <tr>
                                 <th scope="col">Request ID</th>
                                 <th scope="col">Office</th>
-                                <th scope="col">Request By</th>
                                 <th scope="col">Request To</th>
                                 <th scope="col">Request status</th>
                                 <th scope="col">Request date</th>
@@ -33,7 +32,6 @@ use Illuminate\Support\Facades\Session
                             <tr>
                                 <td scope="col">{{ $request->id }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->office }}</td>
-                                <td scope="col" class="text-capitalize">{{ $request->request_by }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_to }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->status }}</td>
                                 <td scope="col">{{ $request->formatted_date }}</td>
@@ -99,15 +97,9 @@ use Illuminate\Support\Facades\Session
                         </table>
                     </div>
                     @if($request->status == 'pending')
-                    <form action="{{ route('manager.accept-request',['rid' => $request->id]) }}" method="post">
+                    <form action="{{ route('manager.complete-request',['rid' => $request->id]) }}" method="post">
                         @csrf
                         <button type="submit" class="btn btn-primary">Accept request</button>
-                    </form>
-                    @endif
-                    @if($request->status == 'accepted')
-                    <form action="{{ route('manager.deliver-request',['rid' => $request->id]) }}" method="post">
-                        @csrf
-                        <button type="submit" class="btn btn-warning">Mark as delivered</button>
                     </form>
                     @endif
                 </div>

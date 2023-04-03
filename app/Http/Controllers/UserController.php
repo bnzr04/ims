@@ -11,9 +11,47 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    //this will show the user dashboard
     public function userHome()
     {
-        return view('user.home');
+        //get the user id
+        $user_id = Auth::user()->id;
+
+        //this will get the total number of pending
+        $pending = ModelsRequest::where('user_id', $user_id)
+            ->where('status', 'pending')
+            ->count('user_id');
+
+        //this will get the total number of completed or received requests
+        $completed = ModelsRequest::where('user_id', $user_id)
+            ->where('status', 'completed')
+            ->count('user_id');
+
+
+
+        return view('user.home')->with([
+            'pending' => $pending,
+            'completed' => $completed
+        ]);
+    }
+
+    public function viewRequest($request)
+    {
+        $user_id = Auth::user()->id;
+
+        $items = ModelsRequest::where('user_id', $user_id)
+            ->where('status', $request)
+            ->get();
+
+        foreach ($items as $item) {
+            $item->formatted_date = Carbon::parse($item->updated_at)->format('F j, Y, g:i:s a');
+        }
+
+
+        return view('user.sub-page.view-request')->with([
+            'items' => $items,
+            'request' => $request
+        ]);
     }
 
     public function searchItem(Request $request)

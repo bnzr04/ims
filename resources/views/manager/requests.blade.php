@@ -1,6 +1,3 @@
-@php
-use Illuminate\Support\Facades\Session
-@endphp
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
@@ -11,16 +8,14 @@ use Illuminate\Support\Facades\Session
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <div class="container-lg">
-                    <h2>Requests</h2>
-                </div>
+                <h2>Requests</h2>
                 <div class="container-lg mt-3 p-2 pt-3 rounded shadow">
                     <div class="container-md">
                         <h5>Pending requests</h5>
                     </div>
-                    <div class="container-md overflow-auto" style="height: 350px;">
+                    <div class="container-md overflow-auto" style="height: 400px;">
                         <table class="table">
-                            <thead class=" bg-success text-white" style="position: sticky;top:0;">
+                            <thead class="bg-success text-white" style="position: sticky;top:0;">
                                 <tr>
                                     <th scope="col">Req ID</th>
                                     <th scope="col">Date-time</th>
@@ -36,12 +31,6 @@ use Illuminate\Support\Facades\Session
                         </table>
                     </div>
                 </div>
-                <hr>
-                @if(session('success'))
-                <div class="alert alert-success" id="alert">
-                    {{ session('success') }}
-                </div>
-                @endif
 
                 <div class="container-lg mt-3 mb-3 p-2 pt-3 rounded shadow">
                     <div class="container-md">
@@ -54,6 +43,7 @@ use Illuminate\Support\Facades\Session
                                     <th scope="col">Req ID</th>
                                     <th scope="col">Date-time</th>
                                     <th scope="col">Office</th>
+                                    <th scope="col">Request by</th>
                                     <th scope="col">Request to</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
@@ -65,6 +55,8 @@ use Illuminate\Support\Facades\Session
                         </table>
                     </div>
                 </div>
+
+
             </div>
         </div>
     </div>
@@ -72,7 +64,7 @@ use Illuminate\Support\Facades\Session
 <script>
     function updateTable() {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', "{{ route('admin.show-requests') }}", true);
+        xhr.open('GET', "{{ route('manager.show-requests') }}", true);
         xhr.onload = function() {
             if (xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
@@ -85,7 +77,7 @@ use Illuminate\Support\Facades\Session
 
                 for (var i = 0; i < data.pending.length; i++) {
                     var row = data.pending[i];
-                    pendingtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    pendingtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
                 }
 
                 if (data.pending.length === 0) {
@@ -94,7 +86,7 @@ use Illuminate\Support\Facades\Session
 
                 for (var i = 0; i < data.completed.length; i++) {
                     var row = data.completed[i];
-                    completedtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    completedtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
                 }
 
                 if (data.completed.length === 0) {

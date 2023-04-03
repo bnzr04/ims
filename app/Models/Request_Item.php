@@ -10,7 +10,10 @@ class Request_Item extends Model
     use HasFactory;
 
     protected $table = "request_items";
-    protected $fillable = [];
+
+    protected $fillable = [
+        'request_id', 'item_id', 'stock_id', 'exp_date', 'quantity'
+    ];
 
     public function request()
     {

@@ -6,17 +6,39 @@ use App\Models\Item;
 use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
-use App\Models\Stock;
 use Carbon\Carbon;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator as FacadesValidator;
-use Illuminate\Support\Str;
 
 class RequestController extends Controller
 {
+
+    //this shows when user click request module
+    public function request()
+    {
+        //Get today date
+        $today = Carbon::today()->format('Y-m-d');
+
+
+        $items =
+            DB::table('item_stocks')
+            ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            ->select('items.name', 'item_stocks.*')
+            ->where('items.category', "!=", "medical supply")
+            ->where('item_stocks.exp_date', ">", $today)
+            ->orderBy('items.name', 'asc')
+            ->get();
+
+        foreach ($items as $item) {
+            $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
+            $item->formatted_exp_date = $exp_date->format('m-d-Y');
+        }
+
+        return view('user.request')->with([
+            'items' => $items,
+        ]);
+    }
 
     public function newRequest(Request $request)
     {
@@ -116,18 +138,18 @@ class RequestController extends Controller
         //Get today date
         $today = Carbon::today()->format('Y-m-d');
 
-        foreach ($requestItems as $item) {
-            $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
-            $item->exp_date = $exp_date->format('m-d-Y');
-        }
+        // foreach ($requestItems as $item) {
+        // $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
+        // $item->exp_date = $exp_date->format('m-d-Y');
+        // }
 
-        if ($requested->request_to === 'csr') {
+        if ($requested->request_to === 'pharmacy') {
 
             $items =
                 DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.name', 'item_stocks.*')
-                ->where('items.category', "=", "medical supply")
+                ->where('items.category', "!=", "medical supply")
                 ->where('item_stocks.exp_date', ">", $today)
                 ->orderBy('items.name', 'asc')
                 ->get();
@@ -142,10 +164,10 @@ class RequestController extends Controller
                 ->get();
         }
 
-        foreach ($items as $item) {
-            $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
-            $item->formatted_exp_date = $exp_date->format('m-d-Y');
-        }
+        // foreach ($items as $item) {
+        //     $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
+        //     $item->formatted_exp_date = $exp_date->format('m-d-Y');
+        // }
 
 
         return view('user.sub-page.view-items')->with([
@@ -164,7 +186,6 @@ class RequestController extends Controller
 
         $model->user_id = $request->user_id;
         $model->office = $request->office;
-        $model->request_by = $request->request_by;
         $model->request_to = $request->request_to;
         $model->save();
 
@@ -300,57 +321,88 @@ class RequestController extends Controller
     }
 
     //This will submit the requested items
-    public function submitRequest($rid)
+    public function submitRequest(Request $request)
     {
+        $requested = $request->input('requestedItems');
+        $requestedItems = json_decode($requested);
+
         //Enable Query Log
         DB::enableQueryLog();
 
-        //check if item request is not empty
-        $itemRequest = Request_Item::where('request_id', $rid)->first();
+        //get user details
+        $user = Auth::user();
+        //user id
+        $userId = $user->id;
+        //user type
+        $userType = $user->type;
+        //we use user name as office name
+        $office = $user->name;
 
+        $requestModel = new ModelsRequest();
+        $requestModel->user_id = $userId;
+        $requestModel->office = $office;
+        //we always send the request to pharmacy
+        $requestModel->request_to = 'pharmacy';
+        $requestModel->save();
 
-        if ($itemRequest) {
-            $request = ModelsRequest::find($rid);
+        $requestID = $requestModel->id;
 
-            $user = Auth::user();
-
-            $user_id = $user->id;
-            $user_type = $user->type;
-            $user_name = $user->name;
-
-            if ($request) {
-                $request->status = 'pending';
-                $request->save();
-
-                //Get Query
-                $sql = DB::getQueryLog();
-
-                if (is_array($sql) && count($sql) > 0) {
-                    $last_query = end($sql)['query'];
-                } else {
-                    $last_query = 'No query log found.';
-                }
-
-                //Log Message
-                $message = $user_name . ", submitted a request. RID: " . $rid;
-
-                // Log the data to the logs table
-                Log::create([
-                    'user_id' => $user_id,
-                    'user_type' => $user_type,
-                    'message' => $message,
-                    'query' => $last_query,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
-
-                return back()->with('success', 'Request successfully submitted');
-            } else {
-                return back()->with('error', 'Request failed to submit');
-            }
+        // Get the SQL query being executed
+        $sql = DB::getQueryLog();
+        if (is_array($sql) && count($sql) > 0) {
+            $last_query = end($sql)['query'];
         } else {
-            return back()->with('warning', 'Item request empty, please add an item to proceed');
+            $last_query = 'No query log found.';
         }
+
+        //Log Message
+        $message = "New request is created. REQUEST ID: " . $requestID;
+
+        // Log the data to the logs table
+        Log::create([
+            'user_id' => $userId,
+            'user_type' => $userType,
+            'message' => $message,
+            'query' => $last_query,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        //add the item in request_items
+        foreach ($requestedItems as $item) {
+            $model = new Request_Item();
+            $model->request_id = $requestModel->id;
+            $model->item_id = $item->item_id;
+            $model->stock_id = $item->stock_id;
+            $model->exp_date = $item->exp_date;
+            $model->quantity = intval($item->quantity);
+            $model->save();
+
+
+            // Get the SQL query being executed
+            $sql = DB::getQueryLog();
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+            //Log Message
+            $message = "Item ID: " . $item->item_id . " is added to Request ID: " . $requestID;
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $userId,
+                'user_type' => $userType,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            // var_dump($model->exp_date);
+        }
+
+        return response()->json(['success' => true, 'request_id' => $requestModel->id]);
     }
 
 

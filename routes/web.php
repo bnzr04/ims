@@ -45,15 +45,18 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
 
     //Request routes
     Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
-    Route::get('/my-requests', [RequestController::class, 'userRequest'])->name('user.request');
+    Route::get('/my-requests', [RequestController::class, 'userRequest'])->name('user.requests');
+    Route::get('/request', [RequestController::class, 'request'])->name('user.request');
     Route::post('/save-requests', [RequestController::class, 'saveRequest'])->name('user.save-request');
     Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');
     Route::get('/request-items/{id}', [RequestController::class, 'itemRequest'])->name('user.request-items');
     Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
     Route::post('/add-item', [RequestController::class, 'addItem'])->name('user.add-item');
     Route::get('/remove-item/{sid}/{id}', [RequestController::class, 'removeItem'])->name('user.remove-item');
-    Route::post('/submit-request/{rid}', [RequestController::class, 'submitRequest'])->name('user.submit-request');
+    Route::post('/submit-request', [RequestController::class, 'submitRequest'])->name('user.submit-request');
     Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request');
+
+    Route::get('/view-request/{request}', [UserController::class, 'viewRequest'])->name('user.viewRequest');
 });
 
 /*------------------------------------------
@@ -100,8 +103,9 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
 
     //Request module routes
     Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
+    Route::get('/show-requests', [AdminRequestController::class, 'showRequest'])->name('admin.show-requests');
     Route::get('/requested-items/{id}', [AdminRequestController::class, 'requestedItems'])->name('admin.requested-items');
-    Route::post('/accept-request/{rid}', [AdminRequestController::class, 'acceptRequest'])->name('admin.accept-request');
+    Route::post('/complete-request/{rid}', [AdminRequestController::class, 'completeRequest'])->name('admin.complete-request');
     Route::post('/deliver-request/{rid}', [AdminRequestController::class, 'deliverRequest'])->name('admin.deliver-request');
 });
 
@@ -134,9 +138,10 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
 
     //Request module
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
-    Route::get('/requests', [ManagerRequestController::class, 'userRequest'])->name('manager.requests');
+    Route::get('/requests', [ManagerRequestController::class, 'viewRequest'])->name('manager.requests');
+    Route::get('/show-requests', [ManagerRequestController::class, 'showRequest'])->name('manager.show-requests');
     Route::get('/requested-items/{id}', [ManagerRequestController::class, 'requestedItems'])->name('manager.requested-items');
-    Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
+    Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
 });
 

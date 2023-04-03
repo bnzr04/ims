@@ -23,7 +23,7 @@
             {{--User links--}}
             @if(Auth::user()->type == 'user')
             <li><a href="{{ route('user.home') }}" class="nav-link">Dashboard</a></li>
-            <li><a href="{{ route('user.request') }}" class="nav-link">My Requests</a></li>
+            <li><a href="{{ route('user.request') }}" class="nav-link">Request</a></li>
             @endif
 
             @if(Auth::user())

@@ -17,9 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('office');
-            $table->string('request_by');
             $table->string('request_to');
-            $table->string('status')->default('not completed');
+            $table->string('status')->default('pending');
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
             $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
 
@@ -33,9 +32,8 @@ return new class extends Migration
             $table->unsignedBigInteger('request_id');
             $table->unsignedBigInteger('item_id');
             $table->integer('stock_id');
-            $table->date('exp_date');
+            $table->string('exp_date');
             $table->integer('quantity');
-            $table->string('remarks')->nullable();
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
             $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
 
