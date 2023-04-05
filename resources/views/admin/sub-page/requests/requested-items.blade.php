@@ -11,9 +11,23 @@ use Illuminate\Support\Facades\Session
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
+                @if($request->status === 'pending' || $request->status === 'delivered')
                 <div class="container-lg p-0">
                     <a href="{{ route('admin.requests') }}" class="btn btn-secondary">Back</a>
                 </div>
+                @endif
+
+                @if($request->status === 'accepted')
+                <div class="container-lg p-0">
+                    <a href="{{ route('admin.requests') }}" class="btn btn-secondary" onclick="alert()">Back</a>
+                </div>
+                @endif
+
+                @if($request->status === 'completed')
+                <div class="container-lg p-0">
+                    <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Back</a>
+                </div>
+                @endif
 
                 <div class="container-md mt-3 pt-2 pb-2 shadow lh-1 rounded overflow-auto">
                     <h4>Request Details</h4>
@@ -96,9 +110,15 @@ use Illuminate\Support\Facades\Session
                         </table>
                     </div>
                     @if($request->status == 'pending')
-                    <form action="{{ route('admin.complete-request',['rid' => $request->id]) }}" method="post">
+                    <form action="{{ route('admin.accept-request',['rid' => $request->id]) }}" method="post">
                         @csrf
-                        <button type="submit" class="btn btn-primary">Mark as complete</button>
+                        <button type="submit" class="btn btn-primary shadow">Accept request</button>
+                    </form>
+                    @endif
+                    @if($request->status == 'accepted')
+                    <form action="{{ route('admin.deliver-request',['rid' => $request->id]) }}" method="post">
+                        @csrf
+                        <button type="submit" class="btn btn-warning shadow">Mark as delivered</button>
                     </form>
                     @endif
                 </div>
@@ -113,6 +133,12 @@ use Illuminate\Support\Facades\Session
 
     function remove() {
         if (!confirm('Do you want to remove this item?')) {
+            event.preventDefault();
+        }
+    }
+
+    function alert() {
+        if (!confirm('Do you want to go back and finish the dispensing later?')) {
             event.preventDefault();
         }
     }

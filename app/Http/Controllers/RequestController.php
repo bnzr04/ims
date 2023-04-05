@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
+use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -400,9 +401,49 @@ class RequestController extends Controller
                 'updated_at' => now()
             ]);
             // var_dump($model->exp_date);
+
+            //Stock reserving
+            $requestedQty = $model->quantity;
+
+            $itemStock = Stock::find($model->stock_id);
+
+            //minus the requested quantity to current stocks
+            $newStock = $itemStock->stock_qty - $requestedQty;
+            $itemStock->stock_qty = $newStock;
+            $itemStock->save();
+
+            if ($itemStock->stock_qty === 0) {
+                $itemStock->delete();
+            }
+
+            // Get the SQL query being executed
+            $sql = DB::getQueryLog();
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+            //Log Message
+            $message = "Stock ID: " . $model->stock_id . " of Item ID: " . $model->item_id . " reserved " . $requestedQty;
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $userId,
+                'user_type' => $userType,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
         }
 
-        return response()->json(['success' => true, 'request_id' => $requestModel->id]);
+        return response()->json([
+            'success' => true,
+            'request_id' => $requestModel->id,
+            'requestedQty' => $requestedQty,
+            'itemStock' => $itemStock,
+        ]);
     }
 
 

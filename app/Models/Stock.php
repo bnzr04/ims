@@ -9,7 +9,9 @@ class Stock extends Model
 {
     use HasFactory;
     protected $table = "item_stocks";
-    protected $fillable = ['stock_qty'];
+    protected $fillable = [
+        'stock_qty',
+    ];
 
     public function item()
     {

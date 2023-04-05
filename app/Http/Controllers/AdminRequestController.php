@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminRequestController extends Controller
 {
-    //this will show all the requests
+    //this will show the request view
     public function adminRequest()
     {
         // $pending = ModelsRequest::where('status', 'pending')
@@ -39,18 +39,18 @@ class AdminRequestController extends Controller
 
     public function showRequest()
     {
-        $pending = ModelsRequest::where('status', 'pending')
+        $pending = ModelsRequest::where('status', '!=', 'completed')->where('status', '!=', 'delivered')
             ->orderByDesc('updated_at')->get()->each(function ($pending) {
                 $pending->formatted_date = Carbon::parse($pending->created_at)->format('F j, Y, g:i:s a');
             });
-        $completed = ModelsRequest::where('status', 'completed')
-            ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-                $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-            });
+        // $completed = ModelsRequest::where('status', 'completed')
+        //     ->orderByDesc('updated_at')->get()->each(function ($accepted) {
+        //         $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
+        //     });
 
         $requests = [
             'pending' => $pending,
-            'completed' => $completed,
+            // 'completed' => $completed,
 
         ];
 
@@ -79,6 +79,100 @@ class AdminRequestController extends Controller
             'items' => $items,
             'requestItems' => $requestItems,
         ]);
+    }
+
+    //this will change the status of request to accepted
+    public function acceptRequest($rid)
+    {
+        //Enable Query Log
+        DB::enableQueryLog();
+
+        $request = ModelsRequest::find($rid);
+
+        $user = Auth::user();
+
+        $user_id = $user->id;
+        $user_type = $user->type;
+        $user_name = $user->name;
+
+
+        if ($request) {
+            $request->status = 'accepted';
+            $request->save();
+
+            //Get Query
+            $sql = DB::getQueryLog();
+
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+            //Log Message
+            $message = "Request ID: " . $rid . ", request is accepted.";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $user_id,
+                'user_type' => $user_type,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            return back()->with('success', 'Request accepted');
+        } else {
+            return back()->with('error', 'Request failed to mark as accepted');
+        }
+    }
+
+    //this will change the status of request to accepted
+    public function deliverRequest($rid)
+    {
+        //Enable Query Log
+        DB::enableQueryLog();
+
+        $request = ModelsRequest::find($rid);
+
+        $user = Auth::user();
+
+        $user_id = $user->id;
+        $user_type = $user->type;
+        $user_name = $user->name;
+
+
+        if ($request) {
+            $request->status = 'delivered';
+            $request->save();
+
+            //Get Query
+            $sql = DB::getQueryLog();
+
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+            //Log Message
+            $message = "Request ID: " . $rid . ", request is delivered.";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $user_id,
+                'user_type' => $user_type,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            return back()->with('success', 'Request delivered');
+        } else {
+            return back()->with('error', 'Request failed to mark as delivered');
+        }
     }
 
     //this will change the status of request to accepted
@@ -126,5 +220,63 @@ class AdminRequestController extends Controller
         } else {
             return back()->with('error', 'Request failed to mark as complete');
         }
+    }
+
+    //Request transaction
+    public function transaction()
+    {
+        return view('admin.sub-page.transaction.transaction');
+    }
+
+    //get transactions/request data
+    public function showTransaction()
+    {
+
+        $transc = ModelsRequest::where('status', 'completed')->orderBy('updated_at', 'desc')->get();
+
+        foreach ($transc as $trans) {
+            $trans->formatted_date =
+                Carbon::parse($trans->updated_at)->format('F j, Y, g:i:s a');
+        }
+
+        return response()->json($transc);
+    }
+
+    //filter transaction
+    public function filterTransaction(Request $request)
+    {
+        $today = $request->input('today');
+        // $from = $request->input('from');
+        // $to = $request->input('to');
+        // $date_to = date('Y-m-d', strtotime($to . ' +1 day'));
+
+        if ($today) {
+            // Filter transactions that occurred today
+            $from = date('Y-m-d 00:00:00');
+            $to = date('Y-m-d 23:59:59');
+
+            $data = ModelsRequest::where('status', 'completed')
+                ->whereBetween('updated_at', [$from, $to])
+                ->orderBy('updated_at', 'asc')
+                ->get();
+        } else {
+
+            $from = $request->input('from');
+            $to = $request->input('to');
+            $date_to = date('Y-m-d', strtotime($to . ' +1 day'));
+
+            $data = ModelsRequest::where('status', 'completed')
+                ->whereBetween('updated_at', [$from, $date_to])
+                ->orderBy('updated_at', 'asc')
+                ->get();
+        }
+
+
+        // Loop through the data and format the created_at timestamp
+        foreach ($data as $item) {
+            $item->formatted_date = date('F j, Y, g:i:s a', strtotime($item->updated_at));
+        }
+
+        return response()->json($data);
     }
 }

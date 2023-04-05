@@ -9,8 +9,8 @@
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 <div class="container-lg">
-                    @if($request->status === 'pending')
-                    <a href="/user/view-request/pending" class="btn btn-secondary">Back</a>
+                    @if($request->status !== 'completed')
+                    <a href="/user/view-request/all" class="btn btn-secondary">Back</a>
                     @endif
 
                     @if($request->status === 'completed')
@@ -80,6 +80,12 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($request->status == 'delivered')
+                    <form action="{{ route('user.receive-request',['rid' => $request->id]) }}" method="post">
+                        @csrf
+                        <button type="submit" class="btn btn-warning shadow">Received</button>
+                    </form>
+                    @endif
                 </div>
             </div>
         </div>

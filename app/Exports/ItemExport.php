@@ -42,37 +42,42 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
     //data collection
     public function collection()
     {
-        $user = Auth::user();
-        $user_type = $user->type;
+        // $user = Auth::user();
+        // $user_type = $user->type;
 
-        if ($user_type === 'manager') {
-            $user_dept = $user->dept;
+        // if ($user_type === 'manager') {
+        //     $user_dept = $user->dept;
 
-            if ($user_dept === 'pharmacy') {
-                $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-                    ->where('items.category', '!=', 'medical supply')
-                    ->orderBy('items.name')->get();
+        //     if ($user_dept === 'pharmacy') {
+        //         $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+        //             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+        //             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+        //             ->where('items.category', '!=', 'medical supply')
+        //             ->orderBy('items.name')->get();
 
-                return $items;
-            } elseif ($user_dept === 'csr') {
-                $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-                    ->where('items.category', 'medical supply')
-                    ->orderBy('items.name')->get();
+        //         return $items;
+        //     } elseif ($user_dept === 'csr') {
+        //         $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+        //             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+        //             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+        //             ->where('items.category', 'medical supply')
+        //             ->orderBy('items.name')->get();
 
-                return $items;
-            }
-        } else {
-            $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-                ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-                ->orderBy('items.name')->get();
+        //         return $items;
+        //     }
+        // } else {
 
-            return $items;
-        }
+
+        $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+            ->orderBy('items.name')->get();
+
+        return $items;
+
+
+        // }
+
     }
 
     //style of excel file

@@ -21,28 +21,29 @@ class StocksController extends Controller
         $user_type = $user->type;
 
 
-        if ($user_type === 'manager') {
-            $user_dept = $user->dept;
+        // if ($user_type === 'manager') {
+        //     $user_dept = $user->dept;
 
-            if ($user_dept === 'pharmacy') {
-                $filename = 'Pharma_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
-                return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-                    'Content-Type' => 'application/vnd.ms-excel',
-                ]);
-            } elseif (
-                $user_dept === 'csr'
-            ) {
-                $filename = 'Csr_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
-                return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-                    'Content-Type' => 'application/vnd.ms-excel',
-                ]);
-            }
-        } else {
-            $filename = 'Pharma&Csr_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
-            return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-                'Content-Type' => 'application/vnd.ms-excel',
-            ]);
-        }
+        //     if ($user_dept === 'pharmacy') {
+        //         $filename = 'Pharma_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+        //         return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+        //             'Content-Type' => 'application/vnd.ms-excel',
+        //         ]);
+        //     } elseif (
+        //         $user_dept === 'csr'
+        //     ) {
+        //         $filename = 'Csr_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+        //         return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+        //             'Content-Type' => 'application/vnd.ms-excel',
+        //         ]);
+        //     }
+        // } else {
+
+        $filename = 'Pharma_Stocks_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+        return Excel::download(new StocksExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+            'Content-Type' => 'application/vnd.ms-excel',
+        ]);
+        // }
     }
 
     public function stocks(Request $request)
@@ -50,18 +51,18 @@ class StocksController extends Controller
         $user = Auth::user();
 
         //check if user is manager
-        if ($user->type === 'manager') {
-            //check if the manager is from pharmacy
-            if ($user->dept === 'pharmacy') {
-                $categories = Item::where('category', '!=', 'medical supply')->distinct('category')->pluck('category');
-            }
-            //check if the manager is from csr
-            elseif ($user->dept === 'csr') {
-                $categories = Item::where('category', 'medical supply')->distinct('category')->pluck('category');
-            }
-        } else {
-            $categories = Item::distinct('category')->pluck('category');
-        }
+        // if ($user->type === 'manager') {
+        //     //check if the manager is from pharmacy
+        //     if ($user->dept === 'pharmacy') {
+        //         $categories = Item::where('category', '!=', 'medical supply')->distinct('category')->pluck('category');
+        //     }
+        //     //check if the manager is from csr
+        //     elseif ($user->dept === 'csr') {
+        //         $categories = Item::where('category', 'medical supply')->distinct('category')->pluck('category');
+        //     }
+        // } else {
+        $categories = Item::distinct('category')->pluck('category');
+        // }
 
         //get the requested category
         $category = $request->category;
@@ -75,29 +76,29 @@ class StocksController extends Controller
                 ->where('items.category', $category)
                 ->get();
         } else {
-            if ($user->type === 'manager') {
-                if ($user->dept === 'pharmacy') {
-                    $stocks = DB::table('item_stocks')
-                        ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                        ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
-                        ->where('items.category', '!=', 'medical supply')
-                        ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
-                        ->get();
-                } elseif ($user->dept === 'csr') {
-                    $stocks = DB::table('item_stocks')
-                        ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                        ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
-                        ->where('items.category', 'medical supply')
-                        ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
-                        ->get();
-                }
-            } else {
-                $stocks = DB::table('item_stocks')
-                    ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
-                    ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
-                    ->get();
-            }
+            // if ($user->type === 'manager') {
+            //     if ($user->dept === 'pharmacy') {
+            //         $stocks = DB::table('item_stocks')
+            //             ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            //             ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
+            //             ->where('items.category', '!=', 'medical supply')
+            //             ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
+            //             ->get();
+            //     } elseif ($user->dept === 'csr') {
+            //         $stocks = DB::table('item_stocks')
+            //             ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            //             ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
+            //             ->where('items.category', 'medical supply')
+            //             ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
+            //             ->get();
+            //     }
+            // } else {
+            $stocks = DB::table('item_stocks')
+                ->join('items', 'item_stocks.item_id', '=', 'items.id')
+                ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
+                ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
+                ->get();
+            // }
         }
 
         if ($user->type === 'manager') {
@@ -130,11 +131,6 @@ class StocksController extends Controller
                     ->join('items', 'item_stocks.item_id', '=', 'items.id')
                     ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))
                     ->where('item_stocks.item_id', $id)
-                    ->where(
-                        'items.category',
-                        '!=',
-                        'medical supply'
-                    )
                     ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
                     ->orderByDesc('item_stocks.created_at')
                     ->get();
@@ -143,32 +139,31 @@ class StocksController extends Controller
                 $totalStocks = DB::table('item_stocks')
                     ->join('items', 'item_stocks.item_id', '=', 'items.id')
                     ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
-                    ->where('items.category', '!=', 'medical supply')
                     ->get();
 
                 // if ($stocks->empty()) {
                 //     return abort(403, 'Item not available for you to access');
                 // }
             } //if the manager department is csr
-            elseif ($user_dept === 'csr') {
-                $stocks = DB::table('item_stocks')
-                    ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))->where('item_stocks.item_id', $id)
-                    ->where('items.category', 'medical supply')
-                    ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
-                    ->orderByDesc('item_stocks.created_at')
-                    ->get();
+            // elseif ($user_dept === 'csr') {
+            //     $stocks = DB::table('item_stocks')
+            //         ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            //         ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))->where('item_stocks.item_id', $id)
+            //         ->where('items.category', 'medical supply')
+            //         ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
+            //         ->orderByDesc('item_stocks.created_at')
+            //         ->get();
 
-                $totalStocks = DB::table('item_stocks')
-                    ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
-                    ->where('items.category', 'medical supply')
-                    ->get();
+            //     $totalStocks = DB::table('item_stocks')
+            //         ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            //         ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
+            //         ->where('items.category', 'medical supply')
+            //         ->get();
 
-                // if ($stocks->empty()) {
-                //     return abort(403, 'Item not available for you to access');
-                // }
-            }
+            // if ($stocks->empty()) {
+            //     return abort(403, 'Item not available for you to access');
+            // }
+            // }
 
             if ($stocks) {
                 return view('manager.sub-page.stocks.add-to-stock')->with([

@@ -11,9 +11,23 @@ use Illuminate\Support\Facades\Session
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
+                @if($request->status === 'pending' || $request->status === 'delivered')
                 <div class="container-lg p-0">
                     <a href="{{ route('manager.requests') }}" class="btn btn-secondary">Back</a>
                 </div>
+                @endif
+
+                @if($request->status === 'accepted')
+                <div class="container-lg p-0">
+                    <a href="{{ route('manager.requests') }}" class="btn btn-secondary" onclick="alert()">Back</a>
+                </div>
+                @endif
+
+                @if($request->status === 'completed')
+                <div class="container-lg p-0">
+                    <a href="{{ route('manager.transaction') }}" class="btn btn-secondary">Back</a>
+                </div>
+                @endif
                 <div class="container-md mt-3">
                     <h4>Request Details</h4>
                 </div>
@@ -97,9 +111,16 @@ use Illuminate\Support\Facades\Session
                         </table>
                     </div>
                     @if($request->status == 'pending')
-                    <form action="{{ route('manager.complete-request',['rid' => $request->id]) }}" method="post">
+                    <form action="{{ route('manager.accept-request',['rid' => $request->id]) }}" method="post">
                         @csrf
                         <button type="submit" class="btn btn-primary">Accept request</button>
+                    </form>
+                    @endif
+
+                    @if($request->status == 'accepted')
+                    <form action="{{ route('manager.deliver-request',['rid' => $request->id]) }}" method="post">
+                        @csrf
+                        <button type="submit" class="btn btn-warning shadow">Mark as delivered</button>
                     </form>
                     @endif
                 </div>
@@ -114,6 +135,12 @@ use Illuminate\Support\Facades\Session
 
     function remove() {
         if (!confirm('Do you want to remove this item?')) {
+            event.preventDefault();
+        }
+    }
+
+    function alert() {
+        if (!confirm('Do you want to go back and finish the dispensing later?')) {
             event.preventDefault();
         }
     }

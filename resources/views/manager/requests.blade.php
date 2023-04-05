@@ -11,7 +11,7 @@
                 <h2>Requests</h2>
                 <div class="container-lg mt-3 p-2 pt-3 rounded shadow">
                     <div class="container-md">
-                        <h5>Pending requests</h5>
+                        <h5>Pending & accepted requests</h5>
                     </div>
                     <div class="container-md overflow-auto" style="height: 400px;">
                         <table class="table">
@@ -31,30 +31,15 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="container-lg mt-3 mb-3 p-2 pt-3 rounded shadow">
-                    <div class="container-md">
-                        <h5>Completed requests</h5>
-                    </div>
-                    <div class="container-md overflow-auto" style="height: 250px;">
-                        <table class="table">
-                            <thead class="bg-secondary text-white" style="position: sticky;top:0;">
-                                <tr>
-                                    <th scope="col">Req ID</th>
-                                    <th scope="col">Date-time</th>
-                                    <th scope="col">Office</th>
-                                    <th scope="col">Request by</th>
-                                    <th scope="col">Request to</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="completed_table">
-
-                            </tbody>
-                        </table>
-                    </div>
+                <hr>
+                <div class="container-lg">
+                    <a href="{{ route('manager.transaction') }}" class="btn btn-secondary">Transactions</a>
                 </div>
+                @if(session('success'))
+                <div class="alert alert-success" id="alert">
+                    {{ session('success') }}
+                </div>
+                @endif
 
 
             </div>
@@ -72,9 +57,6 @@
                 var pendingtbody = document.querySelector('#pending_table');
                 pendingtbody.innerHTML = '';
 
-                var completedtbody = document.querySelector('#completed_table');
-                completedtbody.innerHTML = '';
-
                 for (var i = 0; i < data.pending.length; i++) {
                     var row = data.pending[i];
                     pendingtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
@@ -84,14 +66,6 @@
                     pendingtbody.innerHTML += "<tr><td colspan='6'>No pending request...</td></tr>";
                 }
 
-                for (var i = 0; i < data.completed.length; i++) {
-                    var row = data.completed[i];
-                    completedtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
-                }
-
-                if (data.completed.length === 0) {
-                    completedtbody.innerHTML += "<tr><td colspan='6'>No completed request...</td></tr>";
-                }
             } else {
                 console.log('Error: ' + xhr.status);
             }

@@ -105,8 +105,14 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
     Route::get('/show-requests', [AdminRequestController::class, 'showRequest'])->name('admin.show-requests');
     Route::get('/requested-items/{id}', [AdminRequestController::class, 'requestedItems'])->name('admin.requested-items');
-    Route::post('/complete-request/{rid}', [AdminRequestController::class, 'completeRequest'])->name('admin.complete-request');
+    Route::post('/accept-request/{rid}', [AdminRequestController::class, 'acceptRequest'])->name('admin.accept-request');
     Route::post('/deliver-request/{rid}', [AdminRequestController::class, 'deliverRequest'])->name('admin.deliver-request');
+    Route::post('/complete-request/{rid}', [AdminRequestController::class, 'completeRequest'])->name('admin.complete-request');
+
+    //Request transaction
+    Route::get('/transaction', [AdminRequestController::class, 'transaction'])->name('admin.transaction');
+    Route::get('/show-transaction', [AdminRequestController::class, 'showTransaction'])->name('admin.show-transaction');
+    Route::get('/filter-transaction', [AdminRequestController::class, 'filterTransaction'])->name('admin.filter-transaction');
 });
 
 /*------------------------------------------
@@ -141,8 +147,14 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::get('/requests', [ManagerRequestController::class, 'viewRequest'])->name('manager.requests');
     Route::get('/show-requests', [ManagerRequestController::class, 'showRequest'])->name('manager.show-requests');
     Route::get('/requested-items/{id}', [ManagerRequestController::class, 'requestedItems'])->name('manager.requested-items');
-    Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
+    Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
+    Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
+
+    //Transaction
+    Route::get('/transaction', [ManagerRequestController::class, 'transaction'])->name('manager.transaction');
+    Route::get('/show-transaction', [ManagerRequestController::class, 'showTransaction'])->name('manager.show-transaction');
+    Route::get('/filter-transaction', [ManagerRequestController::class, 'filterTransaction'])->name('manager.filter-transaction');
 });
 
 //Logout

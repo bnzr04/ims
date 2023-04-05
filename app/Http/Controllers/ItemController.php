@@ -94,27 +94,10 @@ class ItemController extends Controller
         $user = Auth::user();
         $user_type = $user->type;
 
-
-        if ($user_type === 'manager') {
-            $user_dept = $user->dept;
-
-            if ($user_dept === 'pharmacy') {
-                $filename = 'Pharma_ITEMS_' . Carbon::now()->format('Ymd-His') . '.xlsx';
-                return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-                    'Content-Type' => 'application/vnd.ms-excel',
-                ]);
-            } elseif ($user_dept === 'csr') {
-                $filename = 'Csr_ITEMS_' . Carbon::now()->format('Ymd-His') . '.xlsx';
-                return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-                    'Content-Type' => 'application/vnd.ms-excel',
-                ]);
-            }
-        } else {
-            $filename = 'Pharma&Csr_ITEMS_' . Carbon::now()->format('Ymd-His') . '.xlsx';
-            return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-                'Content-Type' => 'application/vnd.ms-excel',
-            ]);
-        }
+        $filename = 'Pharma_items_' . Carbon::now()->format('Ymd-His') . '.xlsx';
+        return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+            'Content-Type' => 'application/vnd.ms-excel',
+        ]);
     }
 
 
@@ -137,17 +120,14 @@ class ItemController extends Controller
 
         //Check the user if manager type
         if ($user->type === 'manager') {
-            //If the user is manager type, manager has department to assign
-            //the condition will return the 
+
             if ($user->dept === 'pharmacy') {
-                $categories = Item::where('category', '!=', 'medical supply')
-                    ->distinct('category')
+                $categories = Item::distinct('category')
                     ->pluck('category');
 
                 $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
                     ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
                     ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-                    ->where('items.category', '!=', 'medical supply')
                     ->orderBy('items.name');
 
                 if ($category) {

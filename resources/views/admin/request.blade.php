@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Session
                 </div>
                 <div class="container-lg mt-3 p-2 pt-3 rounded shadow">
                     <div class="container-md">
-                        <h5>Pending requests</h5>
+                        <h5>Pending & accepted requests</h5>
                     </div>
                     <div class="container-md overflow-auto" style="height: 350px;">
                         <table class="table">
@@ -37,13 +37,16 @@ use Illuminate\Support\Facades\Session
                     </div>
                 </div>
                 <hr>
+                <div class="container-lg">
+                    <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Transactions</a>
+                </div>
                 @if(session('success'))
                 <div class="alert alert-success" id="alert">
                     {{ session('success') }}
                 </div>
                 @endif
 
-                <div class="container-lg mt-3 mb-3 p-2 pt-3 rounded shadow">
+                <!-- <div class="container-lg mt-3 mb-3 p-2 pt-3 rounded shadow">
                     <div class="container-md">
                         <h5>Completed requests</h5>
                     </div>
@@ -64,7 +67,7 @@ use Illuminate\Support\Facades\Session
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -80,8 +83,8 @@ use Illuminate\Support\Facades\Session
                 var pendingtbody = document.querySelector('#pending_table');
                 pendingtbody.innerHTML = '';
 
-                var completedtbody = document.querySelector('#completed_table');
-                completedtbody.innerHTML = '';
+                // var completedtbody = document.querySelector('#completed_table');
+                // completedtbody.innerHTML = '';
 
                 for (var i = 0; i < data.pending.length; i++) {
                     var row = data.pending[i];
@@ -92,14 +95,14 @@ use Illuminate\Support\Facades\Session
                     pendingtbody.innerHTML += "<tr><td colspan='6'>No pending request...</td></tr>";
                 }
 
-                for (var i = 0; i < data.completed.length; i++) {
-                    var row = data.completed[i];
-                    completedtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
-                }
+                // for (var i = 0; i < data.completed.length; i++) {
+                //     var row = data.completed[i];
+                //     completedtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                // }
 
-                if (data.completed.length === 0) {
-                    completedtbody.innerHTML += "<tr><td colspan='6'>No completed request...</td></tr>";
-                }
+                // if (data.completed.length === 0) {
+                //     completedtbody.innerHTML += "<tr><td colspan='6'>No completed request...</td></tr>";
+                // }
             } else {
                 console.log('Error: ' + xhr.status);
             }

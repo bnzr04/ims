@@ -19,7 +19,7 @@ class UserController extends Controller
 
         //this will get the total number of pending
         $pending = ModelsRequest::where('user_id', $user_id)
-            ->where('status', 'pending')
+            ->where('status', '!=', 'completed')
             ->count('user_id');
 
         //this will get the total number of completed or received requests
@@ -39,9 +39,15 @@ class UserController extends Controller
     {
         $user_id = Auth::user()->id;
 
-        $items = ModelsRequest::where('user_id', $user_id)
-            ->where('status', $request)
-            ->get();
+        if ($request === 'all') {
+            $items = ModelsRequest::where('user_id', $user_id)
+                ->where('status', '!=', 'completed')
+                ->get();
+        } else if ($request === 'completed') {
+            $items = ModelsRequest::where('user_id', $user_id)
+                ->where('status', 'completed')
+                ->get();
+        }
 
         foreach ($items as $item) {
             $item->formatted_date = Carbon::parse($item->updated_at)->format('F j, Y, g:i:s a');
