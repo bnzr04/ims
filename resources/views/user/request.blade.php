@@ -19,7 +19,7 @@
                             <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
                                 <option></option>
                                 @foreach($items as $item)
-                                <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} ({{ $item->formatted_exp_date }})</option>
+                                <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }})</option>
                                 @endforeach
                             </select>
 

@@ -53,6 +53,7 @@ use Illuminate\Support\Facades\Session
                             <th scope="col">Create Date</th>
                             <th scope="col">Update Date</th>
                             <th scope="col">Quantity</th>
+                            <th scope="col">MOA</th>
                             <th scope="col">Exp Date</th>
                             <th scope="col">Action</th>
                         </tr>
@@ -65,6 +66,7 @@ use Illuminate\Support\Facades\Session
                             <td>{{ $stock->created_at }}</td>
                             <td>{{ $stock->updated_at }}</td>
                             <td>{{ $stock->stock_qty }}</td>
+                            <td>{{ $stock->mode_acquisition }}</td>
                             <td>{{ $stock->exp_date }}</td>
                             <td>
                                 <a href="{{ route('manager.add-stock', ['id' => $stock->id]) }}" class="btn btn-primary">+</a>
@@ -79,7 +81,7 @@ use Illuminate\Support\Facades\Session
 
                 <form action="{{ route('manager.save-stock') }}" method="post">
                     @csrf
-                    <div class="modal-body p-2">
+                    <div class="modal-body p-2" style="width:100%;max-width:300px">
                         <h5>ADD NEW STOCKS BATCH:</h5>
                         <input type="hidden" class="form-control" name="item_id" id="item_id" value="{{ $item->id }}">
 
@@ -92,6 +94,18 @@ use Illuminate\Support\Facades\Session
                             <label for="exp_date">Expiration Date</label>
                             <input type="date" class="form-control" name="exp_date" id="exp_date" required>
                         </div>
+
+                        <div class="container-sm mt-1">
+                            <label for="mode_acq">Mode of acquisition</label>
+                            <input type="text" class="form-control" name="mode_acq" id="mode_acq_input" list="mode_acq" required>
+                            <datalist id="mode_acq">
+                                <option value="Petty Cash">
+                                <option value="LGU">
+                                <option value="Donation">
+                            </datalist>
+
+                            <div class="matching_options"></div>
+                        </div>
                     </div>
 
                     @if(session('success'))
@@ -101,7 +115,7 @@ use Illuminate\Support\Facades\Session
                     @endif
 
                     @if(session('error'))
-                    <div class="alert alert-danger" id="alert">
+                    <div class="alert alert-danger">
                         {{ session('error') }}
                     </div>
                     @endif
@@ -116,7 +130,7 @@ use Illuminate\Support\Facades\Session
 </div>
 <script>
     setTimeout(function() {
-        document.getElementById('alert').style.display = 'none';
+        document.getElementById("alert").style.display = 'none';
     }, 3000);
 
     function deleteStock() {
@@ -124,5 +138,24 @@ use Illuminate\Support\Facades\Session
             event.preventDefault();
         }
     }
+
+    const modeAcqInput = document.getElementById("mode_acq_input");
+    const modeAcq = document.getElementById("mode_acq").options;
+    const matchingOptionsContainer = document.getElementById("matching_options");
+
+    modeAcqInput.addEventListener("input", function() {
+        const inputValue = this.value.toLowerCase();
+        let matchingOptionsHTML = "";
+
+        for (let i = 0; i < modeAcq.length; i++) {
+            const optionValue = modeAcq[i].value.toLowerCase();
+
+            if (optionValue.includes(inputValue)) {
+                matchingOptionsHTML = `<div>${modeAcq[i].value}</div>`;
+            }
+        }
+
+        matchingOptionsContainer.innerHTML = matchingOptionsHTML;
+    });
 </script>
 @endsection

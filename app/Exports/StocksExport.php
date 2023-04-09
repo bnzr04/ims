@@ -111,7 +111,6 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
 
             foreach ($items as $item) {
                 $item_id = $item->item_id;
-
                 $item->total_quantity = Stock::select(DB::raw('SUM(stock_qty) as total_quantity'))->groupBy('item_id')->where('item_id', $item_id)->get();
             }
 

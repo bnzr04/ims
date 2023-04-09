@@ -44,8 +44,8 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
     Route::get('/home', [UserController::class, 'userHome'])->name('user.home');
 
     //Request routes
-    Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
-    Route::get('/my-requests', [RequestController::class, 'userRequest'])->name('user.requests');
+    // Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
+    // Route::get('/my-requests', [RequestController::class, 'userRequest'])->name('user.requests');
     Route::get('/request', [RequestController::class, 'request'])->name('user.request');
     Route::post('/save-requests', [RequestController::class, 'saveRequest'])->name('user.save-request');
     Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');

@@ -72,7 +72,7 @@ class StocksController extends Controller
             $stocks = DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw('MAX(item_stocks.created_at) as latest_stock'))
-                ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
+                ->groupBy('item_stocks.item_id', 'item_stocks.mode_acquisition', 'items.name', 'items.description', 'items.category')
                 ->where('items.category', $category)
                 ->get();
         } else {
@@ -96,7 +96,7 @@ class StocksController extends Controller
             $stocks = DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
-                ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
+                ->groupBy('item_stocks.item_id', 'item_stocks.mode_acquisition', 'items.name', 'items.description', 'items.category')
                 ->get();
             // }
         }
@@ -131,7 +131,7 @@ class StocksController extends Controller
                     ->join('items', 'item_stocks.item_id', '=', 'items.id')
                     ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))
                     ->where('item_stocks.item_id', $id)
-                    ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
+                    ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
                     ->orderByDesc('item_stocks.created_at')
                     ->get();
 
@@ -175,12 +175,13 @@ class StocksController extends Controller
                 return view('manager.sub-page.stocks.add-to-stock')->with('item', $item);
             }
         }
+
         //else the user is admin
         else {
             $stocks = DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))->where('item_stocks.item_id', $id)
-                ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
+                ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
                 ->orderByDesc('item_stocks.created_at')
                 ->get();
 
@@ -210,6 +211,7 @@ class StocksController extends Controller
 
         $save->item_id = $request->item_id;
         $save->stock_qty = $request->stock_qty;
+        $save->mode_acquisition = $request->mode_acq;
         $save->exp_date = $request->exp_date;
         $save->save();
 
@@ -264,10 +266,20 @@ class StocksController extends Controller
 
         if ($user_type === 'manager') {
             if ($stock !== null) {
+                // foreach ($stock as $stock) {
+                $stock->formated_created_at = Carbon::parse($stock->created_at)->format('F d, Y h:i:s A');
+                $stock->formated_updated_at = Carbon::parse($stock->updated_at)->format('F d, Y h:i:s A');
+                // }
+
                 return view('manager.sub-page.stocks.add-stock')->with(['stock' => $stock, 'item' => $stockItem]);
             }
         } else {
             if ($stock !== null) {
+                // foreach ($stock as $stock) {
+                $stock->formated_created_at = Carbon::parse($stock->created_at)->format('F d, Y h:i:s A');
+                $stock->formated_updated_at = Carbon::parse($stock->updated_at)->format('F d, Y h:i:s A');
+                // }
+
                 return view('admin.sub-page.stocks.add-stock')->with(['stock' => $stock, 'item' => $stockItem]);
             }
         }
@@ -315,10 +327,10 @@ class StocksController extends Controller
         }
 
         //Log Message
-        if ($operation == "add") {
-            $message = "Stock batch (id:" . $id . ") updated (+ " . $toStockQty . ")";
+        if ($operation == "return") {
+            $message = "Stock ID: " . $id . ",  returned: " . $toStockQty . ", prev quantity: " . $currentStockQty . ", current quantity: " . $newStockQty;
         } else {
-            $message = "Stock batch (id:" . $id . ") updated (- " . $toStockQty . ")";
+            $message = "Stock ID: " . $id . ",  removed: " . $toStockQty . ", prev quantity: " . $currentStockQty . ", current quantity: " . $newStockQty;
         }
 
 
