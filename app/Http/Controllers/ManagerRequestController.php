@@ -277,7 +277,7 @@ class ManagerRequestController extends Controller
                 'updated_at' => now()
             ]);
 
-            return back()->with('success', 'Request delivered');
+            return redirect()->route('manager.requests')->with('success', 'Request delivered');
         } else {
             return back()->with('error', 'Request failed to mark as delivered');
         }

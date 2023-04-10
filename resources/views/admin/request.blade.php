@@ -37,14 +37,15 @@ use Illuminate\Support\Facades\Session
                     </div>
                 </div>
                 <hr>
-                <div class="container-lg">
-                    <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Transactions</a>
-                </div>
                 @if(session('success'))
                 <div class="alert alert-success" id="alert">
                     {{ session('success') }}
                 </div>
                 @endif
+
+                <div class="container-lg">
+                    <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Transactions</a>
+                </div>
 
                 <!-- <div class="container-lg mt-3 mb-3 p-2 pt-3 rounded shadow">
                     <div class="container-md">

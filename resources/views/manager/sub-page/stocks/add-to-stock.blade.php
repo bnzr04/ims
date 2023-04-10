@@ -139,23 +139,25 @@ use Illuminate\Support\Facades\Session
         }
     }
 
-    const modeAcqInput = document.getElementById("mode_acq_input");
-    const modeAcq = document.getElementById("mode_acq").options;
-    const matchingOptionsContainer = document.getElementById("matching_options");
+    function modeOfAcquisition() {
+        const modeAcqInput = document.getElementById("mode_acq_input");
+        const modeAcq = document.getElementById("mode_acq").options;
+        const matchingOptionsContainer = document.getElementById("matching_options");
 
-    modeAcqInput.addEventListener("input", function() {
-        const inputValue = this.value.toLowerCase();
-        let matchingOptionsHTML = "";
+        modeAcqInput.addEventListener("input", function() {
+            const inputValue = this.value.toLowerCase();
+            let matchingOptionsHTML = "";
 
-        for (let i = 0; i < modeAcq.length; i++) {
-            const optionValue = modeAcq[i].value.toLowerCase();
+            for (let i = 0; i < modeAcq.length; i++) {
+                const optionValue = modeAcq[i].value.toLowerCase();
 
-            if (optionValue.includes(inputValue)) {
-                matchingOptionsHTML = `<div>${modeAcq[i].value}</div>`;
+                if (optionValue.includes(inputValue)) {
+                    matchingOptionsHTML = `<div>${modeAcq[i].value}</div>`;
+                }
             }
-        }
 
-        matchingOptionsContainer.innerHTML = matchingOptionsHTML;
-    });
+            matchingOptionsContainer.innerHTML = matchingOptionsHTML;
+        });
+    }
 </script>
 @endsection

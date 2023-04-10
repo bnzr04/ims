@@ -101,6 +101,10 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('admin.delete-stock');
     Route::post('/export-stocks', [StocksController::class, 'export'])->name('admin.export-stocks');
 
+    //Dispense Report
+    Route::get('/dispense', [StocksController::class, 'dispense'])->name('admin.dispense');
+    Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('admin.get-dispense');
+
     //Request module routes
     Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
     Route::get('/show-requests', [AdminRequestController::class, 'showRequest'])->name('admin.show-requests');
@@ -150,6 +154,9 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
     Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
+
+    //Dispense Report
+    Route::get('/dispense', [StocksController::class, 'dispense'])->name('manager.dispense');
 
     //Transaction
     Route::get('/transaction', [ManagerRequestController::class, 'transaction'])->name('manager.transaction');

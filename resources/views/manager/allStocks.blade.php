@@ -43,10 +43,14 @@
                     </div>
                 </div>
                 <div class="container-lg px-2 pt-2 pb-4 mt-3 mb-4 rounded shadow bg-white">
-                    <div class="container-lg p-0 mb-2">
+                    <div class="container-lg p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:200px">
                         <form action="{{ route('manager.export-stocks') }}" method="post" class="m-0">
                             @csrf
                             <button type="submit" class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
+                        </form>
+
+                        <form action="{{ route('manager.dispense') }}" method="get">
+                            <button class="btn btn-secondary">Dispense report</button>
                         </form>
                     </div>
 
@@ -67,7 +71,7 @@
                             <tbody>
                                 @forelse( $stocks as $stock )
                                 <tr>
-                                    <th scope="row">{{ $stock->item_id }}</th>
+                                    <th scope="row">{{ $stock->id }}</th>
                                     <th>{{ $stock->name }}</th>
                                     <td>{{ $stock->description }}</td>
                                     <td>{{ $stock->category }}</td>
@@ -79,7 +83,7 @@
                                     @endif
                                     <th>{{ $stock->latest_stock }}</th>
                                     <td>
-                                        <a href="{{ route('manager.add-to-stocks', ['id' => $stock->item_id]) }}" class="btn btn-secondary">View batches</a>
+                                        <a href="{{ route('manager.add-to-stocks', ['id' => $stock->id]) }}" class="btn btn-secondary">View batches</a>
                                     </td>
                                 </tr>
                                 @empty

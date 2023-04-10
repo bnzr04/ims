@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Exports\StocksExport;
 use App\Models\Item;
 use App\Models\Log;
+use App\Models\Request as ModelsRequest;
+use App\Models\Request_Item;
 use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -69,10 +71,17 @@ class StocksController extends Controller
 
 
         if ($category) {
-            $stocks = DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw('MAX(item_stocks.created_at) as latest_stock'))
-                ->groupBy('item_stocks.item_id', 'item_stocks.mode_acquisition', 'items.name', 'items.description', 'items.category')
+            $stocks = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+                ->select(
+                    'items.id',
+                    'items.name',
+                    'items.description',
+                    'items.category',
+                    DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
+                    DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
+                    DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
+                )
+                ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
                 ->where('items.category', $category)
                 ->get();
         } else {
@@ -93,10 +102,17 @@ class StocksController extends Controller
             //             ->get();
             //     }
             // } else {
-            $stocks = DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
-                ->groupBy('item_stocks.item_id', 'item_stocks.mode_acquisition', 'items.name', 'items.description', 'items.category')
+            $stocks = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+                ->select(
+                    'items.id',
+                    'items.name',
+                    'items.description',
+                    'items.category',
+                    DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
+                    DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
+                    DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
+                )
+                ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
                 ->get();
             // }
         }
@@ -395,5 +411,29 @@ class StocksController extends Controller
         } else {
             return back()->with('error', 'Stock failed to delete.');
         }
+    }
+
+    ///////////////Dispense report///////////////
+    public function dispense()
+    {
+        $user = Auth::user();
+
+        if ($user->type === 'manager') {
+            return view('manager.sub-page.stocks.dispense');
+        } else {
+            return view('admin.sub-page.stocks.dispense');
+        }
+    }
+
+    public function getDispense()
+    {
+        $completedAndDeliveredId = ModelsRequest::whereIn('status', ['completed', 'delivered'])->pluck('id');
+
+        $items = Request_Item::select('*')
+            ->distinct()
+            ->whereIn('request_id', $completedAndDeliveredId)
+            ->get();
+
+        return response()->json($items);
     }
 }

@@ -32,15 +32,15 @@
                     </div>
                 </div>
                 <hr>
-                <div class="container-lg">
-                    <a href="{{ route('manager.transaction') }}" class="btn btn-secondary">Transactions</a>
-                </div>
                 @if(session('success'))
                 <div class="alert alert-success" id="alert">
                     {{ session('success') }}
                 </div>
                 @endif
 
+                <div class="container-lg">
+                    <a href="{{ route('manager.transaction') }}" class="btn btn-secondary">Transactions</a>
+                </div>
 
             </div>
         </div>
