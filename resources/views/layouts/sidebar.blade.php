@@ -4,33 +4,33 @@
 
             {{--Admin links--}}
             @if( Auth::user()->type == 'admin' )
-            <li><a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
-            <li><a href="{{ route('admin.users') }}" class="nav-link">Users</a></li>
-            <li><a href="{{ route('admin.items') }}" class="nav-link">Items & Stocks</a></li>
+            <li><a href="{{ route('admin.dashboard') }}" class="nav-link text-white">Dashboard</a></li>
+            <li><a href="{{ route('admin.users') }}" class="nav-link text-white">Users</a></li>
+            <li><a href="{{ route('admin.items') }}" class="nav-link text-white">Items & Stocks</a></li>
             <!-- <li><a href="{{ route('admin.deployment') }}" class="nav-link">Deployment</a></li> -->
-            <li><a href="{{ route('admin.requests') }}" class="nav-link">Requests</a></li>
-            <li><a href="{{ route('admin.log-index') }}" class="nav-link">Log</a></li>
+            <li><a href="{{ route('admin.requests') }}" class="nav-link text-white">Requests</a></li>
+            <li><a href="{{ route('admin.log-index') }}" class="nav-link text-white">Log</a></li>
             @endif
 
             {{--Manager links--}}
             @if( Auth::user()->type == 'manager' )
-            <li><a href="{{ route('manager.home') }}" class="nav-link">Dashboard</a></li>
-            <li><a href="{{ route('manager.stocks') }}" class="nav-link">Items & Stocks</a></li>
+            <li><a href="{{ route('manager.home') }}" class="nav-link text-white">Dashboard</a></li>
+            <li><a href="{{ route('manager.stocks') }}" class="nav-link text-white">Items & Stocks</a></li>
             <!-- <li><a href="{{ route('manager.deployment') }}" class="nav-link">Deployment</a></li> -->
-            <li><a href="{{ route('manager.requests') }}" class="nav-link">Requests</a></li>
+            <li><a href="{{ route('manager.requests') }}" class="nav-link text-white">Requests</a></li>
             @endif
 
             {{--User links--}}
             @if(Auth::user()->type == 'user')
-            <li><a href="{{ route('user.home') }}" class="nav-link">Dashboard</a></li>
-            <li><a href="{{ route('user.request') }}" class="nav-link">Request</a></li>
+            <li><a href="{{ route('user.home') }}" class="nav-link text-white">Dashboard</a></li>
+            <li><a href="{{ route('user.request') }}" class="nav-link text-white">Request</a></li>
             @endif
 
             @if(Auth::user())
             <li>
-                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                <a class="nav-link text-white" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                    {{ __('Logout') }} 
+                    {{ __('Logout') }}
                 </a>
             </li>
             @endif

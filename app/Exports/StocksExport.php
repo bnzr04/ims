@@ -53,6 +53,7 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
             [
                 'Stock ID',
                 'Expiration Date (YYYY-MM-DD)',
+                'Mode of Acquisition',
                 'Quantity',
                 'Item ID',
                 'Name',
@@ -75,9 +76,9 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
 
             if ($user_dept === 'pharmacy') {
                 $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at',)
-                    ->where('items.category', '!=', 'medical supply')
+                    ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.mode_acquisition', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at',)
+                    // ->where('items.category', '!=', 'medical supply')
                     ->orderBy('items.name')->get();
 
                 foreach ($items as $item) {
@@ -90,8 +91,8 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
                 return $items;
             } elseif ($user_dept === 'csr') {
                 $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at',)
+                    ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at',)
                     ->where('items.category', 'medical supply')
                     ->orderBy('items.name')->get();
 
@@ -105,8 +106,8 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
             }
         } else {
             $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at',)
+                ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+                ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at',)
                 ->orderBy('items.name')->get();
 
             foreach ($items as $item) {
@@ -125,13 +126,13 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
         return [
             $row->id,
             $row->exp_date,
+            $row->mode_acquisition,
             $row->stock_qty,
             $row->item_id,
             $row->name,
             $row->description,
             $row->category,
             $row->unit,
-            // $row->total_quantity[0]['total_quantity'],
 
         ];
     }

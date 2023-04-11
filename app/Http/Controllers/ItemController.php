@@ -358,7 +358,7 @@ class ItemController extends Controller
         }
 
         //Log Message
-        $message = "Item updated.";
+        $message = "Item ID: " . $item->id . ", " . $item->name .  " updated its info.";
 
         // Log the data to the logs table
         Log::create([

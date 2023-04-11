@@ -91,7 +91,7 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
         ]);
 
         // Center align all cells
-        $sheet->getStyle('A1:F100')->getAlignment()->setHorizontal('center')->setVertical('center');
+        $sheet->getStyle('A1:F1000')->getAlignment()->setHorizontal('center')->setVertical('center');
     }
 
     public function map($row): array
