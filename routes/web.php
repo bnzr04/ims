@@ -104,6 +104,8 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     //Dispense Report
     Route::get('/dispense', [StocksController::class, 'dispense'])->name('admin.dispense');
     Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('admin.get-dispense');
+    Route::get('/filter-dispense', [StocksController::class, 'dispenseFilter'])->name('admin.filter-dispense');
+    Route::post('/export-dispense', [StocksController::class, 'dispenseExport'])->name('admin.export-dispense');
 
     //Request module routes
     Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
@@ -157,6 +159,9 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
 
     //Dispense Report
     Route::get('/dispense', [StocksController::class, 'dispense'])->name('manager.dispense');
+    Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('manager.get-dispense');
+    Route::get('/filter-dispense', [StocksController::class, 'dispenseFilter'])->name('manager.filter-dispense');
+    Route::post('/export-dispense', [StocksController::class, 'dispenseExport'])->name('manager.export-dispense');
 
     //Transaction
     Route::get('/transaction', [ManagerRequestController::class, 'transaction'])->name('manager.transaction');
