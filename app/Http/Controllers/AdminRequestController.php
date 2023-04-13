@@ -252,8 +252,8 @@ class AdminRequestController extends Controller
 
         if ($today) {
             // Filter transactions that occurred today
-            $from = date('Y-m-d 00:00:00');
-            $to = date('Y-m-d 23:59:59');
+            $from = Carbon::now()->startOfDay();
+            $to = Carbon::now()->endOfDay();
 
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('updated_at', [$from, $to])
