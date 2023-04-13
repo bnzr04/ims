@@ -84,27 +84,16 @@ class StocksController extends Controller
     public function stocks(Request $request)
     {
         $user = Auth::user();
-
-        //check if user is manager
-        // if ($user->type === 'manager') {
-        //     //check if the manager is from pharmacy
-        //     if ($user->dept === 'pharmacy') {
-        //         $categories = Item::where('category', '!=', 'medical supply')->distinct('category')->pluck('category');
-        //     }
-        //     //check if the manager is from csr
-        //     elseif ($user->dept === 'csr') {
-        //         $categories = Item::where('category', 'medical supply')->distinct('category')->pluck('category');
-        //     }
-        // } else {
         $categories = Item::distinct('category')->pluck('category');
-        // }
+
+        $search = $request->input("search");
 
         //get the requested category
         $category = $request->category;
 
 
         if ($category) {
-            $stocks = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+            $stocks = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select(
                     'items.id',
                     'items.name',
@@ -117,25 +106,26 @@ class StocksController extends Controller
                 ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
                 ->where('items.category', $category)
                 ->get();
+        } elseif ($search) {
+            $stocks = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
+                ->select(
+                    'items.id',
+                    'items.name',
+                    'items.description',
+                    'items.category',
+                    DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
+                    DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
+                    DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
+                )
+                ->where(function ($query) use ($search) {
+                    $query->where('items.name', 'like', "%" . $search . "%")
+                        ->orWhere('item_stocks.item_id', $search);
+                })
+                ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
+                ->orderBy('name')
+                ->get();
         } else {
-            // if ($user->type === 'manager') {
-            //     if ($user->dept === 'pharmacy') {
-            //         $stocks = DB::table('item_stocks')
-            //             ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            //             ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
-            //             ->where('items.category', '!=', 'medical supply')
-            //             ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
-            //             ->get();
-            //     } elseif ($user->dept === 'csr') {
-            //         $stocks = DB::table('item_stocks')
-            //             ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            //             ->select('item_stocks.item_id', 'items.name', 'items.description', 'items.category', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'), DB::raw('COUNT(item_stocks.item_id) as stocks_batch'), DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock"))
-            //             ->where('items.category', 'medical supply')
-            //             ->groupBy('item_stocks.item_id', 'items.name', 'items.description', 'items.category')
-            //             ->get();
-            //     }
-            // } else {
-            $stocks = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+            $stocks = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select(
                     'items.id',
                     'items.name',
@@ -147,13 +137,12 @@ class StocksController extends Controller
                 )
                 ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
                 ->get();
-            // }
         }
 
         if ($user->type === 'manager') {
-            return view('manager.allStocks')->with(['stocks' => $stocks, 'categories' => $categories, 'category' => $category]);
+            return view('manager.allStocks')->with(['stocks' => $stocks, 'categories' => $categories, 'category' => $category, 'search' => $search]);
         } else {
-            return view('admin.stocks')->with(['stocks' => $stocks, 'categories' => $categories, 'category' => $category]);
+            return view('admin.stocks')->with(['stocks' => $stocks, 'categories' => $categories, 'category' => $category, 'search' => $search]);
         }
     }
 

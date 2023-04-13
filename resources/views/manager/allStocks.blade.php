@@ -37,10 +37,12 @@
                         </form>
                     </div>
 
-                    <div class="input-group" style="width: 100%;max-width: 400px">
-                        <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search">
-                        <button type="submit" class="input-group-text btn btn-secondary">Search</button>
-                    </div>
+                    <form action="" method="get">
+                        <div class="input-group" style="width: 100%;max-width: 400px">
+                            <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search" value="{{ $search }}">
+                            <button type="submit" class="input-group-text btn btn-secondary">Search</button>
+                        </div>
+                    </form>
                 </div>
                 <div class="container-lg px-2 pt-2 pb-4 mt-3 mb-4 rounded shadow bg-white">
                     <div class="container-lg p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:200px">

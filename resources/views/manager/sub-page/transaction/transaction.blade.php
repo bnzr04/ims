@@ -114,7 +114,7 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
@@ -149,7 +149,7 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {

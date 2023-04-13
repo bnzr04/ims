@@ -68,12 +68,24 @@
                     </div>
                 </div>
                 <hr>
-                <div class="container-sm">
+                <div class="container-sm d-flex flex-wrap" style="align-items: center;">
                     <form action="{{ route('manager.export-dispense') }}" method="post">
                         @csrf
                         <button type="submit" name="filter" value="today" class="btn btn-light border border-secondary" title="Download Today Report">Today <img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                         <button type="submit" name="filter" value="yesterday" class="btn btn-light border border-secondary" title="Download Yesterday Report">Yesterday <img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                         <button type="submit" name="filter" value="this-month" class="btn btn-light border border-secondary" title="Download This Month Report">This Month <img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
+                    </form>
+
+                    <form class="m-0 mx-3" action="{{ route('manager.export-dispense') }}" method="post">
+                        @csrf
+                        <div class="container-lg d-flex" style="width:100%;align-items: center;">
+                            <label for="date_from">From</label>
+                            <input type="date" class="form-control mx-1" name="date_from" id="from" required>
+
+                            <label for="date_to">To</label>
+                            <input type="date" class="form-control mx-1" name="date_to" id="to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY" required>
+                            <button type="submit" title="Download Specific Date Report" class="btn btn-outline-success">Download</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -87,6 +99,9 @@
     // Set the maximum value for a date input field to today's date
     document.getElementById("date_from").setAttribute("max", today);
     document.getElementById("date_to").setAttribute("max", today);
+
+    document.getElementById("from").setAttribute("max", today);
+    document.getElementById("to").setAttribute("max", today);
 
 
     function showDispense() {
