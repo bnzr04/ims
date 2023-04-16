@@ -26,7 +26,6 @@ class RequestController extends Controller
             DB::table('item_stocks')
             ->join('items', 'item_stocks.item_id', '=', 'items.id')
             ->select('items.name', 'item_stocks.*')
-            ->where('items.category', "!=", "medical supply")
             ->where('item_stocks.exp_date', ">", $today)
             ->orderBy('items.name', 'asc')
             ->get();
@@ -65,11 +64,11 @@ class RequestController extends Controller
         if ($status) {
             $requests = ModelsRequest::where('user_id', $userId)
                 ->where('status', $status)
-                ->orderByDesc('created_at')
-                ->get()
                 ->each(function ($request) {
-                    $request->formatted_created_at = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
-                });
+                    $request->formatted_created_at = Carbon::parse($request->created_at)->format('F j, Y, g:i:s a');
+                })
+                ->orderBy('created_at', 'asc')
+                ->get();
 
             $pending = ModelsRequest::where('user_id', $userId)
                 ->where('status', 'pending')
@@ -89,11 +88,11 @@ class RequestController extends Controller
         } else {
             $requests = ModelsRequest::where('user_id', $userId)
                 ->where('status', 'pending')
-                ->orderByDesc('created_at')
-                ->get()
                 ->each(function ($request) {
-                    $request->formatted_created_at = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
-                });
+                    $request->formatted_created_at = Carbon::parse($request->created_at)->format('F j, Y, g:i:s a');
+                })
+                ->orderBy('created_at', 'asc')
+                ->get();
 
             $pending = ModelsRequest::where('user_id', $userId)
                 ->where('status', 'pending')
@@ -120,6 +119,33 @@ class RequestController extends Controller
             'delivered' => $delivered,
             'completed' => $completed,
             'notcompleted' => $notcompleted,
+        ]);
+    }
+
+    public function viewRequest($request)
+    {
+        $user_id = Auth::user()->id;
+
+        if ($request === 'all') {
+            $items = ModelsRequest::where('user_id', $user_id)
+                ->where('status', '!=', 'completed')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else if ($request === 'completed') {
+            $items = ModelsRequest::where('user_id', $user_id)
+                ->where('status', 'completed')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        foreach ($items as $item) {
+            $item->formatted_date = Carbon::parse($item->created_at)->format('F j, Y, g:i:s a');
+        }
+
+
+        return view('user.sub-page.view-request')->with([
+            'items' => $items,
+            'request' => $request
         ]);
     }
 
@@ -150,7 +176,6 @@ class RequestController extends Controller
                 DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.name', 'item_stocks.*')
-                ->where('items.category', "!=", "medical supply")
                 ->where('item_stocks.exp_date', ">", $today)
                 ->orderBy('items.name', 'asc')
                 ->get();
@@ -159,7 +184,6 @@ class RequestController extends Controller
                 DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.name', 'item_stocks.*')
-                ->where('items.category', "!=", "medical supply")
                 ->where('item_stocks.exp_date', ">", $today)
                 ->orderBy('items.name', 'asc')
                 ->get();
@@ -240,6 +264,7 @@ class RequestController extends Controller
             $table->request_id = $request->request_id;
             $table->item_id = $request->nameSearch;
             $table->stock_id = $request->stock_id;
+            $table->mode_acquisition = $request->mode_acquisition;
             $table->exp_date = $request->exp_date;
             $table->quantity = $request->quantity;
 
@@ -325,6 +350,8 @@ class RequestController extends Controller
     public function submitRequest(Request $request)
     {
         $requested = $request->input('requestedItems');
+        $request_by = $request->input('requestBy');
+        $patient_name = $request->input('patientName');
         $requestedItems = json_decode($requested);
 
         //Enable Query Log
@@ -344,6 +371,8 @@ class RequestController extends Controller
         $requestModel->office = $office;
         //we always send the request to pharmacy
         $requestModel->request_to = 'pharmacy';
+        $requestModel->request_by = $request_by;
+        $requestModel->patient_name = $patient_name;
         $requestModel->save();
 
         $requestID = $requestModel->id;
@@ -375,6 +404,7 @@ class RequestController extends Controller
             $model->request_id = $requestModel->id;
             $model->item_id = $item->item_id;
             $model->stock_id = $item->stock_id;
+            $model->mode_acquisition = $item->mode_acquisition;
             $model->exp_date = $item->exp_date;
             $model->quantity = intval($item->quantity);
             $model->save();

@@ -11,7 +11,26 @@ use Illuminate\Support\Facades\Session
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <h1 class="mb-2">Edit Item</h1>
+                <div class="container-lg">
+                    <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
+                    <hr>
+                </div>
+
+                <div class="container-lg">
+                    <h1 class="mb-2">Edit Item</h1>
+                    @if(session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                    @endif
+
+                    @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                    @endif
+                </div>
+
                 <form action="{{ route('admin.update-item', ['id' => $item->id]) }}" method="post" class="container-sm">
                     @csrf
                     <div class="container-sm mb-1">
@@ -77,20 +96,22 @@ use Illuminate\Support\Facades\Session
                         </div>
                     </div>
 
-                    @if(session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
+                    <div class="container-sm p-3 mt-3 mb-3 shadow-lg rounded">
+                        <div class="container-sm">
+                            <h5>Threshold</h5>
+                        </div>
+                        <div class="container-sm">
+                            <label for="max_limit">Maximum Quantity Limit</label>
+                            <input type="number" min="1" name="max_limit" class="form-control" id="max_limit" value="{{ $item->max_limit  }}" required>
+                        </div>
+                        <div class="container-sm">
+                            <label for="warning_level">Warning level (%)</label>
+                            <input type="number" min="1" max="100" name="warning_level" class="form-control" id="warning_level" value="{{ $item->warning_level }}" required>
+                        </div>
                     </div>
-                    @endif
 
-                    @if(session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                    @endif
 
                     <div class="container-sm">
-                        <a href="{{ route('admin.items') }}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </div>
                 </form>

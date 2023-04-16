@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Session
                 <div class="container-lg">
                     <h2>Requests</h2>
                 </div>
-                <div class="container-lg mt-3 p-2 pt-3 rounded shadow">
+                <div class="container-lg mt-3 p-2 pt-3 border rounded shadow">
                     <div class="container-md">
                         <h5>Pending & accepted requests</h5>
                     </div>
@@ -25,7 +25,9 @@ use Illuminate\Support\Facades\Session
                                     <th scope="col">Req ID</th>
                                     <th scope="col">Date-time</th>
                                     <th scope="col">Office</th>
-                                    <th scope="col">Request to</th>
+                                    <th scope="col">Patient Name</th>
+                                    <th scope="col">Request By</th>
+                                    <th scope="col">Request To</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -89,11 +91,11 @@ use Illuminate\Support\Facades\Session
 
                 for (var i = 0; i < data.pending.length; i++) {
                     var row = data.pending[i];
-                    pendingtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    pendingtbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
                 }
 
                 if (data.pending.length === 0) {
-                    pendingtbody.innerHTML += "<tr><td colspan='6'>No pending request...</td></tr>";
+                    pendingtbody.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
                 }
 
                 // for (var i = 0; i < data.completed.length; i++) {

@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Facades\Session
+@endphp
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
@@ -7,65 +10,82 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 py-1">
-                <h2>ITEMS & STOCKS</h2>
-                <div class="mt-3 d-flex justify-content-between">
-                    <div class="container-sm">
-                        <a href="{{ route('manager.new-item') }}" class="btn btn-success">New Item</a>
-                        <a href="{{ route('manager.AllStocks') }}" class="btn btn-secondary">All Stocks</a>
+            <div id="content" class="px-2 pt-1 pb-5 container-lg">
+                <h2>ITEMS</h2>
+                <div class="container-lg p-0 mt-1 d-flex justify-content-between" style="flex-wrap: wrap;">
+                    <div class="container-sm p-0 m-0" style="display: flex;flex-wrap:wrap">
+                        <a href="{{ route('manager.new-item') }}" class="btn btn-success m-1">New Item</a>
+                        <a href="{{ route('manager.AllStocks') }}" class="btn btn-secondary m-1">All Stocks</a>
                     </div>
+                </div>
 
-                    <form action="" method="get">
-                        <div class="input-group flex-nowrap" style="width: 30rem;">
-                            <input type="text" class="form-control bg-white" placeholder="Search name..." aria-label="search" aria-describedby="addon-wrapping" name="search" id="search" value="{{ $search }}">
-                            <button type="submit" class="btn btn-primary">Search</button>
+                <div class="container-sm d-flex p-0 mt-2" style="flex-wrap:wrap">
+                    <form action="" method="get" class="d-flex mx-1 my-1 m-0">
+                        <div class="input-group flex-nowrap m-0 p-0" style="width: 300px;z-index:0;">
+                            <input type="text" class="form-control bg-white" placeholder="Search name..." aria-label="search" aria-describedby="addon-wrapping" name="search" id="search" value="{{ $search == true ? $search : ''}}">
+                            <button type="submit" class="btn btn-outline-secondary">Search</button>
                         </div>
                     </form>
 
-                </div>
-
-                @if(Auth::user()->dept === 'pharmacy')
-                <div class="container-sm mt-2 d-flex">
-                    <form action="" method="get">
-                        <label for="category">Item Category</label>
-                        <div class="container-sm p-0 d-flex input-group" style="width: 400px;">
+                    <form action="{{ route('manager.stocks') }}" method="get" style="z-index:0;" class="mx-1 my-1 m-0">
+                        <div class="container-sm p-0 input-group" style="width: 300px;">
                             <select name="category" class="form-select text-capitalize" id="category">
                                 @if($category)
                                 <option value="{{ $category }}">{{ $category }}</option>
-                                <option value="">All</option>
-                                @else
-                                <option value="">All</option>
                                 @endif
+                                <option value="">All</option>
                                 @foreach($categories as $category)
                                 <option value="{{ $category }}">{{ $category }}</option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="btn btn-primary">Filter</button>
+                            <button type="submit" class="btn btn-outline-primary">Filter</button>
                         </div>
                     </form>
                 </div>
-                @else
-                <div class="container-sm mt-2 d-flex">
-                    <form action="" method="get">
-                        <label for="category">Item Category</label>
-                        <div class="container-sm p-0 d-flex input-group" style="width: 400px;">
-                            <select name="category" class="form-select text-capitalize" id="category" disabled>
-                                <option value="medical supply">Medical Supply</option>
-                            </select>
+
+                <div class="container-sm p-0 mt-2 d-flex">
+
+                    <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#00CDCD">&nbsp;</div>
+                            <p class="m-0">Over Max Limit</p>
                         </div>
-                    </form>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="width:40px;height:100%;background-color:#1ea200">&nbsp;</div>
+                            <p class="m-0">Safe Level</p>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="width:40px;height:100%;background-color:#d67b00">&nbsp;</div>
+                            <p class="m-0">Warning Level</p>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="width:40px;height:100%;background-color:#dc0f00">&nbsp;</div>
+                            <p class="m-0">No Stocks</p>
+                        </div>
+                    </div>
+
+                    <div class="container-sm d-flex m-0 p-0" style="width:100%;max-width:200px;flex-direction:column-reverse">
+                        <form class="m-0" action="{{ route('manager.export-items') }}" method="post">
+                            @csrf
+                            <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
+                        </form>
+                    </div>
+                </div>
+
+                @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
                 </div>
                 @endif
 
-                <div class="container-sm">
-                    <form action="{{ route('manager.export-items') }}" method="post">
-                        @csrf
-                        <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
-                    </form>
+                @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
                 </div>
+                @endif
 
-                <div class="container-lg p-0 border border-dark rounded shadow" style="height: 400px;overflow:auto;">
-                    <table class="table">
+                <div class="container-lg mt-2 p-0 rounded shadow" style="height: 400px;overflow:auto;">
+                    <table class="table" id="items_table">
                         <thead class="bg-success text-white" style="position: sticky;top: 0;">
                             <tr>
                                 <th scope="col">Item ID</th>
@@ -79,20 +99,21 @@
                         </thead>
                         <tbody>
                             @forelse($items as $item)
-                            <tr>
+                            <tr style="border-bottom: 1px black solid;">
                                 <th>{{ $item->id }}</th>
                                 <td class="text-capitalize">{{ $item->name }}</td>
                                 <td class="text-capitalize">{{ $item->description }}</td>
                                 <td class="text-capitalize">{{ $item->category }}</td>
-                                <th class="">{{ $item->unit }}</th>
+                                <td>{{ $item->unit }}</td>
                                 @if($item->total_quantity !== null)
-                                <th class="{{ $item->total_quantity <= 100 ? 'text-warning' : ( $item->total_quantity < 1 ? 'text-danger' : 'text-success') }}">{{ $item->total_quantity }}</th>
+                                <th class="total_quantity" data-warning-level="{{ $item->warning_level }}" data-max-limit="{{ $item->max_limit }}">{{ $item->total_quantity }}</th>
                                 @else
                                 <th class="text-danger">No stocks</th>
                                 @endif
-                                <td>
-                                    <a href="{{ route('manager.add-to-stocks',['id' => $item->id]) }}" class="btn btn-secondary" title="Add stocks">Stocks</a>
-                                    <a href="{{ route('manager.show-item', ['id' => $item->id]) }}" class="btn btn-success">Edit</a>
+
+                                <td class="d-flex border-0" style="flex-direction:column;">
+                                    <a href="{{route('manager.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary m-1" title="Add stocks">Stocks</a>
+                                    <a href="{{route('manager.show-item', ['id' => $item->id])}}" class="btn btn-success m-1">Edit</a>
                                 </td>
                             </tr>
                             @empty
@@ -102,6 +123,7 @@
                                 </td>
                             </tr>
                             @endforelse
+
                         </tbody>
                     </table>
                 </div>
@@ -115,5 +137,35 @@
             event.preventDefault();
         };
     }
+
+    function threshold() {
+        const totalQuantity = document.getElementsByClassName("total_quantity");
+
+        for (let i = 0; i < totalQuantity.length; i++) {
+
+            var warningLevel = totalQuantity[i].getAttribute('data-warning-level');
+            var maxLimit = totalQuantity[i].getAttribute('data-max-limit');
+            var totalQuantityValue = totalQuantity[i].innerHTML;
+
+            var warningLevel = warningLevel / 100;
+
+            var warningQty = maxLimit * warningLevel;
+
+            if (totalQuantityValue <= warningQty) {
+                totalQuantity[i].style.color = "#d67b00";
+            } else if (totalQuantityValue === 0) {
+                totalQuantity[i].style.color = "#c6ae00 ";
+            } else if (totalQuantityValue > maxLimit) {
+                totalQuantity[i].style.color = "#00CDCD";
+            } else {
+                totalQuantity[i].style.color = "#1ea200";
+            }
+        }
+    }
+
+    threshold();
+
+    // const warningLevel = totalQuantity.getAttribute('data-warning-level');
+    // const totalQuantityValue = totalQuantity.innerHTML;
 </script>
 @endsection

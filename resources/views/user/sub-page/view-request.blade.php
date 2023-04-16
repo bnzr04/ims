@@ -13,12 +13,23 @@
                 </div>
                 <div class="container-lg mt-3 p-2 pt-3 rounded shadow">
                     <div class="container-md">
-                        @if($request === 'pending')
-                        <h5>Pending requests</h5>
-                        @endif
                         @if($request === 'completed')
                         <h5>Completed / Received requests</h5>
                         @endif
+                    </div>
+                    <div class="container-md d-flex">
+                        <form id="pending_form" class="mx-1" method="get">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary">Pending (1)</button>
+                        </form>
+                        <form id="accepted_form" class="mx-1" method="get">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary">Accepted (1)</button>
+                        </form>
+                        <form id="delivered_form" class="mx-1" method="get">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary">Delivered (1)</button>
+                        </form>
                     </div>
                     <div class="container-md overflow-auto" style="height: 400px;">
                         <table class="table">
@@ -27,6 +38,8 @@
                                     <th scope="col">Req ID</th>
                                     <th scope="col">Date-time</th>
                                     <th scope="col">Office</th>
+                                    <th scope="col">Patient Name</th>
+                                    <th scope="col">Request By</th>
                                     <th scope="col">Request to</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
@@ -38,6 +51,8 @@
                                     <td>{{$item->id}}</td>
                                     <td>{{$item->formatted_date}}</td>
                                     <td>{{$item->office}}</td>
+                                    <td>{{$item->patient_name}}</td>
+                                    <td>{{$item->request_by}}</td>
                                     <td>{{$item->request_to}}</td>
                                     <td>{{$item->status}}</td>
                                     <td>

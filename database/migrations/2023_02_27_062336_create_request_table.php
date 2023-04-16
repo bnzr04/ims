@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('office');
             $table->string('request_to');
+            $table->string('request_by');
+            $table->string('patient_name');
             $table->string('status')->default('pending');
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
             $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
@@ -32,6 +34,7 @@ return new class extends Migration
             $table->unsignedBigInteger('request_id');
             $table->unsignedBigInteger('item_id');
             $table->integer('stock_id');
+            $table->string('mode_acquisition');
             $table->string('exp_date');
             $table->integer('quantity');
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');

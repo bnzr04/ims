@@ -19,6 +19,8 @@ return new class extends Migration
             $table->text('description');
             $table->string('category');
             $table->string('unit');
+            $table->integer('max_limit')->default(500);
+            $table->integer('warning_level')->default(30);
             $table->timestamp('created_at')->useCurrent()->format('h:i:s A');
             $table->timestamp('updated_at')->useCurrent()->format('h:i:s A');
         });

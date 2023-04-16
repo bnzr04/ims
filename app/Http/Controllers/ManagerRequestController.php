@@ -307,18 +307,36 @@ class ManagerRequestController extends Controller
     public function filterTransaction(Request $request)
     {
         $today = $request->input('today');
-        // $from = $request->input('from');
-        // $to = $request->input('to');
-        // $date_to = date('Y-m-d', strtotime($to . ' +1 day'));
+        $yesterday = $request->input('yesterday');
+        $thisMonth = $request->input('this-month');
+
 
         if ($today) {
             // Filter transactions that occurred today
-            $from = date('Y-m-d 00:00:00');
-            $to = date('Y-m-d 23:59:59');
+            $from = Carbon::now()->startOfDay();
+            $to = Carbon::now()->endOfDay();
 
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('updated_at', [$from, $to])
-                ->orderBy('updated_at', 'asc')
+                ->orderBy('updated_at', 'desc')
+                ->get();
+        } else if ($yesterday) {
+            // Filter transactions that occurred today
+            $from = Carbon::yesterday()->startOfDay();
+            $to = Carbon::yesterday()->endOfDay();
+
+            $data = ModelsRequest::where('status', 'completed')
+                ->whereBetween('updated_at', [$from, $to])
+                ->orderBy('updated_at', 'desc')
+                ->get();
+        } else if ($thisMonth) {
+            // Filter transactions that occurred today
+            $from = Carbon::now()->startOfMonth();
+            $to = Carbon::now()->endOfMonth();
+
+            $data = ModelsRequest::where('status', 'completed')
+                ->whereBetween('updated_at', [$from, $to])
+                ->orderBy('updated_at', 'desc')
                 ->get();
         } else {
 
@@ -328,7 +346,7 @@ class ManagerRequestController extends Controller
 
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('updated_at', [$from, $date_to])
-                ->orderBy('updated_at', 'asc')
+                ->orderBy('updated_at', 'desc')
                 ->get();
         }
 

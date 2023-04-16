@@ -7,35 +7,35 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 py-1">
+            <div id="content" class="px-2 py-3">
                 <div class="container-lg px-0 mt-2">
                     <h4><strong>REQUEST ITEM</strong></h4>
                 </div>
                 <div class="container-lg mt-3 mb-3 p-0">
 
-                    <div class="container-lg" id="add-item-div">
-                        <h5 style="letter-spacing: 3px;">ITEM NAME: </h5>
-                        <div class="container-lg p-0 m-0 d-flex align-items-center" style="width:100%;max-width:500px">
-                            <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
-                                <option></option>
-                                @foreach($items as $item)
-                                <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }})</option>
-                                @endforeach
-                            </select>
+                    <div class="container-lg p-0 d-flex" style="flex-direction:column">
+                        <div class="container-lg " id="add-item-div">
+                            <h5 style="letter-spacing: 3px;">ITEM NAME: </h5>
+                            <div class="container-lg p-0 m-0 d-flex align-items-center" style="width:100%;max-width:500px">
+                                <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
+                                    <option></option>
+                                    @foreach($items as $item)
+                                    <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }})</option>
+                                    @endforeach
+                                </select>
 
-                            <input type="number" id="quantity" class="form-control m-1" name="quantity" min="1" max="" style="width:100%;max-width:120px;" placeholder="Quantity" required>
-                            <input type="hidden" id="stock_id" name="stock_id" style="min-width:120px;">
-                            <input type="hidden" id="exp_date" name="exp_date" style="min-width:120px;">
-                            <button type="button" id="add-item-btn" class="btn btn-secondary py-1 px-2">Add</button>
+                                <input type="number" id="quantity" class="form-control m-1" name="quantity" min="1" max="" style="width:100%;max-width:120px;" placeholder="Quantity" required>
+                                <input type="hidden" id="stock_id" name="stock_id" style="min-width:120px;">
+                                <input type="hidden" id="exp_date" name="exp_date" style="min-width:120px;">
+                                <button type="button" id="add-item-btn" class="btn btn-secondary py-1 px-2">Add</button>
+                            </div>
                         </div>
                     </div>
 
                 </div>
-                <div class="container-lg p-0 border border-dark shadow p-3 mt-3 mb-2 bg-body rounded" style="height: 340px;">
+                <div class="container-lg p-0 border border-dark shadow-lg p-3 mt-3 mb-2 bg-body rounded" style="min-height: 360px;">
                     <h4>Requested Items</h4>
-                    <div class="container-md">
-
-
+                    <div class="container-md p-0 border rounded shadow">
                         <div class=" container-lg p-0" style="height:230px;overflow-y: auto;">
                             <table class="table" id="requested-item-table">
                                 <thead class="text-white bg-secondary" style="position: sticky;top: 0;z-index: 0;">
@@ -43,6 +43,7 @@
                                         <th scope="col">Item ID</th>
                                         <th scope="col">Item Name</th>
                                         <th scope="col">Stock ID</th>
+                                        <th scope="col">Mode Of ACQ</th>
                                         <th scope="col">Expiration Date</th>
                                         <th scope="col">Quantity</th>
                                         <th scope="col" id="action-header">Action</th>
@@ -55,13 +56,25 @@
                         </div>
                     </div>
 
-                    <form action="" method="post">
-                        @csrf
-                        <button type="button" id="submit-request-btn" class="btn btn-primary">Submit request</button>
-                        <strong><span id="request_id_span"></span></strong>
-                    </form>
+                    <div class="container-lg p-0 d-flex my-2">
+                        <div class="container-lg d-flex" style="flex-wrap:wrap">
+                            <div class="container-lg m-0">
+                                <label for="patient_name">Patient Name:</label>
+                                <input type="text" name="patient_name" id="patient_name" class="form-control border border-secondary" style="width: 100%;max-width:320px">
+                            </div>
+                            <div class="container-lg m-0">
+                                <label for="request_by">Requester Name:</label>
+                                <input type="text" name="request_by" id="request_by" class="form-control border border-secondary" style="width: 100%;max-width:320px">
+                            </div>
+                        </div>
 
+                        <form action="" method="post" class="m-0 d-flex" style="flex-direction: column-reverse;">
+                            @csrf
+                            <button type="button" id="submit-request-btn" class="btn btn-primary" style="width: 200px;">Submit request</button>
+                            <strong><span id="request_id_span"></span></strong>
+                        </form>
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,6 +100,7 @@
             var selectedOptionValue = $('#nameSearch option:selected');
             var itemId = selectedOptionValue.data('item-id');
             var stockId = selectedOptionValue.data('stock-id');
+            var modeOfAcq = selectedOptionValue.data('mode-acq');
             var stockExpDate = selectedOptionValue.data('stock-exp');
             var quantity = selectedOptionValue.data('stock-qty');
             $('#stock_id').val(stockId);
@@ -103,12 +117,13 @@
             var itemId = selectedOptionValue.data('item-id');
             var itemName = selectedOptionValue.data('item-name');
             var stockId = selectedOptionValue.data('stock-id');
+            var modeOfAcq = selectedOptionValue.data('mode-acq');
             var stockExpDate = selectedOptionValue.data('stock-exp');
             var stockQty = selectedOptionValue.data('stock-qty');
             var quantity = $('#quantity').val();
 
             //check the inputs if not empty
-            if (selectedOptionValue !== '' && itemId !== '' && itemName !== '' && stockId !== '' && stockExpDate !== '' && quantity !== '') {
+            if (selectedOptionValue !== '' && itemId !== '' && itemName !== '' && stockId !== '' && modeOfAcq !== '' && stockExpDate !== '' && quantity !== '') {
                 $('#stock_id').val(stockId);
                 $('#exp_date').val(stockExpDate);
 
@@ -136,10 +151,11 @@
                             item_id: itemId,
                             item_name: itemName,
                             stock_id: stockId,
+                            mode_acquisition: modeOfAcq,
                             quantity: quantity,
                             exp_date: stockExpDate,
                         });
-                        var row = '<tr><td class="align-items-center">' + itemId + '</td><td>' + itemName + '</td><td>' + stockId + '</td><td>' + stockExpDate + '</td><td>' + quantity + '</td><td><button id="remove-item-btn" class="btn btn-danger" data-stock-id="' + stockId + '">✘</button></td></tr>';
+                        var row = '<tr><td class="align-items-center">' + itemId + '</td><td>' + itemName + '</td><td>' + stockId + '</td><td>' + modeOfAcq + '</td><td>' + stockExpDate + '</td><td>' + quantity + '</td><td><button id="remove-item-btn" class="btn btn-danger" data-stock-id="' + stockId + '">✘</button></td></tr>';
 
                         //this will remove the 'No items' if data is added
                         $("#requested-item-table-body td:contains('No items')").parent().remove();
@@ -177,34 +193,77 @@
         });
 
         $('#submit-request-btn').on('click', function() {
+
             if (selectedItem.length !== 0) {
+                var requestByInput = $("#request_by");
+                var patientNameInput = $("#patient_name");
+
+                var requestBy = requestByInput.val();
+                var patientName = patientNameInput.val();
+
                 var requestedItems = JSON.stringify(selectedItem);
-                $.ajax({
-                    type: 'POST',
-                    url: '/user/submit-request',
-                    data: {
-                        requestedItems: requestedItems,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        $('#add-item-btn').prop('disabled', true);
-                        $('#nameSearch').prop('disabled', true);
-                        $('#quantity').prop('disabled', true);
-                        $('#submit-request-btn').text('Pending').prop('disabled', true).css('background-color', 'green');
-                        $('#action-header').remove();
-                        $('#requested-item-table tbody tr').each(function() {
-                            $(this).find('#remove-item-btn').parent('td').remove();
-                            $(this).find('#item-row-qty').prop('readonly', true);
-                        });
-                        $('#request_id_span').text('Request ID: ' + response.request_id);
-                        console.log(response);
+                var $btn = $(this);
+
+
+
+                if (requestBy !== "" && patientName !== "") {
+                    if ($btn.prop('disabled')) {
+                        return false; // don't submit if button is already disabled
                     }
-                });
+                    $btn.prop('disabled', true); // disable button to prevent double-clicking
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/user/submit-request',
+                        data: {
+                            requestBy: requestBy,
+                            patientName: patientName,
+                            requestedItems: requestedItems,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            requestByInput.prop('disabled', true);
+                            patientNameInput.prop('disabled', true);
+                            $btn.text('Pending').css('background-color', 'green');
+                            $('#add-item-btn').prop('disabled', true);
+                            $('#nameSearch').prop('disabled', true);
+                            $('#quantity').prop('disabled', true);
+                            $('#action-header').remove();
+                            $('#requested-item-table tbody tr').each(function() {
+                                $(this).find('#remove-item-btn').parent('td').remove();
+                                $(this).find('#item-row-qty').prop('readonly', true);
+                            });
+                            $('#request_id_span').text('Request ID: ' + response.request_id);
+                            console.log(response);
+                        },
+                        error: function() {
+                            $btn.prop('disabled', false); // enable button again on error
+                        }
+                    });
+                } else if (requestBy === "") {
+                    alert("Please enter requester name");
+                } else if (patientName === "") {
+                    alert("Please enter patient name");
+                }
+
+
             } else {
                 alert('Please add an item to proceed.');
+                $btn.prop('disabled', false); // enable button again on alert
             }
         });
 
+
+        // function requesterNameAlert() {
+        //     var requestNameInput = document.getElementById("#request_by");
+        //     var requestName = requestNameInput.value;
+
+        //     if (requestName !== "") {
+        //         alert('test')
+        //     }
+        // }
+
+        // requesterNameAlert();
     });
 </script>
 @endsection

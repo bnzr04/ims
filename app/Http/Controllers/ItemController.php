@@ -126,8 +126,8 @@ class ItemController extends Controller
                     ->pluck('category');
 
                 $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level',)
                     ->orderBy('items.name');
 
                 if ($category) {
@@ -174,8 +174,8 @@ class ItemController extends Controller
         //This will get the all items and will know if there is a stocks or none
         //This portion will execute if the user is admin
         $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
+            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level')
             ->orderBy('items.name');
 
         if ($category) {
@@ -253,6 +253,13 @@ class ItemController extends Controller
         } else {
             $item->unit = $request->unit;
         }
+
+        if ($request->max_limit !== "") {
+            $item->max_limit = $request->max_limit;
+        } else if ($request->warning_level !== "") {
+            $item->warning_level = $request->warning_level;
+        }
+
         $item->save();
 
         $user = auth()->user();
@@ -343,6 +350,11 @@ class ItemController extends Controller
         } else {
             $item->unit = ucwords($request->unit);
         }
+
+        $item->max_limit = $request->max_limit;
+
+        $item->warning_level = $request->warning_level;
+
         $item->save();
 
         //QUERY LOG

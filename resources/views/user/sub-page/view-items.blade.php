@@ -17,13 +17,14 @@
                     <a href="/user/view-request/completed" class="btn btn-secondary">Back</a>
                     @endif
                 </div>
-                <div class="container-md mt-3 pt-2 pb-2 shadow lh-1 rounded overflow-auto">
+                <div class="container-md mt-3 pt-2 pb-2 border shadow lh-1 rounded overflow-auto">
                     <h4>Request Details</h4>
                     <table class="table">
                         <thead class="bg-success text-white">
                             <tr>
                                 <th scope="col">Request ID</th>
                                 <th scope="col">Office</th>
+                                <th scope="col">Patient Name</th>
                                 <th scope="col">Request By</th>
                                 <th scope="col">Request To</th>
                                 <th scope="col">Request status</th>
@@ -34,6 +35,7 @@
                             <tr>
                                 <td scope="col">{{ $request->id }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->office }}</td>
+                                <td scope="col" class="text-capitalize">{{ $request->patient_name }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_by }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_to }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->status }}</td>
@@ -55,6 +57,7 @@
                                     <th scope="col">Unit</th>
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Stock ID</th>
+                                    <th scope="col">Mode Of ACQ</th>
                                     <th scope="col">Expiration</th>
                                 </tr>
                             </thead>
@@ -68,6 +71,7 @@
                                     <td scope="col" class="text-capitalize">{{ $item->unit }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->quantity }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->stock_id }}</td>
+                                    <td scope="col" class="text-capitalize">{{ $item->mode_acquisition }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->exp_date }}</td>
                                 </tr>
                                 @empty

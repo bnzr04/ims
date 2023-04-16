@@ -9,23 +9,37 @@
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 <div class="container-md">
-                    <div class="container-md py-2">
-                        <h2>NEW ITEM</h2>
-                        <form action="{{ route('admin.insert-items') }}" method="post" enctype="multipart/form-data">
-                            @csrf
-                            <div class="container-lg p-0">
+
+                    <div class="container-md mt-2 d-inline" style="flex-direction: column;">
+                        <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
+                        <hr>
+                        <div class="container-md py-2 mt-3 shadow">
+                            <form action="{{ route('admin.insert-items') }}" method="post" enctype="multipart/form-data">
+                                @csrf
                                 <label for="import_item">Add items file</label>
-                                <input type="file" class="form-control" name="import_item" id="import_item" accept=".csv,.xlsx" style="max-width:230px;">
-                            </div>
-                            <div class="contianer-lg pt-2">
-                                <button type="submit" class="btn btn-secondary">Insert</button>
-                            </div>
-                        </form>
+                                <div class="container-md p-0 d-flex">
+                                    <input type="file" class="form-control" name="import_item" id="import_item" accept=".csv,.xlsx" style="max-width:230px;" required>
+                                    <button type="submit" class="btn btn-outline-secondary mx-2">Insert</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                     <div class="container-lg px-0 py-3">
+                        @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                        @endif
+
+                        @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                        @endif
+                        <h2>NEW ITEM</h2>
                         <form action="{{ route('admin.saveItem') }}" method="post">
                             @csrf
-                            <div class="modal-body">
+                            <div class="modal-body shadow pb-2 rounded">
                                 <div class="container-sm mb-2">
                                     <label for="name"><b>Item name</b></label>
                                     <input type="text" class="form-control" name="name" id="name" value="{{ old('name') }}">
@@ -86,19 +100,23 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                            @endif
 
-                            @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
+                            <div class="container-sm p-3 mt-3 mb-3 shadow-lg rounded">
+                                <div class="container-sm">
+                                    <h5>Threshold</h5>
+                                </div>
+                                <div class="container-sm">
+                                    <label for="max_limit">Maximum Quantity Limit</label>
+                                    <input type="number" name="max_limit" class="form-control" id="max_limit" placeholder="Default: 500">
+                                </div>
+                                <div class="container-sm">
+                                    <label for="warning_level">Warning level (%)</label>
+                                    <input type="number" name="warning_level" class="form-control" id="warning_level" placeholder="Default: 30%">
+                                </div>
                             </div>
-                            @endif
+
+
                             <div class="container-sm">
-                                <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back</a>
                                 <button type="submit" class="btn btn-primary" id="unique">Add Item</button>
                             </div>
                         </form>

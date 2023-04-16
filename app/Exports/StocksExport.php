@@ -77,7 +77,7 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
             if ($user_dept === 'pharmacy') {
                 $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
                     ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.mode_acquisition', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at',)
+                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at',)
                     // ->where('items.category', '!=', 'medical supply')
                     ->orderBy('items.name')->get();
 
@@ -92,7 +92,7 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
             } elseif ($user_dept === 'csr') {
                 $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
                     ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at',)
+                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.created_at', 'item_stocks.updated_at',)
                     ->where('items.category', 'medical supply')
                     ->orderBy('items.name')->get();
 
@@ -107,7 +107,7 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
         } else {
             $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at',)
+                ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.created_at', 'item_stocks.updated_at',)
                 ->orderBy('items.name')->get();
 
             foreach ($items as $item) {
@@ -157,10 +157,10 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
 
                     if ($expirationDate < $today) {
                         // Set background color to red and font color to white
-                        $sheet->getStyle("A$row:H$row")->getFill()
+                        $sheet->getStyle("A$row:I$row")->getFill()
                             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                             ->getStartColor()->setARGB('FFFF0000');
-                        $sheet->getStyle("A$row:H$row")->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+                        $sheet->getStyle("A$row:I$row")->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
                     }
 
                     // $itemId = $sheet->getCell("D$row")->getValue();

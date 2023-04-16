@@ -99,11 +99,20 @@ class StocksController extends Controller
                     'items.name',
                     'items.description',
                     'items.category',
+                    'items.max_limit',
+                    'items.warning_level',
                     DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
                     DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
                     DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
                 )
-                ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
+                ->groupBy(
+                    'items.id',
+                    'items.name',
+                    'items.description',
+                    'items.category',
+                    'items.max_limit',
+                    'items.warning_level',
+                )
                 ->where('items.category', $category)
                 ->get();
         } elseif ($search) {
@@ -113,6 +122,8 @@ class StocksController extends Controller
                     'items.name',
                     'items.description',
                     'items.category',
+                    'items.max_limit',
+                    'items.warning_level',
                     DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
                     DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
                     DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
@@ -121,7 +132,14 @@ class StocksController extends Controller
                     $query->where('items.name', 'like', "%" . $search . "%")
                         ->orWhere('item_stocks.item_id', $search);
                 })
-                ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
+                ->groupBy(
+                    'items.id',
+                    'items.name',
+                    'items.description',
+                    'items.category',
+                    'items.max_limit',
+                    'items.warning_level',
+                )
                 ->orderBy('name')
                 ->get();
         } else {
@@ -131,11 +149,20 @@ class StocksController extends Controller
                     'items.name',
                     'items.description',
                     'items.category',
+                    'items.max_limit',
+                    'items.warning_level',
                     DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
                     DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
                     DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
                 )
-                ->groupBy('items.id', 'items.name', 'items.description', 'items.category')
+                ->groupBy(
+                    'items.id',
+                    'items.name',
+                    'items.description',
+                    'items.category',
+                    'items.max_limit',
+                    'items.warning_level'
+                )
                 ->get();
         }
 
@@ -169,7 +196,7 @@ class StocksController extends Controller
                     ->join('items', 'item_stocks.item_id', '=', 'items.id')
                     ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))
                     ->where('item_stocks.item_id', $id)
-                    ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
+                    ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.created_at', 'items.updated_at',)
                     ->orderByDesc('item_stocks.created_at')
                     ->get();
 
@@ -219,7 +246,7 @@ class StocksController extends Controller
             $stocks = DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))->where('item_stocks.item_id', $id)
-                ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
+                ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.created_at', 'items.updated_at',)
                 ->orderByDesc('item_stocks.created_at')
                 ->get();
 

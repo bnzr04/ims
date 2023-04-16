@@ -35,31 +35,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function viewRequest($request)
-    {
-        $user_id = Auth::user()->id;
-
-        if ($request === 'all') {
-            $items = ModelsRequest::where('user_id', $user_id)
-                ->where('status', '!=', 'completed')
-                ->get();
-        } else if ($request === 'completed') {
-            $items = ModelsRequest::where('user_id', $user_id)
-                ->where('status', 'completed')
-                ->get();
-        }
-
-        foreach ($items as $item) {
-            $item->formatted_date = Carbon::parse($item->updated_at)->format('F j, Y, g:i:s a');
-        }
-
-
-        return view('user.sub-page.view-request')->with([
-            'items' => $items,
-            'request' => $request
-        ]);
-    }
-
     public function searchItem(Request $request)
     {
 

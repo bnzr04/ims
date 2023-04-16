@@ -10,6 +10,7 @@
             <div id="content" class="px-2 py-1">
                 <div class="container-lg mt-2">
                     <a href="{{ route('admin.stocks') }}" class="btn btn-secondary">Back</a>
+                    <hr>
                 </div>
                 <div class="container-lg mt-3">
                     <h3>Dispense Report</h3>

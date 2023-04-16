@@ -56,7 +56,7 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
     Route::post('/submit-request', [RequestController::class, 'submitRequest'])->name('user.submit-request');
     Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request');
 
-    Route::get('/view-request/{request}', [UserController::class, 'viewRequest'])->name('user.viewRequest');
+    Route::get('/view-request/{request}', [RequestController::class, 'viewRequest'])->name('user.viewRequest');
 });
 
 /*------------------------------------------

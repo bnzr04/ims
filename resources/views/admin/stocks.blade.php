@@ -8,12 +8,21 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <a href="{{ route('admin.items') }}" class="btn btn-secondary mt-2 mb-4">Back</a>
-                <h2>STOCKS</h2>
-                <div class="mt-3 d-inline-block justify-content-between">
-                    <div class="container-sm p-0">
-                        <label for="category">Item Category</label>
+                <div class="container-lg">
+                    <a href="{{ route('admin.items') }}" class="btn btn-secondary mt-2 mb-1">Back</a>
+                    <hr>
+                    <h2>STOCKS</h2>
+                </div>
+                <div class="container-lg">
+                    <div class="container-sm p-0 px- d-flex">
                         <form action="" method="get">
+                            <div class="input-group" style="width: 100%;max-width: 400px">
+                                <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search" value="{{ $search }}">
+                                <button type="submit" class="input-group-text btn btn-outline-secondary">Search</button>
+                            </div>
+                        </form>
+
+                        <form action="" method="get" class="mx-2">
                             <div class="container-sm p-0 d-flex input-group" style="width: 100%;max-width: 400px">
                                 <select name="category" class="form-select text-capitalize" id="category">
                                     @if($category !== null)
@@ -26,29 +35,49 @@
                                     <option value="{{ $category }}">{{ $category }}</option>
                                     @endforeach
                                 </select>
-                                <button type="submit" class="btn btn-primary">Filter</button>
+                                <button type="submit" class="btn btn-outline-primary">Filter</button>
                             </div>
                         </form>
+
                     </div>
 
-                    <form action="" method="get">
-                        <div class="input-group" style="width: 100%;max-width: 400px">
-                            <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search" value="{{ $search }}">
-                            <button type="submit" class="input-group-text btn btn-secondary">Search</button>
+                    <div class="container-sm p-0 mt-2 d-flex">
+
+                        <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#00CDCD">&nbsp;</div>
+                                <p class="m-0">Over Max Limit</p>
+                            </div>
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="width:40px;height:100%;background-color:#1ea200">&nbsp;</div>
+                                <p class="m-0">Safe Level</p>
+                            </div>
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="width:40px;height:100%;background-color:#d67b00">&nbsp;</div>
+                                <p class="m-0">Warning Level</p>
+                            </div>
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="width:40px;height:100%;background-color:#dc0f00">&nbsp;</div>
+                                <p class="m-0">No Stocks</p>
+                            </div>
                         </div>
-                    </form>
-                </div>
-                <div class="container-lg px-2 pt-2 pb-4 mt-3 mb-4 rounded shadow bg-white">
-                    <div class="container-lg p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:200px">
-                        <form action="{{ route('admin.export-stocks') }}" method="post" class="m-0">
-                            @csrf
-                            <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
-                        </form>
 
-                        <form action="{{ route('admin.dispense') }}" method="get">
-                            <button class="btn btn-secondary">Dispense report</button>
-                        </form>
+                        <div class="container-lg p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:300px;flex-direction:column-reverse">
+                            <div class="container-sm d-flex m-0 p-1">
+                                <form action="{{ route('admin.export-stocks') }}" method="post" class="m-0 d-flex">
+                                    @csrf
+                                    <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
+                                </form>
+
+                                <form action="{{ route('admin.dispense') }}" method="get" class="m-1">
+                                    <button class="btn btn-secondary">Dispense report</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div class="container-lg px-2 pb-4 mb-4 rounded shadow bg-white">
+
 
                     <div class=" container-lg p-0 border" style="height: 400px;overflow:auto;">
                         <table class="table">
@@ -66,20 +95,16 @@
                             </thead>
                             <tbody>
                                 @forelse( $stocks as $stock )
-                                <tr>
+                                <tr style="border-bottom: 1px black solid;">
                                     <th scope="row">{{ $stock->id }}</th>
                                     <th>{{ $stock->name }}</th>
                                     <td>{{ $stock->description }}</td>
                                     <td>{{ $stock->category }}</td>
                                     <td>{{ $stock->stocks_batch}}</td>
-                                    @if($stock->total_quantity !== null)
-                                    <th class="{{ $stock->total_quantity <= 100 ? 'text-warning' : 'text-success' }}">{{ $stock->total_quantity }}</th>
-                                    @else
-                                    <th class="text-danger">No stocks</th>
-                                    @endif
+                                    <th class="total_quantity" data-warning-level="{{ $stock->warning_level }}" data-max-limit="{{ $stock->max_limit }}">{{ $stock->total_quantity }}</th>
                                     <th>{{ $stock->latest_stock }}</th>
                                     <td>
-                                        <a href="{{ route('admin.add-to-stocks', ['id' => $stock->id]) }}" class="btn btn-secondary">View batches</a>
+                                        <a href="{{ route('admin.add-to-stocks', ['id' => $stock->id]) }}" class="btn btn-outline-secondary">View Batches</a>
                                     </td>
                                 </tr>
                                 @empty
@@ -98,4 +123,34 @@
         </div>
     </div>
 </div>
+<script>
+    function threshold() {
+        const totalQuantity = document.getElementsByClassName("total_quantity");
+
+        for (let i = 0; i < totalQuantity.length; i++) {
+
+            var warningLevel = totalQuantity[i].getAttribute('data-warning-level');
+            var maxLimit = totalQuantity[i].getAttribute('data-max-limit');
+            var totalQuantityValue = totalQuantity[i].innerHTML;
+
+            var warningLevel = warningLevel / 100;
+
+            var warningQty = maxLimit * warningLevel;
+
+            console.log(maxLimit);
+
+            if (totalQuantityValue <= warningQty) {
+                totalQuantity[i].style.color = "#d67b00";
+            } else if (totalQuantityValue === 0) {
+                totalQuantity[i].style.color = "#c6ae00 ";
+            } else if (totalQuantityValue > maxLimit) {
+                totalQuantity[i].style.color = "#00CDCD";
+            } else {
+                totalQuantity[i].style.color = "#1ea200";
+            }
+        }
+    }
+
+    threshold();
+</script>
 @endsection

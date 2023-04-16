@@ -36,6 +36,8 @@ use Illuminate\Support\Facades\Session
                             <tr>
                                 <th scope="col">Request ID</th>
                                 <th scope="col">Office</th>
+                                <th scope="col">Patient Name</th>
+                                <th scope="col">Request By</th>
                                 <th scope="col">Request To</th>
                                 <th scope="col">Request status</th>
                                 <th scope="col">Request date</th>
@@ -45,6 +47,8 @@ use Illuminate\Support\Facades\Session
                             <tr>
                                 <td scope="col">{{ $request->id }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->office }}</td>
+                                <td scope="col" class="text-capitalize">{{ $request->patient_name }}</td>
+                                <td scope="col" class="text-capitalize">{{ $request->request_by }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_to }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->status }}</td>
                                 <td scope="col">{{ $request->formatted_date }}</td>
@@ -84,6 +88,7 @@ use Illuminate\Support\Facades\Session
                                     <th scope="col">Unit</th>
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Stock ID</th>
+                                    <th scope="col">Mode Of Acq</th>
                                     <th scope="col">Expiration</th>
                                 </tr>
                             </thead>
@@ -97,11 +102,12 @@ use Illuminate\Support\Facades\Session
                                     <td scope="col" class="text-capitalize">{{ $item->unit }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->quantity }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->stock_id }}</td>
+                                    <td scope="col" class="text-capitalize">{{ $item->mode_acquisition }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->exp_date }}</td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="8">
+                                    <td colspan="9">
                                         No Items...
                                     </td>
                                 </tr>

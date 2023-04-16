@@ -18,12 +18,24 @@
                     <div class="container-md d-flex">
 
                         <form id="today_form" class="m-0">
-                            <div class="mx-3">
+                            <div class="mx-1">
                                 <input type="hidden" name="today" value="1">
-                                <button type="submit" class="btn btn-secondary m-0">Today</button>
+                                <button type="submit" class="btn btn-outline-secondary m-0">Today</button>
                             </div>
                         </form>
-                        <form id="filter_form" class="m-0">
+                        <form id="yesterday_form" class="m-0">
+                            <div class="mx-1">
+                                <input type="hidden" name="today" value="1">
+                                <button type="submit" class="btn btn-outline-secondary m-0">Yesterday</button>
+                            </div>
+                        </form>
+                        <form id="thisMonth_form" class="m-0">
+                            <div class="mx-1">
+                                <input type="hidden" name="today" value="1">
+                                <button type="submit" class="btn btn-outline-secondary m-0">This Month</button>
+                            </div>
+                        </form>
+                        <form id="filter_form" class="m-0 mx-3">
                             @csrf
                             <!-- <a href="" class="btn btn-secondary" style="letter-spacing:2px;">TODAY</a> -->
                             <div class="d-flex" style="align-items: center;">
@@ -32,7 +44,7 @@
 
                                 <label for="date_to">To</label>
                                 <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY">
-                                <button type="submit" class="btn btn-success">Filter</button>
+                                <button type="submit" class="btn btn-outline-success">Filter</button>
                             </div>
                         </form>
                     </div>
@@ -43,6 +55,8 @@
                                     <th scope="col">Req ID</th>
                                     <th scope="col">Date-time</th>
                                     <th scope="col">Office</th>
+                                    <th scope="col">Patient Name</th>
+                                    <th scope="col">Request By</th>
                                     <th scope="col">Request to</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
@@ -79,11 +93,11 @@
                 // console.log(data)
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='6'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
                 }
             } else {
                 console.log('Error: ' + xhr.status);
@@ -96,6 +110,8 @@
 
 
     const todayForm = document.querySelector('#today_form');
+    const yesterdayForm = document.querySelector('#yesterday_form');
+    const thisMonthForm = document.querySelector('#thisMonth_form');
     const form = document.querySelector('#filter_form');
     const fromDateInput = document.querySelector('#date_from');
     const toDateInput = document.querySelector('#date_to');
@@ -114,11 +130,77 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='6'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
+                }
+            } else {
+                var data = JSON.parse(xhr.responseText);
+                console.log(data);
+            }
+        };
+        xhr.onerror = function() {
+            var data = JSON.parse(xhr.responseText);
+            console.log(data);
+        };
+        xhr.send();
+    });
+
+
+    yesterdayForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `{{ route('admin.filter-transaction') }}?yesterday=1`);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                var transaction_table = document.querySelector('#transaction_table');
+                transaction_table.innerHTML = '';
+                // console.log(data);
+
+                for (var i = 0; i < data.length; i++) {
+                    var row = data[i];
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                }
+
+                if (data.length === 0) {
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
+                }
+            } else {
+                var data = JSON.parse(xhr.responseText);
+                console.log(data);
+            }
+        };
+        xhr.onerror = function() {
+            var data = JSON.parse(xhr.responseText);
+            console.log(data);
+        };
+        xhr.send();
+    });
+
+
+    thisMonthForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `{{ route('admin.filter-transaction') }}?this-month=1`);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                var transaction_table = document.querySelector('#transaction_table');
+                transaction_table.innerHTML = '';
+                // console.log(data);
+
+                for (var i = 0; i < data.length; i++) {
+                    var row = data[i];
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                }
+
+                if (data.length === 0) {
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);
@@ -149,11 +231,11 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='6'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);

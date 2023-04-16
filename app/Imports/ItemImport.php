@@ -20,6 +20,8 @@ class ItemImport implements ToModel, WithHeadingRow
             'description' => $row['description'],
             'category' => $row['category'],
             'unit' => $row['unit'],
+            'max_limit' => $row['max_limit'],
+            'warning_level' => $row['warning_level'],
         ]);
     }
 }
