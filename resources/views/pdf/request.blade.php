@@ -181,13 +181,13 @@
         </div>
 
         <div class="request">
-            <p><strong>REQUEST CODE: </strong><span>123</span></p>
+            <p><strong>REQUEST CODE: </strong><span>{{ $request->id }}</span></p>
         </div>
 
         <div class="patient-details">
             <p>PATIENT NAME:<span>{{ $request->patient_name }}</span></p>
-            <p>AGE:<span>27</span></p>
-            <p>GENDER:<span>MALE</span></p>
+            <p>AGE:<span>0</span></p>
+            <p>GENDER:<span>-</span></p>
         </div>
 
         <div class="other-details">
@@ -211,7 +211,7 @@
         <table>
             <tr>
                 <td colspan="5" id="total-amount">Total Amount</td>
-                <td>200.00</td>
+                <td><b>200.00</b></td>
             </tr>
             <tr>
                 <th>ID</th>

@@ -358,4 +358,30 @@ class ManagerRequestController extends Controller
 
         return response()->json($data);
     }
+
+
+    //PRINT REQUEST
+    public function generate_receipt($rid)
+    {
+        $user = Auth::user();
+
+        $user_name = $user->name;
+
+        $request = ModelsRequest::find($rid);
+        $items = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
+            ->where('request_id', $rid)->get();
+
+        foreach ($items as $item) {
+            $stock = Stock::select('stock_qty')
+                ->where('id', $item->stock_id)
+                ->first();
+
+            $item->remaining = $stock->stock_qty;
+        }
+
+        return view("pdf.request")->with([
+            'request' => $request,
+            'items' => $items,
+        ]);
+    }
 }

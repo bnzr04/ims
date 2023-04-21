@@ -159,6 +159,8 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
     Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
 
+    Route::get('/generate-receipt/{rid}', [ManagerRequestController::class, 'generate_receipt'])->name('manager.generate-receipt');
+
     //Dispense Report
     Route::get('/dispense', [StocksController::class, 'dispense'])->name('manager.dispense');
     Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('manager.get-dispense');
