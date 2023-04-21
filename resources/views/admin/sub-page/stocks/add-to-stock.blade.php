@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Session
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div class="container-lg pt-2">
-                <a href="{{ route('admin.stocks') }}" class="btn btn-secondary">Back</a>
+                <a href="{{ route('admin.items') }}" class="btn btn-secondary">Back to Items</a>
+                <a href="{{ route('admin.stocks') }}" class="btn btn-secondary">Back to Stocks</a>
             </div>
 
             <div id="content container-lg" class="p-3">
@@ -180,7 +181,7 @@ use Illuminate\Support\Facades\Session
 
             var warningLevel = totalQuantity[i].getAttribute('data-warning-level');
             var maxLimit = totalQuantity[i].getAttribute('data-max-limit');
-            var totalQuantityValue = totalQuantity[i].innerHTML;
+            var totalQuantityValue = parseInt(totalQuantity[i].innerHTML);
 
             var warningLevel = warningLevel / 100;
 
@@ -188,11 +189,12 @@ use Illuminate\Support\Facades\Session
 
             if (totalQuantityValue <= warningQty) {
                 totalQuantity[i].style.color = "#d67b00";
-            } else if (totalQuantityValue === 0) {
-                totalQuantity[i].style.color = "#c6ae00 ";
+            } else if (isNaN(totalQuantityValue)) {
+                totalQuantity[i].innerHTML = 0;
+                totalQuantity[i].style.color = "#fa0505 ";
             } else if (totalQuantityValue > maxLimit) {
                 totalQuantity[i].style.color = "#00CDCD";
-            } else {
+            } else if (totalQuantityValue > warningLevel && totalQuantityValue < maxLimit) {
                 totalQuantity[i].style.color = "#1ea200";
             }
         }

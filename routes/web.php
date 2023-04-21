@@ -114,6 +114,8 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::post('/accept-request/{rid}', [AdminRequestController::class, 'acceptRequest'])->name('admin.accept-request');
     Route::post('/deliver-request/{rid}', [AdminRequestController::class, 'deliverRequest'])->name('admin.deliver-request');
     Route::post('/complete-request/{rid}', [AdminRequestController::class, 'completeRequest'])->name('admin.complete-request');
+    Route::get('/generate-receipt/{rid}', [AdminRequestController::class, 'generate_receipt'])->name('admin.generate-receipt');
+    // Route::get('/export_pdf', [AdminRequestController::class, 'export_pdf'])->name('admin.export_pdf');
 
     //Request transaction
     Route::get('/transaction', [AdminRequestController::class, 'transaction'])->name('admin.transaction');

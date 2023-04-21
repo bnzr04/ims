@@ -255,9 +255,9 @@ class ItemController extends Controller
         }
 
         if ($request->max_limit !== "") {
-            $item->max_limit = $request->max_limit;
+            $item->max_limit = $request->filled('max_limit') ? $request->max_limit : 500;
         } else if ($request->warning_level !== "") {
-            $item->warning_level = $request->warning_level;
+            $item->warning_level = $request->filled('warning_level') ? $request->warning_level : 30;
         }
 
         $item->save();

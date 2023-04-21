@@ -38,7 +38,8 @@
                                     <th scope="col">Req ID</th>
                                     <th scope="col">Date-time</th>
                                     <th scope="col">Office</th>
-                                    <th scope="col">Patient Name</th>
+                                    <th scope="col">Patient</th>
+                                    <th scope="col">Doctor</th>
                                     <th scope="col">Request By</th>
                                     <th scope="col">Request to</th>
                                     <th scope="col">Status</th>
@@ -52,6 +53,7 @@
                                     <td>{{$item->formatted_date}}</td>
                                     <td>{{$item->office}}</td>
                                     <td>{{$item->patient_name}}</td>
+                                    <td>{{$item->doctor_name}}</td>
                                     <td>{{$item->request_by}}</td>
                                     <td>{{$item->request_to}}</td>
                                     <td>{{$item->status}}</td>

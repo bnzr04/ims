@@ -200,6 +200,10 @@ class StocksController extends Controller
                     ->orderByDesc('item_stocks.created_at')
                     ->get();
 
+                foreach ($stocks as $stock) {
+                    $stock->exp_date = Carbon::parse($stock->exp_date)->format("m-d-Y");
+                }
+
                 //get total stocks by item id
                 $totalStocks = DB::table('item_stocks')
                     ->join('items', 'item_stocks.item_id', '=', 'items.id')
@@ -249,6 +253,10 @@ class StocksController extends Controller
                 ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.created_at', 'items.updated_at',)
                 ->orderByDesc('item_stocks.created_at')
                 ->get();
+
+            foreach ($stocks as $stock) {
+                $stock->exp_date = Carbon::parse($stock->exp_date)->format("m-d-Y");
+            }
 
 
             $totalStocks = DB::table('item_stocks')

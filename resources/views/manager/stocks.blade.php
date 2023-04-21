@@ -145,7 +145,7 @@ use Illuminate\Support\Facades\Session
 
             var warningLevel = totalQuantity[i].getAttribute('data-warning-level');
             var maxLimit = totalQuantity[i].getAttribute('data-max-limit');
-            var totalQuantityValue = totalQuantity[i].innerHTML;
+            var totalQuantityValue = parseInt(totalQuantity[i].innerHTML);
 
             var warningLevel = warningLevel / 100;
 

@@ -6,6 +6,8 @@ use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
 use App\Models\Stock;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -221,6 +223,43 @@ class AdminRequestController extends Controller
             return back()->with('error', 'Request failed to mark as complete');
         }
     }
+
+    public function generate_receipt($rid)
+    {
+        $user = Auth::user();
+
+        $user_name = $user->name;
+
+        $request = ModelsRequest::find($rid);
+        $items = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
+            ->where('request_id', $rid)->get();
+
+        foreach ($items as $item) {
+            $stock = Stock::select('stock_qty')
+                ->where('id', $item->stock_id)
+                ->first();
+
+            $item->remaining = $stock->stock_qty;
+        }
+
+        return view("pdf.request")->with([
+            'request' => $request,
+            'items' => $items,
+        ]);
+    }
+
+    // public function export_pdf()
+    // {
+    //     $pdf = Pdf::loadView('pdf.request-pdf');
+    //     $pdf->setPaper(array(0, 0, 396, 612 / 2), "landscape");
+    //     $pdf->setOption('margin-top', 0);
+    //     $pdf->setOption('margin-right', 0);
+    //     $pdf->setOption('margin-bottom', 0);
+    //     $pdf->setOption('margin-left', 0);
+    //     $pdf->setOption('isHtml5ParserEnabled', true);
+
+    //     return $pdf->stream('request.pdf');
+    // }
 
     //Request transaction
     public function transaction()

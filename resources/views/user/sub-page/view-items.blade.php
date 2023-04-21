@@ -10,11 +10,11 @@
             <div id="content" class="px-2 py-1">
                 <div class="container-lg">
                     @if($request->status !== 'completed')
-                    <a href="/user/view-request/all" class="btn btn-secondary">Back</a>
+                    <a href="{{route('user.viewRequest',['request' => 'all'])}}" class="btn btn-secondary">Back</a>
                     @endif
 
                     @if($request->status === 'completed')
-                    <a href="/user/view-request/completed" class="btn btn-secondary">Back</a>
+                    <a href="{{route('user.viewRequest',['request' => 'completed'])}}" class="btn btn-secondary">Back</a>
                     @endif
                 </div>
                 <div class="container-md mt-3 pt-2 pb-2 border shadow lh-1 rounded overflow-auto">
@@ -24,7 +24,8 @@
                             <tr>
                                 <th scope="col">Request ID</th>
                                 <th scope="col">Office</th>
-                                <th scope="col">Patient Name</th>
+                                <th scope="col">Patient</th>
+                                <th scope="col">Doctor</th>
                                 <th scope="col">Request By</th>
                                 <th scope="col">Request To</th>
                                 <th scope="col">Request status</th>
@@ -36,6 +37,7 @@
                                 <td scope="col">{{ $request->id }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->office }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->patient_name }}</td>
+                                <td scope="col" class="text-capitalize">{{ $request->doctor_name }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_by }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->request_to }}</td>
                                 <td scope="col" class="text-capitalize">{{ $request->status }}</td>

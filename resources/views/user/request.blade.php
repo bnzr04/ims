@@ -20,7 +20,7 @@
                                 <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
                                     <option></option>
                                     @foreach($items as $item)
-                                    <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }})</option>
+                                    <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
                                     @endforeach
                                 </select>
 
@@ -58,9 +58,32 @@
 
                     <div class="container-lg p-0 d-flex my-2">
                         <div class="container-lg d-flex" style="flex-wrap:wrap">
+                            <div class="container-lg mb-3 p-0">
+                                <div class="container-lg m-0">
+                                    <label for="patient_name">Patient Name:</label>
+                                    <input type="text" name="patient_name" id="patient_name" class="form-control border border-secondary" style="width: 100%;max-width:320px">
+                                </div>
+                                <!-- <div class="container-sm m-0 mt-2 p-0">
+                                    <div class="container-lg m-0 d-flex" style="align-items: center;">
+                                        <label for="p_age" class="mx-1">Age:</label>
+                                        <input type="text" name="p_age" id="p_age" class="form-control border border-secondary" style="width: 100%;max-width:50px">
+                                    </div>
+                                    <div class="container-lg m-0 mt-1 d-flex" style="align-items: center;flex-wrap:wrap">
+                                        <label for="" class="m-1">Sex:</label>
+                                        <div class="d-flex mx-1" style="align-items: center;">
+                                            <label for="p_sex_m">Male</label>
+                                            <input type="radio" name="p_sex" class="" id="p_sex_m" value="Male">
+                                        </div>
+                                        <div class="d-flex mx-1" style="align-items: center;">
+                                            <label for="p_sex_f">Female</label>
+                                            <input type="radio" name="p_sex" id="p_sex_f" value="Female">
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </div>
                             <div class="container-lg m-0">
-                                <label for="patient_name">Patient Name:</label>
-                                <input type="text" name="patient_name" id="patient_name" class="form-control border border-secondary" style="width: 100%;max-width:320px">
+                                <label for="doctor_name">Physician/Nurse Name:</label>
+                                <input type="text" name="doctor_name" id="doctor_name" class="form-control border border-secondary" style="width: 100%;max-width:320px">
                             </div>
                             <div class="container-lg m-0">
                                 <label for="request_by">Requester Name:</label>
@@ -197,16 +220,18 @@
             if (selectedItem.length !== 0) {
                 var requestByInput = $("#request_by");
                 var patientNameInput = $("#patient_name");
+                var doctorNameInput = $("#doctor_name");
 
                 var requestBy = requestByInput.val();
                 var patientName = patientNameInput.val();
+                var doctorName = doctorNameInput.val();
 
                 var requestedItems = JSON.stringify(selectedItem);
                 var $btn = $(this);
 
 
 
-                if (requestBy !== "" && patientName !== "") {
+                if (requestBy !== "" && patientName !== "" && doctorName !== "") {
                     if ($btn.prop('disabled')) {
                         return false; // don't submit if button is already disabled
                     }
@@ -218,6 +243,7 @@
                         data: {
                             requestBy: requestBy,
                             patientName: patientName,
+                            doctorName: doctorName,
                             requestedItems: requestedItems,
                             _token: $('meta[name="csrf-token"]').attr('content')
                         },
@@ -244,6 +270,8 @@
                     alert("Please enter requester name");
                 } else if (patientName === "") {
                     alert("Please enter patient name");
+                } else if (doctorName === "") {
+                    alert("Please enter Doctor's name");
                 }
 
 

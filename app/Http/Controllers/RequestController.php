@@ -352,6 +352,7 @@ class RequestController extends Controller
         $requested = $request->input('requestedItems');
         $request_by = $request->input('requestBy');
         $patient_name = $request->input('patientName');
+        $doctor_name = $request->input('doctorName');
         $requestedItems = json_decode($requested);
 
         //Enable Query Log
@@ -371,8 +372,9 @@ class RequestController extends Controller
         $requestModel->office = $office;
         //we always send the request to pharmacy
         $requestModel->request_to = 'pharmacy';
-        $requestModel->request_by = $request_by;
-        $requestModel->patient_name = $patient_name;
+        $requestModel->request_by = ucfirst($request_by);
+        $requestModel->patient_name = ucfirst($patient_name);
+        $requestModel->doctor_name = ucfirst($doctor_name);
         $requestModel->save();
 
         $requestID = $requestModel->id;
