@@ -89,30 +89,65 @@ class ManagerRequestController extends Controller
     //     }
     // }
 
-    public function showRequest()
+    public function showPendingRequest()
     {
-        $pending = ModelsRequest::where('status', '!=', 'completed')->where('status', '!=', 'delivered')
-            ->orderByDesc('updated_at')->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)->format('F j, Y, g:i:s a');
+        $user = Auth::user();
+        $user_id = $user->id;
+        $user_name = $user->name;
+        $user_type = $user->type;
+
+        $pending = ModelsRequest::where('status', 'pending')
+            // ->where('status', '!=', 'delivered') 
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
             });
-        // $completed = ModelsRequest::where('status', 'completed')
-        //     ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-        //         $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-        //     });
 
-        $requests = [
-            'pending' => $pending,
-            // 'completed' => $completed,
+        return response()->json($pending);
+    }
 
-        ];
+    public function showAcceptedRequest()
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+        $user_name = $user->name;
+        $user_type = $user->type;
 
-        return response()->json($requests);
+        if ($user_type === 'manager') {
+            $accepted = ModelsRequest::where('status', 'accepted')
+                ->where('accepted_by_user_id', $user_id)
+                ->orderByDesc('updated_at')
+                ->get()->each(function ($pending) {
+                    $pending->formatted_date = Carbon::parse($pending->created_at)
+                        ->format('F j, Y, g:i:s a');
+                });
+        }
+
+        $accepted = ModelsRequest::where('status', 'accepted')
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        return response()->json($accepted);
     }
 
     //this will show the requested items
     public function requestedItems($id)
     {
+        $user = Auth::user();
+        $user_id = $user->id;
+        $user_name = $user->name;
+        $user_type = $user->type;
+
+        // if ($user_type === 'manager') {
+        //     $request = ModelsRequest::where('id', $id)->where('accepted_user_id', $user_id)->first();
+        // } else {
         $request = ModelsRequest::where('id', $id)->first();
+        // }
+
         $request->formatted_date =
             Carbon::parse($request->created_at)->format('F j, Y, g:i:s a');
 
@@ -158,6 +193,8 @@ class ManagerRequestController extends Controller
 
 
         if ($request) {
+            $request->accepted_by_user_id = $user_id;
+            $request->accepted_by_user_name = $user_name;
             $request->status = 'accepted';
             $request->save();
 

@@ -158,7 +158,8 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     //Request module
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
     Route::get('/requests', [ManagerRequestController::class, 'viewRequest'])->name('manager.requests');
-    Route::get('/show-requests', [ManagerRequestController::class, 'showRequest'])->name('manager.show-requests');
+    Route::get('/show-pending-requests', [ManagerRequestController::class, 'showPendingRequest'])->name('manager.show-pending-requests');
+    Route::get('/show-accepted-requests', [ManagerRequestController::class, 'showAcceptedRequest'])->name('manager.show-accepted-requests');
     Route::get('/requested-items/{id}', [ManagerRequestController::class, 'requestedItems'])->name('manager.requested-items');
     Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
