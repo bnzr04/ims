@@ -86,6 +86,7 @@ use Illuminate\Support\Facades\Session
                                     <th scope="col">Description</th>
                                     <th scope="col">Category</th>
                                     <th scope="col">Unit</th>
+                                    <th scope="col">Price</th>
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Stock ID</th>
                                     <th scope="col">Mode Of Acq</th>
@@ -100,6 +101,7 @@ use Illuminate\Support\Facades\Session
                                     <td scope="col" class="text-capitalize">{{ $item->description }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->category }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->unit }}</td>
+                                    <td scope="col" class="text-capitalize">{{ is_null($item->price) ? "-" : $item->price }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->quantity }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->stock_id }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->mode_acquisition }}</td>

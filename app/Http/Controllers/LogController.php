@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LogController extends Controller
 {
@@ -44,5 +46,48 @@ class LogController extends Controller
 
 
         return view('admin.log')->with(['logs' => $logs, 'dateAndTime' => $dateAndTime, 'requestDate' => $requestDate]);
+    }
+
+    /////Log first part//////////
+    public function startLog()
+    {
+        DB::enableQueryLog();
+
+        $user = Auth::user();
+        $user_id = $user->id;
+        $user_type = $user->type;
+        if ($user_type === 'manager') {
+            $user_dept = $user->dept;
+        } else {
+            $user_dept = "";
+        }
+
+        return [$user_id, $user_type, $user_dept];
+    }
+
+    /////Log last part//////////
+    public function endLog($user_id, $user_type, $user_dept, $message)
+    {
+        if ($user_type === 'manager') {
+            $user_type = $user_type . " (" . $user_dept . ")";
+        }
+
+        // Get the SQL query being executed
+        $sql = DB::getQueryLog();
+        if (is_array($sql) && count($sql) > 0) {
+            $last_query = end($sql)['query'];
+        } else {
+            $last_query = 'No query log found.';
+        }
+
+        // Log the data to the logs table
+        Log::create([
+            'user_id' => $user_id,
+            'user_type' => $user_type,
+            'message' => $message,
+            'query' => $last_query,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
     }
 }

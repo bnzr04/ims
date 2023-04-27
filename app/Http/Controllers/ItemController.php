@@ -126,8 +126,8 @@ class ItemController extends Controller
                     ->pluck('category');
 
                 $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level',)
+                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price',)
                     ->orderBy('items.name');
 
                 if ($category) {
@@ -174,8 +174,8 @@ class ItemController extends Controller
         //This will get the all items and will know if there is a stocks or none
         //This portion will execute if the user is admin
         $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level')
+            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price')
             ->orderBy('items.name');
 
         if ($category) {
@@ -253,6 +253,8 @@ class ItemController extends Controller
         } else {
             $item->unit = $request->unit;
         }
+
+        $item->price = $request->price;
 
         if ($request->max_limit !== "") {
             $item->max_limit = $request->filled('max_limit') ? $request->max_limit : 500;
@@ -350,6 +352,8 @@ class ItemController extends Controller
         } else {
             $item->unit = ucwords($request->unit);
         }
+
+        $item->price = $request->price;
 
         $item->max_limit = $request->max_limit;
 

@@ -93,6 +93,7 @@ use Illuminate\Support\Facades\Session
                                 <th scope="col">Description</th>
                                 <th scope="col">Category</th>
                                 <th scope="col">Unit</th>
+                                <th scope="col">Price</th>
                                 <th scope="col">Current Stock</th>
                                 <th scope="col">Action</th>
                             </tr>
@@ -105,6 +106,7 @@ use Illuminate\Support\Facades\Session
                                 <td class="text-capitalize">{{ $item->description }}</td>
                                 <td class="text-capitalize">{{ $item->category }}</td>
                                 <td>{{ $item->unit }}</td>
+                                <td>{{ is_null($item->price) ? "-" : $item->price}}</td>
                                 @if($item->total_quantity !== null)
                                 <th class="total_quantity" data-warning-level="{{ $item->warning_level }}" data-max-limit="{{ $item->max_limit }}">{{ $item->total_quantity }}</th>
                                 @else

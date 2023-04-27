@@ -99,6 +99,15 @@
                                         @enderror
                                     </div>
                                 </div>
+
+                                <div class="container-sm mb-2">
+                                    <label for="price"><b>Item Price</b></label>
+                                    <input type="text" name="price" class="form-control" id="price">
+
+                                    @error('price')
+                                    <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
 
                             <div class="container-sm p-3 mt-3 mb-3 shadow-lg rounded">

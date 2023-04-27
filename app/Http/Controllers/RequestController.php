@@ -25,7 +25,7 @@ class RequestController extends Controller
         $items =
             DB::table('item_stocks')
             ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            ->select('items.name', 'item_stocks.*')
+            ->select('items.name', 'items.category', 'items.unit', 'item_stocks.*')
             ->where('item_stocks.exp_date', ">", $today)
             ->orderBy('items.name', 'asc')
             ->get();

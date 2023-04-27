@@ -20,7 +20,7 @@
                                 <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
                                     <option></option>
                                     @foreach($items as $item)
-                                    <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
+                                    <option data-item-id="{{ $item->item_id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} - {{ $item->category }} {{ $item->unit === "-" ? "" : "- " . $item->unit }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
                                     @endforeach
                                 </select>
 
@@ -63,6 +63,7 @@
                                     <label for="patient_name">Patient Name:</label>
                                     <input type="text" name="patient_name" id="patient_name" class="form-control border border-secondary" style="width: 100%;max-width:320px">
                                 </div>
+
                                 <!-- <div class="container-sm m-0 mt-2 p-0">
                                     <div class="container-lg m-0 d-flex" style="align-items: center;">
                                         <label for="p_age" class="mx-1">Age:</label>
@@ -72,11 +73,11 @@
                                         <label for="" class="m-1">Sex:</label>
                                         <div class="d-flex mx-1" style="align-items: center;">
                                             <label for="p_sex_m">Male</label>
-                                            <input type="radio" name="p_sex" class="" id="p_sex_m" value="Male">
+                                            <input type="radio" name="p_sex" class="" id="p_sex" value="Male">
                                         </div>
                                         <div class="d-flex mx-1" style="align-items: center;">
                                             <label for="p_sex_f">Female</label>
-                                            <input type="radio" name="p_sex" id="p_sex_f" value="Female">
+                                            <input type="radio" name="p_sex" id="p_sex" value="Female">
                                         </div>
                                     </div>
                                 </div> -->

@@ -35,8 +35,8 @@
         }
 
         .main-container {
-            width: 390px;
-            height: 525px;
+            width: 385px;
+            height: 520px;
             border: #000 1px solid;
             /* float: right; */
         }
@@ -129,7 +129,7 @@
             margin: 2px auto;
             margin-bottom: 5px;
             border: #000 1px solid;
-            font-size: 7px;
+            font-size: 8px;
             border-collapse: collapse;
             max-width: 98%;
         }
@@ -157,6 +157,13 @@
 
         .sign-table td {
             height: 30px;
+            vertical-align: bottom;
+            font-weight: bold;
+        }
+
+        .items-table #total-amount-value {
+            font-weight: bolder;
+            font-size: 9px;
         }
     </style>
 
@@ -192,7 +199,7 @@
 
         <div class="other-details">
             <p>WARD/ROOM:<span>{{ $request->office }}</span></p>
-            <p>DATE & TIME:<span>JAN 01, 2023 12:00 AM</span></p>
+            <p>DATE & TIME:<span id="todayDateAndTime"></span></p>
         </div>
 
         <table class="sign-table">
@@ -204,14 +211,14 @@
             <tr>
                 <td>{{ $request->doctor_name }}</td>
                 <td></td>
-                <td></td>
+                <td>{{ Auth::user()->name }}</td>
             </tr>
         </table>
 
-        <table>
+        <table class="items-table">
             <tr>
                 <td colspan="5" id="total-amount">Total Amount</td>
-                <td><b>200.00</b></td>
+                <td id="total-amount-value">{{ $total_amount }}</td>
             </tr>
             <tr>
                 <th>ID</th>
@@ -225,11 +232,11 @@
             @foreach($items as $item)
             <tr>
                 <td>{{ $item->item_id }}</td>
-                <td>{{ $item->quantity }}</td>
+                <td id="quantity">{{ $item->quantity }}</td>
                 <td>{{ $item->unit }}</td>
                 <td>{{ $item->name }}</td>
-                <td>10000</td>
-                <td>100.00</td>
+                <td>{{ is_null($item->price) ? "-" : $item->price }}</td>
+                <td id="amount">{{ $item->amount }}</td>
                 <td>{{ $item->remaining }}</td>
             </tr>
             @endforeach
@@ -242,8 +249,46 @@
         function printReq() {
 
             window.print();
-            // window.close();
+            window.close();
         }
+
+        function dateAndTime() {
+            const todayDateAndTimeOutput = document.getElementById('todayDateAndTime');
+
+            // create a new Date object
+            const today = new Date();
+
+            // get the month name and convert it to uppercase
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            ];
+            const month = monthNames[today.getMonth()].toUpperCase();
+
+            // get the day and add a leading zero if necessary
+            const day = ("0" + today.getDate()).slice(-2);
+
+            // get the year
+            const year = today.getFullYear();
+
+            // get the hours in 12-hour format
+            let hours = today.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours %= 12;
+            hours = hours ? hours : 12;
+
+            // get the minutes and add a leading zero if necessary
+            const minutes = ("0" + today.getMinutes()).slice(-2);
+
+            // combine the date and time components into a string
+            const formattedDateTime = `${month} ${day}, ${year} ${hours}:${minutes} ${ampm}`;
+
+            // output the formatted date and time
+            todayDateAndTimeOutput.innerHTML = formattedDateTime;
+        }
+
+        setInterval(function() {
+            dateAndTime();
+        }, 1000);
     </script>
 </body>
 

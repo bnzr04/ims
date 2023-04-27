@@ -67,7 +67,10 @@ All Admin Routes List
 
 Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(function () {
 
+    //Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/dashboard-display', [AdminController::class, 'dashboardDisplay'])->name('admin.dashboard-display');
+
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
 
     //Users Log Activity
@@ -131,6 +134,8 @@ All Manager Routes List
 Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(function () {
 
     Route::get('/dashboard', [ManagerController::class, 'managerHome'])->name('manager.home');
+    Route::get('/dashboard-display', [ManagerController::class, 'dashboardDisplay'])->name('manager.dashboard-display');
+
     Route::get('/item-stocks', [ItemController::class, 'showAllItems'])->name('manager.stocks');
 
     //Items module
