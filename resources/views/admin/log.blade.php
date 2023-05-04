@@ -9,12 +9,24 @@
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 <h1>Logs</h1>
-                <div class="container-md mb-3">
+                <div class="container-md mb-3 d-flex">
                     <div class="btn-group" role="group" aria-label="Basic outlined example">
                         <button type="button" onclick="window.location.href='{{ route('admin.log-index', ['date' => 'today']) }}'" class="btn btn-outline-dark">Today</button>
                         <button type="button" onclick="window.location.href='{{ route('admin.log-index', ['date' => 'yesterday']) }}'" class="btn btn-outline-dark">Yesterday</button>
                         <button type="button" onclick="window.location.href='{{ route('admin.log-index', ['date' => 'this_month']) }}'" class="btn btn-outline-dark">This Month</button>
                     </div>
+                    <form action="{{ route('admin.log-index', ['date_from' => request()->input('date_from'),'date_to' => request()->input('date_to') ]) }}" id="filter_form" class="m-0 mx-3">
+                        @csrf
+                        <!-- <a href="" class="btn btn-secondary" style="letter-spacing:2px;">TODAY</a> -->
+                        <div class="d-flex" style="align-items: center;width:100%;max-width:500px">
+                            <label for="date_from">From</label>
+                            <input type="date" class="form-control mx-1" name="date_from" id="date_from">
+
+                            <label for="date_to">To</label>
+                            <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY">
+                            <button type="submit" class="btn btn-outline-secondary">Filter</button>
+                        </div>
+                    </form>
                     <button type="button" class="btn btn-outline-primary" onclick="window.location.href=''">↻</button>
                 </div>
                 <div class="container-lg m-0">
@@ -54,4 +66,12 @@
         </div>
     </div>
 </div>
+<script>
+    // Get today's date
+    var today = new Date().toISOString().split('T')[0];
+
+    // Set the maximum value for a date input field to today's date
+    document.getElementById("date_from").setAttribute("max", today);
+    document.getElementById("date_to").setAttribute("max", today);
+</script>
 @endsection

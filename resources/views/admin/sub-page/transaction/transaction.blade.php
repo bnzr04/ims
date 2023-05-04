@@ -82,36 +82,36 @@
     document.getElementById("date_from").setAttribute("max", today);
     document.getElementById("date_to").setAttribute("max", today);
 
-    function transaction() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', "{{ route('admin.show-transaction') }}", true);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                var data = JSON.parse(xhr.responseText);
-                // Update the table with the new data
-                var transaction_table = document.querySelector('#transaction_table');
-                transaction_table.innerHTML = '';
+    // function transaction() {
+    //     var xhr = new XMLHttpRequest();
+    //     xhr.open('GET', "{{ route('admin.show-transaction') }}", true);
+    //     xhr.onload = function() {
+    //         if (xhr.status === 200) {
+    //             var data = JSON.parse(xhr.responseText);
+    //             // Update the table with the new data
+    //             var transaction_table = document.querySelector('#transaction_table');
+    //             transaction_table.innerHTML = '';
 
-                // console.log(data)
-                for (var i = 0; i < data.length; i++) {
-                    var row = data[i];
-                    if (row.accepted_by_user_name === null) {
-                        row.accepted_by_user_name = "-";
-                    }
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
-                }
+    //             // console.log(data)
+    //             for (var i = 0; i < data.length; i++) {
+    //                 var row = data[i];
+    //                 if (row.accepted_by_user_name === null) {
+    //                     row.accepted_by_user_name = "-";
+    //                 }
+    //                 transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+    //             }
 
-                if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
-                }
-            } else {
-                console.log('Error: ' + xhr.status);
-            }
-        };
-        xhr.send();
-    }
+    //             if (data.length === 0) {
+    //                 transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
+    //             }
+    //         } else {
+    //             console.log('Error: ' + xhr.status);
+    //         }
+    //     };
+    //     xhr.send();
+    // }
 
-    transaction();
+    // transaction();
 
 
     const todayForm = document.querySelector('#today_form');
@@ -121,9 +121,9 @@
     const fromDateInput = document.querySelector('#date_from');
     const toDateInput = document.querySelector('#date_to');
 
-    todayForm.addEventListener('submit', (event) => {
-        event.preventDefault();
+    var todayInterval;
 
+    function todayUpdate() {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', `{{ route('admin.filter-transaction') }}?today=1`);
         xhr.onload = function() {
@@ -154,12 +154,20 @@
             console.log(data);
         };
         xhr.send();
+    }
+
+    todayForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        todayInterval = setInterval(todayUpdate, 1000);
+
     });
 
 
     yesterdayForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
+        clearInterval(todayInterval);
         const xhr = new XMLHttpRequest();
         xhr.open('GET', `{{ route('admin.filter-transaction') }}?yesterday=1`);
         xhr.onload = function() {
@@ -196,6 +204,7 @@
     thisMonthForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
+        clearInterval(todayInterval);
         const xhr = new XMLHttpRequest();
         xhr.open('GET', `{{ route('admin.filter-transaction') }}?this-month=1`);
         xhr.onload = function() {
@@ -265,6 +274,8 @@
         };
         xhr.send();
     });
+
+    todayInterval = setInterval(todayUpdate, 1000);
     // Update the table every 5 seconds
     // setInterval(transaction, 1000);
 </script>

@@ -60,12 +60,13 @@ class AdminRequestController extends Controller
 
     public function showPendingRequest()
     {
-        $pending = ModelsRequest::where('status', 'pending')
+        $requests = ModelsRequest::where('status', 'pending')
             ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
+            ->get();
+
+        foreach ($requests as $request) {
+            $request->formatted_date = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
+        }
 
         $requestCount = ModelsRequest::where('status', 'pending')
             ->count();
@@ -73,7 +74,7 @@ class AdminRequestController extends Controller
         DB::connection()->commit();
 
         return response()->json([
-            'pending' => $pending,
+            'pending' => $requests,
             'pendingCount' => $requestCount,
         ]);
     }
@@ -82,10 +83,11 @@ class AdminRequestController extends Controller
     {
         $requests = ModelsRequest::where('status', 'accepted')
             ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
+            ->get();
+
+        foreach ($requests as $request) {
+            $request->formatted_date = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
+        }
 
         $requestCount = ModelsRequest::where('status', 'accepted')
             ->count();
@@ -103,10 +105,12 @@ class AdminRequestController extends Controller
     {
         $requests = ModelsRequest::where('status', 'delivered')
             ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
+            ->get();
+
+        foreach ($requests as $request) {
+            $request->formatted_date = Carbon::parse($request->updated_at)->format('F j, Y, g:i:s a');
+        }
+
 
         $requestCount = ModelsRequest::where('status', 'delivered')
             ->count();
@@ -319,7 +323,6 @@ class AdminRequestController extends Controller
     //get transactions/request data
     public function showTransaction()
     {
-
         $transc = ModelsRequest::where('status', 'completed')->orderBy('updated_at', 'desc')->get();
 
         foreach ($transc as $trans) {

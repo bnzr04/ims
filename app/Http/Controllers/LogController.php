@@ -13,10 +13,18 @@ class LogController extends Controller
     public function index(Request $request)
     {
         $requestDate = $request->date;
+        $date_from = $request->date_from;
+        $date_to = $request->date_to;
 
         $logs = Log::query();
 
-        if ($requestDate === 'yesterday') {
+        if ($requestDate === 'today') {
+            $start = Carbon::today()->startOfDay();
+            $end = Carbon::today()->endOfDay();
+
+            //Current Date and time
+            $dateAndTime = Carbon::now()->format('F j, Y, g:i a');
+        } else if ($requestDate === 'yesterday') {
             $start = Carbon::yesterday()->startOfDay();
             $end = Carbon::yesterday()->endOfDay();
 
@@ -28,6 +36,11 @@ class LogController extends Controller
 
             //This month
             $dateAndTime = Carbon::now()->format('F Y');
+        } else if ($date_from && $date_to) {
+            $start = $date_from;
+            $end = date('Y-m-d', strtotime($date_to . '+1day'));
+
+            $dateAndTime = date('F j, Y', strtotime($date_from)) . " - " . date('F j, Y', strtotime($date_to));
         } else {
             $start = Carbon::today()->startOfDay();
             $end = Carbon::today()->endOfDay();

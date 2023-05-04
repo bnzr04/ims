@@ -35,6 +35,7 @@
         }
 
         .main-container {
+            margin: 0;
             width: 385px;
             height: 520px;
             border: #000 1px solid;
@@ -125,14 +126,14 @@
             text-decoration: underline;
         }
 
-        table {
+        /* table {
             margin: 2px auto;
             margin-bottom: 5px;
             border: #000 1px solid;
             font-size: 8px;
             border-collapse: collapse;
             max-width: 98%;
-        }
+        } */
 
         tr {
             margin: 0;
@@ -159,6 +160,29 @@
             height: 30px;
             vertical-align: bottom;
             font-weight: bold;
+        }
+
+        .sign-table {
+            margin: 2px auto;
+            margin-bottom: 5px;
+            border: #000 1px solid;
+            font-size: 8px;
+            border-collapse: collapse;
+            max-width: 98%;
+        }
+
+        .items-table {
+            margin: 5px auto;
+            padding: 0;
+            border: #000 1px solid;
+            font-size: 8px;
+            border-collapse: collapse;
+            width: 98%;
+        }
+
+        .items-table td,
+        .items-table th {
+            padding: 1px;
         }
 
         .items-table #total-amount-value {
@@ -223,8 +247,9 @@
             <tr>
                 <th>ID</th>
                 <th>QTY</th>
+                <th>CTGY</th>
                 <th>UNIT</th>
-                <th>DRUG/MEDICAL SUPPLY</th>
+                <th>DRUG / MEDICAL SUPPLY</th>
                 <th>UNIT PRICE</th>
                 <th>AMOUNT</th>
 
@@ -233,6 +258,7 @@
             <tr>
                 <td>{{ $item->item_id }}</td>
                 <td id="quantity">{{ $item->quantity }}</td>
+                <td>{{ $item->category }}</td>
                 <td>{{ $item->unit }}</td>
                 <td>{{ $item->name }}</td>
                 <td>{{ is_null($item->price) ? "-" : $item->price }}</td>

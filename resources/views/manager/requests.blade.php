@@ -14,10 +14,16 @@ use Illuminate\Support\Facades\Session
                 <div class="container-lg">
                     <h2>Requests</h2>
                 </div>
-                <div class="container-lg pt-3">
-                    <button class="btn btn-outline-dark" id="pending">Pending (<span id="pending-count"></span>)</button>
-                    <button class="btn btn-outline-dark" id="accepted">Accepted (<span id="accepted-count"></span>)</button>
-                    <button class="btn btn-outline-dark" id="delivered">Delivered (<span id="delivered-count"></span>)</button>
+                <div class="container-lg pt-3 d-flex">
+                    <form id="pending_form">
+                        <button class="btn btn-outline-dark mx-1" id="pending">Pending (<span id="pending-count"></span>)</button>
+                    </form>
+                    <form id="accepted_form">
+                        <button class="btn btn-outline-dark mx-1" id="accepted">Accepted (<span id="accepted-count"></span>)</button>
+                    </form>
+                    <form id="delivered_form">
+                        <button class="btn btn-outline-dark mx-1" id="delivered">Delivered (<span id="delivered-count"></span>)</button>
+                    </form>
                 </div>
                 <div class="container-lg mt-1 p-2 border rounded shadow">
                     <div class="container-md">
@@ -61,18 +67,20 @@ use Illuminate\Support\Facades\Session
     </div>
 </div>
 <script>
-    const pendingBtn = document.getElementById("pending");
-    const acceptedBtn = document.getElementById("accepted");
-    const deliveredBtn = document.getElementById("delivered");
+    const pendingForm = document.querySelector("#pending_form");
+    const acceptedForm = document.querySelector("#accepted_form");
+    const deliveredForm = document.querySelector("#delivered_form");
 
     const pendingCountOutput = document.getElementById('pending-count');
     const acceptedCountOutput = document.getElementById('accepted-count');
     const deliveredCountOutput = document.getElementById('delivered-count');
 
     const title = document.getElementById("title");
-    const requestTbody = $('#request_table');
+    const requestTbody = document.querySelector('#request_table');
 
     var pendingInterval = setInterval(pendingUpdate, 1000);
+    var acceptedInterval;
+    var deliveredInterval;
 
     function pendingCount() {
         setInterval(function() {
@@ -126,120 +134,104 @@ use Illuminate\Support\Facades\Session
     }
 
     function pendingUpdate() {
-        $.ajax({
-            url: "{{ route('manager.show-pending-requests') }}",
-            type: "GET",
-            dataType: "json",
-            success: function(data) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "{{ route('manager.show-pending-requests') }}");
+        xhr.responseType = "json";
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = xhr.response;
                 title.innerHTML = "Pending request";
-                console.log(data);
+                // console.log(data);
+
                 // Update the table with the new data
+                requestTbody.innerHTML = "";
 
-                requestTbody.empty();
-
-                if (data.pending.length > 0) {
-                    $.each(data.pending, function(i, row) {
-                        if (row.accepted_by_user_name === null) {
-                            row.accepted_by_user_name = "-";
-                        }
-                        requestTbody.append("<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>");
-                    });
-                } else {
-                    requestTbody.append("<tr><td colspan='10'>No pending request...</td></tr>");
+                for (let i = 0; i < data.pending.length; i++) {
+                    var row = data.pending[i];
+                    if (row.accepted_by_user_name === null) {
+                        row.accepted_by_user_name = "-";
+                    }
+                    requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
                 }
-            },
-            error: function(xhr, textStatus, errorThrown) {
+                if (data.pending === 0) {
+                    requestTbody.innerHTML += "<tr><td colspan='10'>No pending request...</td></tr>";
+                }
+            } else {
                 console.log('Error: ' + xhr.status);
             }
-        });
+        };
+        xhr.send();
     }
 
-    function acceptedUpdate() {
-        $.ajax({
-            url: "{{ route('manager.show-accepted-requests') }}",
-            type: "GET",
-            dataType: "json",
-            success: function(data) {
-                title.innerHTML = "Accepted request";
-                console.log(data);
-                // Update the table with the new data
-                requestTbody.empty();
-
-                if (data.accepted.length > 0) {
-                    $.each(data.accepted, function(i, row) {
-                        requestTbody.append("<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>");
-                    });
-                } else {
-                    requestTbody.append("<tr><td colspan='10'>No accepted request...</td></tr>");
-                }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                console.log('Error: ' + xhr.status);
-            }
-        });
-    }
-
-    function deliveredUpdate() {
-        $.ajax({
-            url: "{{ route('manager.show-delivered-requests') }}",
-            type: "GET",
-            dataType: "json",
-            success: function(data) {
-                title.innerHTML = "Delivered request";
-                console.log(data);
-                // Update the table with the new data
-                requestTbody.empty();
-
-                $.each(data.delivered, function(i, row) {
-                    requestTbody.append("<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/manager/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>");
-                });
-
-                if (data.delivered.length === 0) {
-                    requestTbody.append("<tr><td colspan='10'>No delivered request...</td></tr>");
-                }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                console.log('Error: ' + xhr.status);
-            }
-        });
-    }
-
-    $(pendingBtn).on('click', function() {
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        pendingUpdate();
+    pendingForm.addEventListener('submit', (event) => {
+        event.preventDefault();
         pendingInterval = setInterval(pendingUpdate, 1000);
     });
 
-    $(acceptedBtn).on('click', function() {
+    acceptedForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
         clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        acceptedUpdate();
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "{{ route('manager.show-accepted-requests') }}");
+        xhr.responseType = "json";
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = xhr.response;
+                title.innerHTML = "Accepted request";
+                // console.log(data);
+                // Update the table with the new data
+
+                requestTbody.innerHTML = "";
+
+                if (data.accepted.length > 0) {
+                    data.accepted.forEach(function(row) {
+                        if (row.accepted_by_user_name === null) {
+                            row.accepted_by_user_name = "-";
+                        }
+                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    });
+                } else {
+                    requestTbody.innerHTML += "<tr><td colspan='10'>No accepted request...</td></tr>";
+                }
+            } else {
+                console.log('Error: ' + xhr.status);
+            }
+        };
+        xhr.send();
     });
 
-    $(deliveredBtn).on('click', function() {
+    deliveredForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
         clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        deliveredUpdate();
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
-        clearInterval(pendingInterval);
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "{{ route('manager.show-delivered-requests') }}");
+        xhr.responseType = "json";
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = xhr.response;
+                title.innerHTML = "Delivered request";
+                // console.log(data);
+
+                // Update the table with the new data
+                requestTbody.innerHTML = "";
+
+                if (data.delivered.length > 0) {
+                    data.delivered.forEach(function(row) {
+                        if (row.accepted_by_user_name === null) {
+                            row.accepted_by_user_name = "-";
+                        }
+                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                    });
+                } else {
+                    requestTbody.innerHTML += "<tr><td colspan='10'>No delivered request...</td></tr>";
+                }
+            } else {
+                console.log('Error: ' + xhr.status);
+            }
+        };
+        xhr.send();
     });
 
     pendingCount();
