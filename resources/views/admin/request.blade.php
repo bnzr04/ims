@@ -145,15 +145,15 @@ use Illuminate\Support\Facades\Session
 
                 requestTbody.innerHTML = "";
 
-
-                for (let i = 0; i < data.pending.length; i++) {
-                    var row = data.pending[i];
-                    if (row.accepted_by_user_name === null) {
-                        row.accepted_by_user_name = "-";
+                if (data.pending.length > 0) {
+                    for (let i = 0; i < data.pending.length; i++) {
+                        var row = data.pending[i];
+                        if (row.accepted_by_user_name === null) {
+                            row.accepted_by_user_name = "-";
+                        }
+                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
                     }
-                    requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
-                }
-                if (data.pending === 0) {
+                } else {
                     requestTbody.innerHTML += "<tr><td colspan='10'>No pending request...</td></tr>";
                 }
             } else {
