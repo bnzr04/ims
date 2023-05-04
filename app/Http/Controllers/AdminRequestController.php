@@ -58,6 +58,67 @@ class AdminRequestController extends Controller
         return response()->json($requests);
     }
 
+    public function showPendingRequest()
+    {
+        $pending = ModelsRequest::where('status', 'pending')
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        $requestCount = ModelsRequest::where('status', 'pending')
+            ->count();
+
+        DB::connection()->commit();
+
+        return response()->json([
+            'pending' => $pending,
+            'pendingCount' => $requestCount,
+        ]);
+    }
+
+    public function showAcceptedRequest()
+    {
+        $requests = ModelsRequest::where('status', 'accepted')
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        $requestCount = ModelsRequest::where('status', 'accepted')
+            ->count();
+
+        DB::connection()->commit();
+
+        return response()->json([
+            'accepted' => $requests,
+            'acceptedCount' => $requestCount,
+        ]);
+        // return back()->with(['requests' => $requests]);
+    }
+
+    public function showDeliveredRequest()
+    {
+        $requests = ModelsRequest::where('status', 'delivered')
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        $requestCount = ModelsRequest::where('status', 'delivered')
+            ->count();
+
+        DB::connection()->commit();
+
+        return response()->json([
+            'delivered' => $requests,
+            'deliveredCount' => $requestCount,
+        ]);
+    }
+
     //this will show the requested items
     public function requestedItems($id)
     {
@@ -99,6 +160,7 @@ class AdminRequestController extends Controller
 
         if ($request) {
             $request->status = 'accepted';
+            $request->accepted_by_user_name = $user_name;
             $request->save();
 
             //Get Query

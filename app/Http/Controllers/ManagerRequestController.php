@@ -97,14 +97,19 @@ class ManagerRequestController extends Controller
         $user_type = $user->type;
 
         $pending = ModelsRequest::where('status', 'pending')
-            // ->where('status', '!=', 'delivered') 
             ->orderByDesc('updated_at')
             ->get()->each(function ($pending) {
                 $pending->formatted_date = Carbon::parse($pending->created_at)
                     ->format('F j, Y, g:i:s a');
             });
 
-        return response()->json($pending);
+        $requestCount = ModelsRequest::where('status', 'pending')
+            ->count();
+
+        return response()->json([
+            'pending' => $pending,
+            'pendingCount' => $requestCount,
+        ]);
     }
 
     public function showAcceptedRequest()
@@ -115,8 +120,19 @@ class ManagerRequestController extends Controller
         $user_type = $user->type;
 
         if ($user_type === 'manager') {
-            $accepted = ModelsRequest::where('status', 'accepted')
+            $requests = ModelsRequest::where('status', 'accepted')
                 ->where('accepted_by_user_id', $user_id)
+                ->orderByDesc('updated_at')
+                ->get()->each(function ($pending) {
+                    $pending->formatted_date = Carbon::parse($pending->created_at)
+                        ->format('F j, Y, g:i:s a');
+                });
+
+            $requestCount = ModelsRequest::where('status', 'accepted')
+                ->where('accepted_by_user_id', $user_id)
+                ->count();
+        } else {
+            $requests = ModelsRequest::where('status', 'accepted')
                 ->orderByDesc('updated_at')
                 ->get()->each(function ($pending) {
                     $pending->formatted_date = Carbon::parse($pending->created_at)
@@ -124,14 +140,47 @@ class ManagerRequestController extends Controller
                 });
         }
 
-        $accepted = ModelsRequest::where('status', 'accepted')
-            ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
 
-        return response()->json($accepted);
+        return response()->json([
+            'accepted' => $requests,
+            'acceptedCount' => $requestCount,
+        ]);
+        // return back()->with(['requests' => $requests]);
+    }
+
+    public function showDeliveredRequest()
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+        $user_name = $user->name;
+        $user_type = $user->type;
+
+        if ($user_type === 'manager') {
+            $requests = ModelsRequest::where('status', 'delivered')
+                ->where('accepted_by_user_id', $user_id)
+                ->orderByDesc('updated_at')
+                ->get()->each(function ($pending) {
+                    $pending->formatted_date = Carbon::parse($pending->created_at)
+                        ->format('F j, Y, g:i:s a');
+                });
+
+            $requestCount = ModelsRequest::where('status', 'delivered')
+                ->where('accepted_by_user_id', $user_id)
+                ->count();
+        } else {
+            $requests = ModelsRequest::where('status', 'delivered')
+                ->orderByDesc('updated_at')
+                ->get()->each(function ($pending) {
+                    $pending->formatted_date = Carbon::parse($pending->created_at)
+                        ->format('F j, Y, g:i:s a');
+                });
+        }
+
+
+        return response()->json([
+            'delivered' => $requests,
+            'deliveredCount' => $requestCount,
+        ]);
     }
 
     //this will show the requested items
@@ -410,7 +459,7 @@ class ManagerRequestController extends Controller
             $stock = Stock::select('stock_qty')
                 ->where('id', $item->stock_id)
                 ->first();
-            $item->remaining = $stock->stock_qty;
+            $item->remaining = empty($stock->stock_qty) ? "0" : $stock->stock_qty;
             $item->amount = number_format($item->quantity * $item->price, 2);
             $total_amount += $item->quantity * $item->price; // add item amount to total amount
         }

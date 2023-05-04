@@ -56,8 +56,10 @@
                                     <th scope="col">Date-time</th>
                                     <th scope="col">Office</th>
                                     <th scope="col">Patient Name</th>
+                                    <th scope="col">Doctor Name</th>
                                     <th scope="col">Request By</th>
                                     <th scope="col">Request to</th>
+                                    <th scope="col">Accepted By</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -93,11 +95,14 @@
                 // console.log(data)
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    if (row.accepted_by_user_name === null) {
+                        row.accepted_by_user_name = "-";
+                    }
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
                 }
             } else {
                 console.log('Error: ' + xhr.status);
@@ -130,11 +135,14 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    if (row.accepted_by_user_name === null) {
+                        row.accepted_by_user_name = "-";
+                    }
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);
@@ -163,11 +171,14 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    if (row.accepted_by_user_name === null) {
+                        row.accepted_by_user_name = "-";
+                    }
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);
@@ -196,11 +207,14 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    if (row.accepted_by_user_name === null) {
+                        row.accepted_by_user_name = "-";
+                    }
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);
@@ -231,11 +245,14 @@
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    if (row.accepted_by_user_name === null) {
+                        row.accepted_by_user_name = "-";
+                    }
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No pending request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);

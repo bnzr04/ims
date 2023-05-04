@@ -47,7 +47,6 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
     // Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
     // Route::get('/my-requests', [RequestController::class, 'userRequest'])->name('user.requests');
     Route::get('/request', [RequestController::class, 'request'])->name('user.request');
-    Route::post('/save-requests', [RequestController::class, 'saveRequest'])->name('user.save-request');
     Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');
     Route::get('/request-items/{id}', [RequestController::class, 'itemRequest'])->name('user.request-items');
     Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
@@ -55,6 +54,11 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
     Route::get('/remove-item/{sid}/{id}', [RequestController::class, 'removeItem'])->name('user.remove-item');
     Route::post('/submit-request', [RequestController::class, 'submitRequest'])->name('user.submit-request');
     Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request');
+
+    Route::get('/show-pending-requests', [RequestController::class, 'showPendingRequest'])->name('user.show-pending-requests');
+    Route::get('/show-accepted-requests', [RequestController::class, 'showAcceptedRequest'])->name('user.show-accepted-requests');
+    Route::get('/show-delivered-requests', [RequestController::class, 'showDeliveredRequest'])->name('user.show-delivered-requests');
+    Route::get('/show-completed-requests', [RequestController::class, 'showCompletedRequest'])->name('user.show-completed-requests');
 
     Route::get('/view-request/{request}', [RequestController::class, 'viewRequest'])->name('user.viewRequest');
 });
@@ -118,7 +122,9 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::post('/deliver-request/{rid}', [AdminRequestController::class, 'deliverRequest'])->name('admin.deliver-request');
     Route::post('/complete-request/{rid}', [AdminRequestController::class, 'completeRequest'])->name('admin.complete-request');
     Route::get('/generate-receipt/{rid}', [AdminRequestController::class, 'generate_receipt'])->name('admin.generate-receipt');
-    // Route::get('/export_pdf', [AdminRequestController::class, 'export_pdf'])->name('admin.export_pdf');
+    Route::get('/show-pending-requests', [AdminRequestController::class, 'showPendingRequest'])->name('admin.show-pending-requests');
+    Route::get('/show-accepted-requests', [AdminRequestController::class, 'showAcceptedRequest'])->name('admin.show-accepted-requests');
+    Route::get('/show-delivered-requests', [AdminRequestController::class, 'showDeliveredRequest'])->name('admin.show-delivered-requests');
 
     //Request transaction
     Route::get('/transaction', [AdminRequestController::class, 'transaction'])->name('admin.transaction');
@@ -160,6 +166,7 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::get('/requests', [ManagerRequestController::class, 'viewRequest'])->name('manager.requests');
     Route::get('/show-pending-requests', [ManagerRequestController::class, 'showPendingRequest'])->name('manager.show-pending-requests');
     Route::get('/show-accepted-requests', [ManagerRequestController::class, 'showAcceptedRequest'])->name('manager.show-accepted-requests');
+    Route::get('/show-delivered-requests', [ManagerRequestController::class, 'showDeliveredRequest'])->name('manager.show-delivered-requests');
     Route::get('/requested-items/{id}', [ManagerRequestController::class, 'requestedItems'])->name('manager.requested-items');
     Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');

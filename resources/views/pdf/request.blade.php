@@ -193,8 +193,8 @@
 
         <div class="patient-details">
             <p>PATIENT NAME:<span>{{ $request->patient_name }}</span></p>
-            <p>AGE:<span>0</span></p>
-            <p>GENDER:<span>-</span></p>
+            <p>AGE:<span>{{ is_null($request->age) ? "0" : $request->age }}</span></p>
+            <p>GENDER:<span>{{ is_null($request->gender) ? "-" : $request->gender }}</span></p>
         </div>
 
         <div class="other-details">

@@ -10,6 +10,7 @@ use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class RequestController extends Controller
@@ -25,7 +26,7 @@ class RequestController extends Controller
         $items =
             DB::table('item_stocks')
             ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            ->select('items.name', 'items.category', 'items.unit', 'item_stocks.*')
+            ->select('items.id', 'items.name', 'items.category', 'items.unit', 'item_stocks.id as item_stock_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition')
             ->where('item_stocks.exp_date', ">", $today)
             ->orderBy('items.name', 'asc')
             ->get();
@@ -37,6 +38,119 @@ class RequestController extends Controller
 
         return view('user.request')->with([
             'items' => $items,
+        ]);
+    }
+
+    public function showPendingRequest()
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+
+        $pending = ModelsRequest::where('status', 'pending')
+            ->where('user_id', $user_id)
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+        Cache::put('filteredData', $pending, $expiresAt);
+
+        $requestCount = ModelsRequest::where('status', 'pending')
+            ->where('user_id', $user_id)
+            ->count();
+
+        DB::connection()->commit();
+
+        return response()->json([
+            'pending' => $pending,
+            'pendingCount' => $requestCount,
+        ]);
+    }
+
+    public function showAcceptedRequest()
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+
+        $requests = ModelsRequest::where('status', 'accepted')
+            ->where('user_id', $user_id)
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+        Cache::put('filteredData', $requests, $expiresAt);
+
+        $requestCount = ModelsRequest::where('status', 'accepted')
+            ->where('user_id', $user_id)
+            ->count();
+
+        DB::connection()->commit();
+
+        return response()->json([
+            'accepted' => $requests,
+            'acceptedCount' => $requestCount,
+        ]);
+        // return back()->with(['requests' => $requests]);
+    }
+
+    public function showDeliveredRequest()
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+
+        $requests = ModelsRequest::where('status', 'delivered')
+            ->where('user_id', $user_id)
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+        Cache::put('filteredData', $requests, $expiresAt);
+
+        $requestCount = ModelsRequest::where('status', 'delivered')
+            ->where('user_id', $user_id)
+            ->count();
+
+        DB::connection()->commit();
+
+        return response()->json([
+            'delivered' => $requests,
+            'deliveredCount' => $requestCount,
+        ]);
+    }
+
+    public function showCompletedRequest()
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+
+        $requests = ModelsRequest::where('status', 'completed')
+            ->where('user_id', $user_id)
+            ->orderByDesc('updated_at')
+            ->get()->each(function ($pending) {
+                $pending->formatted_date = Carbon::parse($pending->created_at)
+                    ->format('F j, Y, g:i:s a');
+            });
+
+        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+        Cache::put('filteredData', $requests, $expiresAt);
+
+        $requestCount = ModelsRequest::where('status', 'completed')
+            ->where('user_id', $user_id)
+            ->count();
+
+        DB::connection()->commit();
+
+        return response()->json([
+            'completed' => $requests,
+            'completedCount' => $requestCount,
         ]);
     }
 
@@ -126,9 +240,19 @@ class RequestController extends Controller
     {
         $user_id = Auth::user()->id;
 
-        if ($request === 'all') {
+        if ($request === 'pending') {
             $items = ModelsRequest::where('user_id', $user_id)
-                ->where('status', '!=', 'completed')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else if ($request === 'accepted') {
+            $items = ModelsRequest::where('user_id', $user_id)
+                ->where('status', 'accepted')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else if ($request === 'delivered') {
+            $items = ModelsRequest::where('user_id', $user_id)
+                ->where('status', 'delivered')
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else if ($request === 'completed') {
@@ -202,51 +326,6 @@ class RequestController extends Controller
         ]);
     }
 
-    public function saveRequest(Request $request)
-    {
-        //Enable Query log
-        DB::enableQueryLog();
-
-        $model = new ModelsRequest;
-
-        $model->user_id = $request->user_id;
-        $model->office = $request->office;
-        $model->request_to = $request->request_to;
-        $model->save();
-
-
-        //QUERY LOG
-        $user = auth()->user();
-
-        $user_id = $user->id; // Get the ID of the authenticated user
-        $user_type = $user->type; // Get the type of the authenticated user
-        $user_name = $user->name; // Get the name of the authenticated user
-
-
-        // Get the SQL query being executed
-        $sql = DB::getQueryLog();
-        if (is_array($sql) && count($sql) > 0) {
-            $last_query = end($sql)['query'];
-            $newStockID = $model->id;
-        } else {
-            $last_query = 'No query log found.';
-        }
-
-        //Log Message
-        $message = "New request created (ID: " . $newStockID . ")";
-
-        // Log the data to the logs table
-        Log::create([
-            'user_id' => $user_id,
-            'user_type' => $user_type,
-            'message' => $message,
-            'query' => $last_query,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        return redirect()->route('user.request-items', ['id' => $newStockID])->with('success', 'Request successfully created');
-    }
 
     //This function will add item to request
     public function addItem(Request $request)
@@ -352,6 +431,8 @@ class RequestController extends Controller
         $requested = $request->input('requestedItems');
         $request_by = $request->input('requestBy');
         $patient_name = $request->input('patientName');
+        $patient_age = $request->input('patientAge');
+        $patient_gender = $request->input('patientGender');
         $doctor_name = $request->input('doctorName');
         $requestedItems = json_decode($requested);
 
@@ -374,6 +455,8 @@ class RequestController extends Controller
         $requestModel->request_to = 'pharmacy';
         $requestModel->request_by = ucfirst($request_by);
         $requestModel->patient_name = ucfirst($patient_name);
+        $requestModel->age = filled($patient_age) ? $patient_age : 0;
+        $requestModel->gender = filled($patient_gender) ? $patient_gender : "-";
         $requestModel->doctor_name = ucfirst($doctor_name);
         $requestModel->save();
 

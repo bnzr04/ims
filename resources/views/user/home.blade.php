@@ -12,7 +12,7 @@
                 <div class="container-fluid d-flex">
                     <div class="container1 rounded p-3 mx-1 bg-primary text-white" style="width: 150px;height:150px;display: flex;justify-content: center;align-items: center;flex-direction: column;letter-spacing:3px">
                         <h5>Requests</h5>
-                        <h1><a href="{{ route('user.viewRequest', ['request' => 'all']) }}" style="color:white;">{{ $pending }}</a></h1>
+                        <h1><a href="{{ route('user.viewRequest', ['request' => 'pending']) }}" style="color:white;">{{ $pending }}</a></h1>
                     </div>
                     <div class="container2 rounded p-3 mx-1 bg-success text-white" style="width: 150px;height:150px;display: flex;justify-content: center;align-items: center;flex-direction: column;letter-spacing:3px">
                         <h5>Received</h5>
