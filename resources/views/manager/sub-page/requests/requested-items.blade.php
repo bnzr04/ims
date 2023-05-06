@@ -39,6 +39,9 @@ use Illuminate\Support\Facades\Session
                                 <th scope="col" style="border: white 1px solid;">Request By</th>
                                 <th scope="col" style="border: white 1px solid;">Request To</th>
                                 <th scope="col" style="border: white 1px solid;">Request status</th>
+                                @if(!is_null($request->accepted_by_user_name))
+                                <th scope="col" style="border: white 1px solid;">Accepted By</th>
+                                @endif
                                 <th scope="col" style="border: white 1px solid;">Request date</th>
                             </tr>
                         </thead>
@@ -49,6 +52,9 @@ use Illuminate\Support\Facades\Session
                                 <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ $request->request_by }}</td>
                                 <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ $request->request_to }}</td>
                                 <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ $request->status }}</td>
+                                @if(!is_null($request->accepted_by_user_name))
+                                <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ is_null($request->accepted_by_user_name) ? "-" : $request->accepted_by_user_name }}</td>
+                                @endif
                                 <td scope="col" style="border: gray 1px solid;">{{ $request->formatted_date }}</td>
                             </tr>
                         </tbody>

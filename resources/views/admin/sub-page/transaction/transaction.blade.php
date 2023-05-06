@@ -40,13 +40,16 @@
                             <!-- <a href="" class="btn btn-secondary" style="letter-spacing:2px;">TODAY</a> -->
                             <div class="d-flex" style="align-items: center;">
                                 <label for="date_from">From</label>
-                                <input type="date" class="form-control mx-1" name="date_from" id="date_from">
+                                <input type="date" class="form-control mx-1" name="date_from" id="date_from" required>
 
                                 <label for="date_to">To</label>
-                                <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY">
+                                <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY" required>
                                 <button type="submit" class="btn btn-outline-success">Filter</button>
                             </div>
                         </form>
+                    </div>
+                    <div class="container-lg">
+                        <h5 id="title" class="mt-2"></h5>
                     </div>
                     <div class="container-md mt-2 overflow-auto" style="height: 350px;">
                         <table class="table">
@@ -58,7 +61,7 @@
                                     <th scope="col">Patient Name</th>
                                     <th scope="col">Doctor Name</th>
                                     <th scope="col">Request By</th>
-                                    <th scope="col">Request to</th>
+                                    <th scope="col">Request To</th>
                                     <th scope="col">Accepted By</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
@@ -75,6 +78,8 @@
     </div>
 </div>
 <script>
+    window.APP_URL = "{{ url('') }}";
+
     // Get today's date
     var today = new Date().toISOString().split('T')[0];
 
@@ -82,37 +87,7 @@
     document.getElementById("date_from").setAttribute("max", today);
     document.getElementById("date_to").setAttribute("max", today);
 
-    // function transaction() {
-    //     var xhr = new XMLHttpRequest();
-    //     xhr.open('GET', "{{ route('admin.show-transaction') }}", true);
-    //     xhr.onload = function() {
-    //         if (xhr.status === 200) {
-    //             var data = JSON.parse(xhr.responseText);
-    //             // Update the table with the new data
-    //             var transaction_table = document.querySelector('#transaction_table');
-    //             transaction_table.innerHTML = '';
-
-    //             // console.log(data)
-    //             for (var i = 0; i < data.length; i++) {
-    //                 var row = data[i];
-    //                 if (row.accepted_by_user_name === null) {
-    //                     row.accepted_by_user_name = "-";
-    //                 }
-    //                 transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
-    //             }
-
-    //             if (data.length === 0) {
-    //                 transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
-    //             }
-    //         } else {
-    //             console.log('Error: ' + xhr.status);
-    //         }
-    //     };
-    //     xhr.send();
-    // }
-
-    // transaction();
-
+    const tableTitle = document.getElementById("title");
 
     const todayForm = document.querySelector('#today_form');
     const yesterdayForm = document.querySelector('#yesterday_form');
@@ -131,14 +106,17 @@
                 var data = JSON.parse(xhr.responseText);
                 var transaction_table = document.querySelector('#transaction_table');
                 transaction_table.innerHTML = '';
+
+                tableTitle.innerHTML = "Today Completed Transactions";
                 // console.log(data);
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
+                    var url = window.APP_URL + '/admin/requested-items/' + row.id;
                     if (row.accepted_by_user_name === null) {
                         row.accepted_by_user_name = "-";
                     }
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='" + url + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
@@ -175,14 +153,17 @@
                 var data = JSON.parse(xhr.responseText);
                 var transaction_table = document.querySelector('#transaction_table');
                 transaction_table.innerHTML = '';
+
+                tableTitle.innerHTML = "Yesterday Completed Transactions";
                 // console.log(data);
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
+                    var url = window.APP_URL + '/admin/requested-items/' + row.id;
                     if (row.accepted_by_user_name === null) {
                         row.accepted_by_user_name = "-";
                     }
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='" + url + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
@@ -212,14 +193,17 @@
                 var data = JSON.parse(xhr.responseText);
                 var transaction_table = document.querySelector('#transaction_table');
                 transaction_table.innerHTML = '';
+
+                tableTitle.innerHTML = "This Month Transactions";
                 // console.log(data);
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
+                    var url = window.APP_URL + '/admin/requested-items/' + row.id;
                     if (row.accepted_by_user_name === null) {
                         row.accepted_by_user_name = "-";
                     }
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='" + url + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
@@ -239,10 +223,20 @@
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
+        const fromDate = new Date(fromDateInput.value);
+        const toDate = new Date(toDateInput.value);
 
-        const fromDate = fromDateInput.value;
-        const toDate = toDateInput.value;
+        // Format the dates into a readable format
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
 
+        const fromDateStr = fromDate.toLocaleDateString('en-US', options);
+        const toDateStr = toDate.toLocaleDateString('en-US', options);
+
+        clearInterval(todayInterval);
         const xhr = new XMLHttpRequest();
         xhr.open('GET', `{{ route('admin.filter-transaction') }}?from=${fromDate}&to=${toDate}`);
         xhr.onload = function() {
@@ -250,14 +244,17 @@
                 var data = JSON.parse(xhr.responseText);
                 var transaction_table = document.querySelector('#transaction_table');
                 transaction_table.innerHTML = '';
+
+                tableTitle.innerHTML = "From " + fromDateStr + " to " + toDateStr;
                 // console.log(data);
 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
+                    var url = window.APP_URL + '/admin/requested-items/' + row.id;
                     if (row.accepted_by_user_name === null) {
                         row.accepted_by_user_name = "-";
                     }
-                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-outline-secondary'>View</a></td></tr>";
+                    transaction_table.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='" + url + "' class='btn btn-outline-secondary'>View</a></td></tr>";
                 }
 
                 if (data.length === 0) {
@@ -273,6 +270,7 @@
             console.log(data);
         };
         xhr.send();
+
     });
 
     todayInterval = setInterval(todayUpdate, 1000);

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" style="position: sticky;top: 0;z-index: 1;">
+<nav class="navbar navbar-expand-md navbar-light shadow-sm" style="background-color:#c9df8a;position: sticky;top: 0;z-index: 3;">
     <div class="container">
         <a class="navbar-brand" href="">
             {{ config('app.name', 'Laravel') }}

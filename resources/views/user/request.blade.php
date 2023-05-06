@@ -20,7 +20,7 @@
                                 <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
                                     <option></option>
                                     @foreach($items as $item)
-                                    <option data-item-id="{{ $item->id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-stock-id="{{ $item->item_stock_id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} - {{ $item->category }} {{ $item->unit === "-" ? "" : "- " . $item->unit }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
+                                    <option data-item-id="{{ $item->id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-item-category="{{ $item->category }}" data-item-unit="{{ $item->unit }}" data-stock-id="{{ $item->item_stock_id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} - {{ $item->category }} {{ $item->unit === "-" ? "" : "- " . $item->unit }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
                                     @endforeach
                                 </select>
 
@@ -42,6 +42,8 @@
                                     <tr>
                                         <th scope="col">Item ID</th>
                                         <th scope="col">Item Name</th>
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Unit</th>
                                         <th scope="col">Stock ID</th>
                                         <th scope="col">Mode Of ACQ</th>
                                         <th scope="col">Expiration Date</th>
@@ -106,6 +108,9 @@
 </div>
 <script>
     $(document).ready(function() {
+        window.APP_URL = "{{ url('') }}";
+
+
         $('#nameSearch').select2({
             placeholder: 'select item',
             allowClear: true,
@@ -140,6 +145,8 @@
             var selectedOptionValue = $('#nameSearch option:selected');
             var itemId = selectedOptionValue.data('item-id');
             var itemName = selectedOptionValue.data('item-name');
+            var itemCategory = selectedOptionValue.data('item-category');
+            var itemUnit = selectedOptionValue.data('item-unit');
             var stockId = selectedOptionValue.data('stock-id');
             var modeOfAcq = selectedOptionValue.data('mode-acq');
             var stockExpDate = selectedOptionValue.data('stock-exp');
@@ -179,7 +186,7 @@
                             quantity: quantity,
                             exp_date: stockExpDate,
                         });
-                        var row = '<tr><td class="align-items-center">' + itemId + '</td><td>' + itemName + '</td><td>' + stockId + '</td><td>' + modeOfAcq + '</td><td>' + stockExpDate + '</td><td>' + quantity + '</td><td><button id="remove-item-btn" class="btn btn-danger" data-stock-id="' + stockId + '">✘</button></td></tr>';
+                        var row = '<tr><td class="align-items-center">' + itemId + '</td><td>' + itemName + '</td><td>' + itemCategory + '</td><td>' + itemUnit + '</td><td>' + stockId + '</td><td>' + modeOfAcq + '</td><td>' + stockExpDate + '</td><td>' + quantity + '</td><td><button id="remove-item-btn" class="btn btn-danger" data-stock-id="' + stockId + '">✘</button></td></tr>';
 
                         //this will remove the 'No items' if data is added
                         $("#requested-item-table-body td:contains('No items')").parent().remove();
@@ -260,7 +267,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: '/user/submit-request',
+                        url: window.APP_URL + '/user/submit-request',
                         data: {
                             requestBy: requestBy,
                             patientName: patientName,

@@ -59,13 +59,15 @@ use Illuminate\Support\Facades\Session
                 @endif
 
                 <div class="container-lg">
-                    <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Transactions</a>
+                    <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Completed transactions</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script>
+    window.APP_URL = "{{ url('') }}";
+
     const pendingForm = document.querySelector("#pending_form");
     const acceptedForm = document.querySelector("#accepted_form");
     const deliveredForm = document.querySelector("#delivered_form");
@@ -148,10 +150,11 @@ use Illuminate\Support\Facades\Session
                 if (data.pending.length > 0) {
                     for (let i = 0; i < data.pending.length; i++) {
                         var row = data.pending[i];
+                        var url = window.APP_URL + '/admin/requested-items/' + row.id;
                         if (row.accepted_by_user_name === null) {
                             row.accepted_by_user_name = "-";
                         }
-                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='" + url + "' class='btn btn-secondary'>View</a></td></tr>";
                     }
                 } else {
                     requestTbody.innerHTML += "<tr><td colspan='10'>No pending request...</td></tr>";
@@ -187,10 +190,11 @@ use Illuminate\Support\Facades\Session
 
                 if (data.accepted.length > 0) {
                     data.accepted.forEach(function(row) {
+                        var url = window.APP_URL + '/admin/requested-items/' + row.id;
                         if (row.accepted_by_user_name === null) {
                             row.accepted_by_user_name = "-";
                         }
-                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='" + url + "' class='btn btn-secondary'>View</a></td></tr>";
                     });
                 } else {
                     requestTbody.innerHTML += "<tr><td colspan='10'>No accepted request...</td></tr>";
@@ -220,10 +224,11 @@ use Illuminate\Support\Facades\Session
 
                 if (data.delivered.length > 0) {
                     data.delivered.forEach(function(row) {
+                        var url = window.APP_URL + '/admin/requested-items/' + row.id;
                         if (row.accepted_by_user_name === null) {
                             row.accepted_by_user_name = "-";
                         }
-                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='/admin/requested-items/" + row.id + "' class='btn btn-secondary'>View</a></td></tr>";
+                        requestTbody.innerHTML += "<tr><td>" + row.id + "</td><td>" + row.formatted_date + "</td><td>" + row.office + "</td><td>" + row.patient_name + "</td><td>" + row.doctor_name + "</td><td>" + row.request_by + "</td><td>" + row.request_to + "</td><td>" + row.accepted_by_user_name + "</td><td>" + row.status + "</td><td><a href='" + url + "' class='btn btn-secondary'>View</a></td></tr>";
                     });
                 } else {
                     requestTbody.innerHTML += "<tr><td colspan='10'>No delivered request...</td></tr>";
