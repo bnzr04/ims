@@ -209,31 +209,7 @@ class StocksController extends Controller
                     ->join('items', 'item_stocks.item_id', '=', 'items.id')
                     ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
                     ->get();
-
-                // if ($stocks->empty()) {
-                //     return abort(403, 'Item not available for you to access');
-                // }
-            } //if the manager department is csr
-            // elseif ($user_dept === 'csr') {
-            //     $stocks = DB::table('item_stocks')
-            //         ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            //         ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))->where('item_stocks.item_id', $id)
-            //         ->where('items.category', 'medical supply')
-            //         ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.created_at', 'items.updated_at',)
-            //         ->orderByDesc('item_stocks.created_at')
-            //         ->get();
-
-            //     $totalStocks = DB::table('item_stocks')
-            //         ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            //         ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
-            //         ->where('items.category', 'medical supply')
-            //         ->get();
-
-            // if ($stocks->empty()) {
-            //     return abort(403, 'Item not available for you to access');
-            // }
-            // }
-
+            }
             if ($stocks) {
                 return view('manager.sub-page.stocks.add-to-stock')->with([
                     'item' => $item,

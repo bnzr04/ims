@@ -301,7 +301,7 @@ class AdminRequestController extends Controller
             $stock = Stock::select('stock_qty')
                 ->where('id', $item->stock_id)
                 ->first();
-            $item->remaining = $stock->stock_qty;
+            $item->remaining = empty($stock->stock_qty) ? "0" : $stock->stock_qty;
             $item->amount = number_format($item->quantity * $item->price, 2);
             $total_amount += $item->quantity * $item->price; // add item amount to total amount
         }

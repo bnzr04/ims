@@ -53,7 +53,7 @@ use Illuminate\Support\Facades\Session
 
                             @if($stocks->isEmpty())
                             <tr>
-                                <td colspan="6" class="text-danger">No Stocks...</td>
+                                <td colspan="7" class="text-danger">No Stocks...</td>
                             </tr>
                             @else
                             <thead class="bg-secondary text-white" style="position:sticky;top:0;">
@@ -76,7 +76,7 @@ use Illuminate\Support\Facades\Session
                                     <td>{{ $stock->updated_at }}</td>
                                     <td>{{ $stock->stock_qty }}</td>
                                     <td>{{ $stock->mode_acquisition }}</td>
-                                    <td>{{ $stock->exp_date }}</td>
+                                    <td id="exp-date">{{ $stock->exp_date }}</td>
                                     <td>
                                         <a href="{{ route('manager.add-stock', ['id' => $stock->id]) }}" class="btn btn-primary">+</a>
                                         <a href="{{ route('manager.delete-stock', ['id' => $stock->id]) }}" class="btn btn-danger" onclick="deleteStock()">Dispose</a>
@@ -202,5 +202,30 @@ use Illuminate\Support\Facades\Session
     }
 
     threshold();
+
+    // const expDateOutput = document.getElementById('exp-date');
+
+    // // Create a new Date object
+    // var today = new Date();
+
+    // // Get the day, month, and year
+    // var day = today.getDate();
+    // var month = today.getMonth() + 1; // Months are zero-based, so we add 1
+    // var year = today.getFullYear();
+
+    // // Add leading zeros if necessary
+    // if (day < 10) {
+    //     day = '0' + day;
+    // }
+
+    // if (month < 10) {
+    //     month = '0' + month;
+    // }
+
+    // // Format the date today as "DD-MM-YYYY"
+    // var formattedDate = month + '-' + day + '-' + year;
+
+    // console.log(formattedDate);
+    // console.log(expDateOutput.innerHTML);
 </script>
 @endsection

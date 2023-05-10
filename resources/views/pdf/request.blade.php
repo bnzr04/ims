@@ -247,9 +247,9 @@
             <tr>
                 <th>ID</th>
                 <th>QTY</th>
-                <th>CTGY</th>
-                <th>UNIT</th>
                 <th>DRUG / MEDICAL SUPPLY</th>
+                <th>UNIT</th>
+                <th>CTGY</th>
                 <th>UNIT PRICE</th>
                 <th>AMOUNT</th>
 
@@ -258,9 +258,9 @@
             <tr>
                 <td>{{ $item->item_id }}</td>
                 <td id="quantity">{{ $item->quantity }}</td>
-                <td>{{ $item->category }}</td>
-                <td>{{ $item->unit }}</td>
                 <td>{{ $item->name }}</td>
+                <td>{{ $item->unit }}</td>
+                <td>{{ $item->category }}</td>
                 <td>{{ is_null($item->price) ? "-" : $item->price }}</td>
                 <td id="amount">{{ $item->amount }}</td>
                 <td>{{ $item->remaining }}</td>

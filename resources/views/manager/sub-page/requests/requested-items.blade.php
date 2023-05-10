@@ -171,8 +171,8 @@ use Illuminate\Support\Facades\Session
                         <button type="submit" class="btn btn-warning shadow">Mark as delivered</button>
                     </form>
                     @endif
-                    @if($request->status == 'completed')
-                    <form action="{{ route('manager.generate-receipt',['rid' => $request->id]) }}" target="_blank" method="get">
+                    @if($request->status == 'completed' || $request->status == 'delivered')
+                    <form action="{{ route('manager.generate-receipt',['rid' => $request->id]) }}" target="_blank" method="get" style="float: right;">
                         @csrf
                         <button type="submit" class="btn btn-success shadow">Print</button>
                     </form>

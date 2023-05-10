@@ -52,6 +52,9 @@
                         </div>
                     </form>
                 </div>
+                <div class="container-lg my-3" style="text-align: center;">
+                    <a href="{{ route('info') }}" class="btn p-2" style="text-decoration: none;color:#36802d;border:#36802d 2px solid;border-radius:75%" onmouseover="this.style.color='#c9df8a';this.style.borderColor='#c9df8a';" onmouseout="this.style.color='#36802d';this.style.borderColor='#36802d';">Info</a>
+                </div>
             </div>
         </div>
     </div>

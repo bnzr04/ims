@@ -95,7 +95,6 @@ class RequestController extends Controller
             'accepted' => $requests,
             'acceptedCount' => $requestCount,
         ]);
-        // return back()->with(['requests' => $requests]);
     }
 
     public function showDeliveredRequest()
@@ -151,88 +150,6 @@ class RequestController extends Controller
         return response()->json([
             'completed' => $requests,
             'completedCount' => $requestCount,
-        ]);
-    }
-
-    public function newRequest(Request $request)
-    {
-        $items = Item::query();
-        $searchItem = $request->search_item;
-
-        if ($searchItem !== null) {
-            $items =
-                $items->where(function ($query) use ($searchItem) {
-                    $query->where('name', 'like', '%' . $searchItem . '%')
-                        ->orWhere('id', $searchItem);
-                })->get();
-        }
-
-        return view('user.sub-page.new-request')->with(['items' => $items, 'search_item' => $searchItem]);
-    }
-
-    public function userRequest(Request $request)
-    {
-        $status = $request->query('request');
-        $userId = Auth::id();
-
-        if ($status) {
-            $requests = ModelsRequest::where('user_id', $userId)
-                ->where('status', $status)
-                ->each(function ($request) {
-                    $request->formatted_created_at = Carbon::parse($request->created_at)->format('F j, Y, g:i:s a');
-                })
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            $pending = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'pending')
-                ->count('user_id');
-            $accepted = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'accepted')
-                ->count('user_id');
-            $delivered = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'delivered')
-                ->count('user_id');
-            $completed = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'completed')
-                ->count('user_id');
-            $notcompleted = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'not completed')
-                ->count('user_id');
-        } else {
-            $requests = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'pending')
-                ->each(function ($request) {
-                    $request->formatted_created_at = Carbon::parse($request->created_at)->format('F j, Y, g:i:s a');
-                })
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            $pending = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'pending')
-                ->count('user_id');
-            $accepted = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'accepted')
-                ->count('user_id');
-            $delivered = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'delivered')
-                ->count('user_id');
-            $completed = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'completed')
-                ->count('user_id');
-            $notcompleted = ModelsRequest::where('user_id', $userId)
-                ->where('status', 'not completed')
-                ->count('user_id');
-        }
-
-        return view('user.my-request')->with([
-            'requests' => $requests,
-            'status' => $status,
-            'pending' => $pending,
-            'accepted' => $accepted,
-            'delivered' => $delivered,
-            'completed' => $completed,
-            'notcompleted' => $notcompleted,
         ]);
     }
 
@@ -324,50 +241,6 @@ class RequestController extends Controller
             'request' => $requested,
             'items' => $items,
         ]);
-    }
-
-
-    //This function will add item to request
-    public function addItem(Request $request)
-    {
-        $table = new Request_Item;
-
-        $query = Request_Item::where('request_id', $request->request_id)
-            ->where('item_id', $request->nameSearch)
-            ->where('stock_id', $request->stock_id)
-            ->first();
-
-        if ($query) {
-            return back()->with('error', 'Item stock already added.');
-        } else {
-            $table->request_id = $request->request_id;
-            $table->item_id = $request->nameSearch;
-            $table->stock_id = $request->stock_id;
-            $table->mode_acquisition = $request->mode_acquisition;
-            $table->exp_date = $request->exp_date;
-            $table->quantity = $request->quantity;
-
-            $quantity = $request->quantity;
-
-            $available =
-                DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('item_stocks.stock_qty')
-                ->where('item_stocks.id', $request->stock_id)
-                ->where('item_stocks.item_id', $request->nameSearch)->first();
-
-            if (!empty($available)) {
-                $stock = $available->stock_qty;
-                if ($quantity > $stock) {
-                    return back()->with('warning', 'The available stocks are not enough for your demand.');
-                } else {
-                    $table->save();
-                    return back()->with('success', 'Item successfully added.');
-                }
-            } else {
-                return back()->with('error', 'Item failed to request.');
-            }
-        }
     }
 
     public function removeItem($sid, $id)

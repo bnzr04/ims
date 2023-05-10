@@ -31,6 +31,8 @@ Auth::routes();
 Route::middleware('guest')->group(function () {
     Route::get('/', [HomeController::class, 'login'])->name('home');
     Route::get('/login', [HomeController::class, 'login'])->name('login');
+    Route::get('/info', [HomeController::class, 'showInfo'])->name('info');
+    Route::get('/dashboard-display', [HomeController::class, 'dashboardDisplay'])->name('dashboard-display');
 });
 
 
@@ -43,14 +45,11 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
 
     Route::get('/home', [UserController::class, 'userHome'])->name('user.home');
 
-    //Request routes
-    // Route::get('/new-request', [RequestController::class, 'newRequest'])->name('user.newRequest');
-    // Route::get('/my-requests', [RequestController::class, 'userRequest'])->name('user.requests');
+    ////////Request routes////////
     Route::get('/request', [RequestController::class, 'request'])->name('user.request');
     Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');
     Route::get('/request-items/{id}', [RequestController::class, 'itemRequest'])->name('user.request-items');
     Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
-    Route::post('/add-item', [RequestController::class, 'addItem'])->name('user.add-item');
     Route::get('/remove-item/{sid}/{id}', [RequestController::class, 'removeItem'])->name('user.remove-item');
     Route::post('/submit-request', [RequestController::class, 'submitRequest'])->name('user.submit-request');
     Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request');
@@ -71,16 +70,16 @@ All Admin Routes List
 
 Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(function () {
 
-    //Dashboard
+    ////////Dashboard////////
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/dashboard-display', [AdminController::class, 'dashboardDisplay'])->name('admin.dashboard-display');
 
     Route::get('/deployment', [AdminController::class, 'deployment'])->name('admin.deployment');
 
-    //Users Log Activity
+    ////////Users Log Activity////////
     Route::get('/log', [LogController::class, 'index'])->name('admin.log-index');
 
-    //User module routes
+    ////////User module routes////////
     Route::get('/users', [UsersController::class, 'users'])->name('admin.users');
     Route::get('/new-user', [UsersController::class, 'newUser'])->name('admin.new-user');
     Route::get('/show-user/{id}', [UsersController::class, 'showUser'])->name('admin.show-user');
@@ -89,7 +88,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/to-delete-user/{id}', [UsersController::class, 'toDeleteUser'])->name('admin.to-delete-user');
     Route::post('/delete-user/{id}', [UsersController::class, 'deleteUser'])->name('admin.delete-user');
 
-    //Item module routes
+    ////////Item module routes////////
     Route::get('/items', [ItemController::class, 'showAllItems'])->name('admin.items');
     Route::get('/new-item', [ItemController::class, 'newItem'])->name('admin.new-item');
     Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.show-item');
@@ -98,7 +97,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::post('/insert-items', [ItemController::class, 'import'])->name('admin.insert-items');
     Route::post('/export-items', [ItemController::class, 'export'])->name('admin.export-items');
 
-    //Stocks module routes
+    ////////Stocks module routes////////
     Route::get('/stocks', [StocksController::class, 'stocks'])->name('admin.stocks');
     Route::get('/add-to-stocks/{id}', [StocksController::class, 'addToStocks'])->name('admin.add-to-stocks');
     Route::post('/save-stock', [StocksController::class, 'saveStock'])->name('admin.save-stock');
@@ -108,13 +107,13 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('admin.delete-stock');
     Route::post('/export-stocks', [StocksController::class, 'export'])->name('admin.export-stocks');
 
-    //Dispense Report
+    ////////Dispense Report////////
     Route::get('/dispense', [StocksController::class, 'dispense'])->name('admin.dispense');
     Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('admin.get-dispense');
     Route::get('/filter-dispense', [StocksController::class, 'dispenseFilter'])->name('admin.filter-dispense');
     Route::post('/export-dispense', [StocksController::class, 'dispenseExport'])->name('admin.export-dispense');
 
-    //Request module routes
+    ////////Request module routes////////
     Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
     Route::get('/show-requests', [AdminRequestController::class, 'showRequest'])->name('admin.show-requests');
     Route::get('/requested-items/{id}', [AdminRequestController::class, 'requestedItems'])->name('admin.requested-items');
@@ -126,7 +125,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/show-accepted-requests', [AdminRequestController::class, 'showAcceptedRequest'])->name('admin.show-accepted-requests');
     Route::get('/show-delivered-requests', [AdminRequestController::class, 'showDeliveredRequest'])->name('admin.show-delivered-requests');
 
-    //Request transaction
+    ////////Request transaction////////
     Route::get('/transaction', [AdminRequestController::class, 'transaction'])->name('admin.transaction');
     Route::get('/show-transaction', [AdminRequestController::class, 'showTransaction'])->name('admin.show-transaction');
     Route::get('/filter-transaction', [AdminRequestController::class, 'filterTransaction'])->name('admin.filter-transaction');
@@ -144,7 +143,7 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
 
     Route::get('/item-stocks', [ItemController::class, 'showAllItems'])->name('manager.stocks');
 
-    //Items module
+    ////////Items module////////
     Route::get('/new-item', [ItemController::class, 'newItem'])->name('manager.new-item');
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('manager.saveItem');
     Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('manager.show-item');
@@ -152,7 +151,7 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::post('/insert-items', [ItemController::class, 'import'])->name('manager.insert-items');
     Route::post('/export-items', [ItemController::class, 'export'])->name('manager.export-items');
 
-    //Stocks module
+    ////////Stocks module////////
     Route::get('/stocks', [StocksController::class, 'stocks'])->name('manager.AllStocks');
     Route::get('/add-to-stocks/{id}', [StocksController::class, 'addToStocks'])->name('manager.add-to-stocks');
     Route::post('/save-stock', [StocksController::class, 'saveStock'])->name('manager.save-stock');
@@ -161,7 +160,7 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('manager.delete-stock');
     Route::post('/export-stocks', [StocksController::class, 'export'])->name('manager.export-stocks');
 
-    //Request module
+    ////////Request module////////
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
     Route::get('/requests', [ManagerRequestController::class, 'viewRequest'])->name('manager.requests');
     Route::get('/show-pending-requests', [ManagerRequestController::class, 'showPendingRequest'])->name('manager.show-pending-requests');
@@ -174,19 +173,19 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
 
     Route::get('/generate-receipt/{rid}', [ManagerRequestController::class, 'generate_receipt'])->name('manager.generate-receipt');
 
-    //Dispense Report
+    ////////Dispense Report////////
     Route::get('/dispense', [StocksController::class, 'dispense'])->name('manager.dispense');
     Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('manager.get-dispense');
     Route::get('/filter-dispense', [StocksController::class, 'dispenseFilter'])->name('manager.filter-dispense');
     Route::post('/export-dispense', [StocksController::class, 'dispenseExport'])->name('manager.export-dispense');
 
-    //Transaction
+    ////////Transaction////////
     Route::get('/transaction', [ManagerRequestController::class, 'transaction'])->name('manager.transaction');
     Route::get('/show-transaction', [ManagerRequestController::class, 'showTransaction'])->name('manager.show-transaction');
     Route::get('/filter-transaction', [ManagerRequestController::class, 'filterTransaction'])->name('manager.filter-transaction');
 });
 
-//Logout
+////////Logout////////
 Route::get('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout1');
