@@ -172,8 +172,8 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
     Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
 
-    Route::get('/doctor-list', [DoctorController::class, 'doctorList'])->name('manager.doctor-list');
-    Route::post('/save-doctor', [DoctorController::class, 'saveDoctor'])->name('manager.save-doctor');
+    // Route::get('/doctor-list', [DoctorController::class, 'doctorList'])->name('manager.doctor-list');
+    // Route::post('/save-doctor', [DoctorController::class, 'saveDoctor'])->name('manager.save-doctor');
 
     Route::get('/generate-receipt/{rid}', [ManagerRequestController::class, 'generate_receipt'])->name('manager.generate-receipt');
 
