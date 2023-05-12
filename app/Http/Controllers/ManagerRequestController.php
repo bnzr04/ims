@@ -237,7 +237,7 @@ class ManagerRequestController extends Controller
         $user_name = $user->name;
 
         if ($user_type === 'manager') {
-            $user_type = $user_type . " (" . $user->dept . ")";
+            $user_type = $user_type . " (" . $user_name . ")";
         }
 
 
@@ -258,6 +258,10 @@ class ManagerRequestController extends Controller
 
             //Log Message
             $message = "Request ID: " . $rid . ", request is accepted.";
+
+            if ($user_type === 'manager') {
+                $user_type = $user_type . " (" . $user_name . ")";
+            }
 
             // Log the data to the logs table
             Log::create([
@@ -306,6 +310,10 @@ class ManagerRequestController extends Controller
             //Log Message
             $message = "Request ID: " . $rid . ", request is delivered and mark as completed.";
 
+            if ($user_type === 'manager') {
+                $user_type = $user_type . " (" . $user_name . ")";
+            }
+
             // Log the data to the logs table
             Log::create([
                 'user_id' => $user_id,
@@ -353,6 +361,10 @@ class ManagerRequestController extends Controller
             //Log Message
             $message = "Request ID: " . $rid . ", request is delivered.";
 
+            if ($user_type === 'manager') {
+                $user_type = $user_type . " (" . $user_name . ")";
+            }
+
             // Log the data to the logs table
             Log::create([
                 'user_id' => $user_id,
@@ -363,7 +375,7 @@ class ManagerRequestController extends Controller
                 'updated_at' => now()
             ]);
 
-            return redirect()->route('manager.requests')->with('success', 'Request delivered');
+            return back()->with('success', 'Request delivered');
         } else {
             return back()->with('error', 'Request failed to mark as delivered');
         }

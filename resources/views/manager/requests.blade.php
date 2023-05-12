@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Session
                 <div class="container-lg">
                     <h2>Requests</h2>
                 </div>
+                <!-- <div class="container-lg">
+                    <a href="{{ route('manager.doctor-list') }}" title="doctors list"><img src="{{ asset('/icons/medical-team.png') }}" alt="doctor" width="25px"></a>
+                </div> -->
                 <div class="container-lg pt-3 d-flex">
                     <form id="pending_form">
                         <button class="btn btn-outline-dark mx-1" id="pending">Pending (<span id="pending-count"></span>)</button>
@@ -65,6 +68,11 @@ use Illuminate\Support\Facades\Session
             </div>
         </div>
     </div>
+    <!-- Sound notificaition -->
+    <audio id="notificationSound">
+        <source src="{{ asset('/sound/light-hearted-message-tone.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 </div>
 <script>
     window.APP_URL = "{{ url('') }}";
@@ -84,6 +92,14 @@ use Illuminate\Support\Facades\Session
     var acceptedInterval;
     var deliveredInterval;
 
+
+    function playNotificationSound() {
+        var audio = document.getElementById('notificationSound');
+        audio.play();
+    }
+
+    var previousCount = 0;
+
     function pendingCount() {
         setInterval(function() {
             $.ajax({
@@ -91,7 +107,16 @@ use Illuminate\Support\Facades\Session
                 method: 'GET',
                 dataType: 'json',
                 success: function(data) {
-                    // console.log(data);
+                    // console.log(data.pending);
+                    var currentCount = data.pending.length;
+
+                    if (currentCount > previousCount) {
+                        playNotificationSound();
+                        console.log(currentCount);
+                    }
+
+                    previousCount = currentCount;
+
                     pendingCountOutput.innerHTML = data.pendingCount;
                 },
                 error: function(xhr, status, error) {

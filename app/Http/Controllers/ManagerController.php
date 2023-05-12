@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Doctor;
 use App\Models\Item;
 use App\Models\Request as ModelsRequest;
 use App\Models\Stock;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 

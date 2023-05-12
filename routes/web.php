@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminRequestController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ManagerController;
@@ -170,6 +171,9 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
     Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
+
+    Route::get('/doctor-list', [DoctorController::class, 'doctorList'])->name('manager.doctor-list');
+    Route::post('/save-doctor', [DoctorController::class, 'saveDoctor'])->name('manager.save-doctor');
 
     Route::get('/generate-receipt/{rid}', [ManagerRequestController::class, 'generate_receipt'])->name('manager.generate-receipt');
 

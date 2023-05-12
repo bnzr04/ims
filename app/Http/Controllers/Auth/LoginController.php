@@ -53,13 +53,7 @@ class LoginController extends Controller
 
             $user_id = $user->id; // Get the ID of the authenticated user
             $userName = $user->name; // Get user name
-            $dept = $user->dept; // Get the depart if the user is manager
-
-            if ($user->type === "manager") {
-                $user_type = $user->type . " (" . $dept . ")"; // Get the Type of the authenticated user
-            } else {
-                $user_type = $user->type;
-            }
+            $user_type = $user->type;
 
 
             // Get the SQL query being executed
@@ -71,7 +65,7 @@ class LoginController extends Controller
             }
 
             //Log Message
-            if ($user_type === 'user') {
+            if ($user_type === 'user' || $user_type === 'manager') {
                 $message = $user_type . " (" . $userName . ") logged in.";
             } else {
                 $message = $user_type . " logged in.";
@@ -112,13 +106,8 @@ class LoginController extends Controller
         $user = auth()->user();
 
         $user_id = $user->id; // Get the ID of the authenticated user
-        $dept = $user->dept; // Get the depart if the user is manager
-
-        if ($user->type === "manager") {
-            $user_type = $user->type . " (" . $dept . ")"; // Get the dept of the authenticated manager
-        } else {
-            $user_type = $user->type;
-        }
+        $userName = $user->name; // Get user name
+        $user_type = $user->type;
 
 
 
@@ -134,9 +123,7 @@ class LoginController extends Controller
         $userName = $user->name; // Get user name
 
         //Log Message
-        if (
-            $user_type === 'user'
-        ) {
+        if ($user_type === 'user' || $user_type === 'manager') {
             $message = $user_type . " (" . $userName . ") logged out.";
         } else {
             $message = $user_type . " logged out.";
