@@ -390,15 +390,24 @@ class ManagerRequestController extends Controller
     //get transactions/request data
     public function showTransaction()
     {
+        $user = Auth::user();
+        $user_id = $user->id;
 
-        $transc = ModelsRequest::where('status', 'completed')->orderBy('updated_at', 'desc')->get();
+        $from = Carbon::now()->startOfDay();
+        $to = Carbon::now()->endOfDay();
 
-        foreach ($transc as $trans) {
+        $data = ModelsRequest::where('status', 'completed')
+            ->whereBetween('updated_at', [$from, $to])
+            ->where('accepted_by_user_id', $user_id)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        foreach ($data as $trans) {
             $trans->formatted_date =
                 Carbon::parse($trans->updated_at)->format('F j, Y, g:i:s a');
         }
 
-        return response()->json($transc);
+        return response()->json($data);
     }
 
     //filter transaction
@@ -408,6 +417,8 @@ class ManagerRequestController extends Controller
         $yesterday = $request->input('yesterday');
         $thisMonth = $request->input('this-month');
 
+        $user = Auth::user();
+        $user_id = $user->id;
 
         if ($today) {
             // Filter transactions that occurred today
@@ -416,6 +427,7 @@ class ManagerRequestController extends Controller
 
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('updated_at', [$from, $to])
+                ->where('accepted_by_user_id', $user_id)
                 ->orderBy('updated_at', 'desc')
                 ->get();
         } else if ($yesterday) {
@@ -425,6 +437,7 @@ class ManagerRequestController extends Controller
 
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('updated_at', [$from, $to])
+                ->where('accepted_by_user_id', $user_id)
                 ->orderBy('updated_at', 'desc')
                 ->get();
         } else if ($thisMonth) {
@@ -434,16 +447,18 @@ class ManagerRequestController extends Controller
 
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('updated_at', [$from, $to])
+                ->where('accepted_by_user_id', $user_id)
                 ->orderBy('updated_at', 'desc')
                 ->get();
         } else {
 
             $from = $request->input('from');
             $to = $request->input('to');
-            $date_to = date('Y-m-d', strtotime($to . ' +1 day'));
+            $date_to = date('Y-m-d H:i:s', strtotime($to . ' +1 day'));
 
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('updated_at', [$from, $date_to])
+                ->where('accepted_by_user_id', $user_id)
                 ->orderBy('updated_at', 'desc')
                 ->get();
         }

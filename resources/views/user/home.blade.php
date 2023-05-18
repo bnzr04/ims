@@ -8,19 +8,77 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <h1>Dashboard</h1>
-                <div class="container-fluid d-flex">
-                    <div class="container1 rounded p-3 mx-1 bg-primary text-white" style="width: 150px;height:150px;display: flex;justify-content: center;align-items: center;flex-direction: column;letter-spacing:3px">
-                        <h5>Requests</h5>
-                        <h1><a href="{{ route('user.viewRequest', ['request' => 'pending']) }}" style="color:white;">{{ $pending }}</a></h1>
+                <h2 style="letter-spacing: 3px;">DASHBOARD</h2>
+                <div class="container-lg p-2 d-flex" style="flex-wrap:wrap;">
+                    <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#005073;color:white">
+                        Pending Request
+                        <hr>
+                        <h3><a href="{{ route('user.viewRequest', ['request' => 'pending', 'filter' => 'today']) }}" id="pending-request" style="color:white;"></a></h3>
                     </div>
-                    <div class="container2 rounded p-3 mx-1 bg-success text-white" style="width: 150px;height:150px;display: flex;justify-content: center;align-items: center;flex-direction: column;letter-spacing:3px">
-                        <h5>Received</h5>
-                        <h1><a href="{{ route('user.viewRequest', ['request' => 'completed']) }}" style="color:white;">{{ $completed }}</a></h1>
+                    <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#107dac;color:white">
+                        Accepted Request
+                        <hr>
+                        <h3><a href="{{ route('user.viewRequest', ['request' => 'accepted', 'filter' => 'today']) }}" id="accepted-request" style="color:white;"></a></h3>
+                    </div>
+                    <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#189ad3;color:white">
+                        Delivered Request
+                        <hr>
+                        <h3><a href="{{ route('user.viewRequest', ['request' => 'delivered', 'filter' => 'today']) }}" id="delivered-request" style="color:white;"></a></h3>
+                    </div>
+                    <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#1ebbd7;color:white">
+                        Completed Request
+                        <hr>
+                        <h3><a href="{{ route('user.viewRequest', ['request' => 'completed', 'filter' => 'today']) }}" id="completed-request" style="color:white;"></a></h3>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    const pending = document.getElementById("pending-request");
+    const accepted = document.getElementById("accepted-request");
+    const delivered = document.getElementById("delivered-request");
+    const completed = document.getElementById("completed-request");
+
+    setInterval(function() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', "{{ route('user.dashboard-data') }}", true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                console.log(data);
+
+                // setInterval(function() {
+                pending.innerHTML = "";
+                pending.innerHTML = data.pending;
+                // console.log(data.pending);
+                // }, 1000);
+
+                // setInterval(function() {
+                accepted.innerHTML = "";
+                accepted.innerHTML = data.accepted;
+                // console.log(data.accepted);
+                // }, 1000);
+
+                // setInterval(function() {
+                delivered.innerHTML = "";
+                delivered.innerHTML = data.delivered;
+                // console.log(data.delivered);
+                // }, 1000);
+
+                // setInterval(function() {
+                completed.innerHTML = "";
+                completed.innerHTML = data.completed;
+                // console.log(data.completed);
+                // }, 1000);
+
+            } else {
+                console.log('Error: ' + xhr.status);
+            }
+        };
+
+        xhr.send();
+    }, 1000);
+</script>
 @endsection

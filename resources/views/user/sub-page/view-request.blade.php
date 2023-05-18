@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Facades\Session
+@endphp
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
@@ -11,36 +14,49 @@
                 <div class="container-lg mt-2">
                     <a href="{{ route('user.home') }}" class="btn btn-secondary">Back</a>
                 </div>
-                <div class="container-lg mt-3 px-2 pt-3 rounded shadow">
+                <div class="container-lg mt-3 px-2 rounded shadow">
                     <!-- <div class="container-lg">
                         <button class="btn btn-outline-dark" id="pending">Pending (<span id="pending-count"></span>)</button>
                         <button class="btn btn-outline-dark" id="accepted">Accepted (<span id="accepted-count"></span>)</button>
                         <button class="btn btn-outline-dark" id="delivered">Delivered (<span id="delivered-count"></span>)</button>
                     </div> -->
                     <div class="container-lg">
-                        <h5>
+                        <h3 id="title" style="text-transform: capitalize;">
+                            {{ $title }} request
+                        </h3>
+                        @if(session('success'))
+                        <div class="alert alert-success" id="alert">
+                            {{ session('success') }}
+                        </div>
+                        @endif
 
-                        </h5>
+                        @if(session('error'))
+                        <div class="alert alert-danger" id="alert">
+                            {{ session('error') }}
+                        </div>
+                        @endif
+                        <div class="container-lg p-0">
+                            <div class="container-lg p-0 d-flex">
+                                <div class="container-lg p-0">
+                                    <a href="{{ route('user.viewRequest', ['request' => $title, 'filter' => 'today']) }}" class="btn btn-outline-success">Today</a>
+                                    <a href="{{ route('user.viewRequest', ['request' => $title, 'filter' => 'this-week']) }}" class="btn btn-outline-success">This Week</a>
+                                    <a href="{{ route('user.viewRequest', ['request' => $title, 'filter' => 'this-month']) }}" class="btn btn-outline-success">This Month</a>
+                                </div>
+                                <div class="d-flex" style="align-items: center;width:100%;max-width:500px">
+                                    <label for="date_from">From</label>
+                                    <input type="date" class="form-control mx-1" name="date_from" id="date_from">
+
+                                    <label for="date_to">To</label>
+                                    <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY">
+                                    <button type="submit" class="btn btn-outline-success">Filter</button>
+                                </div>
+                            </div>
+                            <div class="container-lg p-0 mt-2">
+                                <h5>{{ $filter == "today" ? "Today" : ($filter == "this-week" ? "This Week" : ($filter == "this-month" ? "This Month" : "")) }} Requests</h5>
+                            </div>
+                        </div>
                     </div>
-                    <div class="container-md d-flex">
-                        <form action="{{ route('user.viewRequest', ['request' => 'pending']) }}" class="mx-1" method="get">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-secondary">Pending (<span id="pending-count"></span>)</button>
-                        </form>
-                        <form action="{{ route('user.viewRequest', ['request' => 'accepted']) }}" class="mx-1" method="get">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-secondary">Accepted (<span id="accepted-count"></span>)</button>
-                        </form>
-                        <form action="{{ route('user.viewRequest', ['request' => 'delivered']) }}" class="mx-1" method="get">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-secondary">Delivered (<span id="delivered-count"></span>)</button>
-                        </form>
-                        <form action="{{ route('user.viewRequest', ['request' => 'completed']) }}" class="mx-1" method="get">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-secondary">Completed (<span id="completed-count"></span>)</button>
-                        </form>
-                    </div>
-                    <div class="container-md overflow-auto mt-1" style="height: 400px;">
+                    <div class="container-md overflow-auto mt-2 border border-dark p-0 rounded" style="height: 400px;">
                         <table class="table">
                             <thead class="bg-success text-white" style="position: sticky;top:0;">
                                 <tr>
@@ -86,82 +102,10 @@
     </div>
 </div>
 <script>
-    const pendingCountOutput = document.getElementById('pending-count');
-    const acceptedCountOutput = document.getElementById('accepted-count');
-    const deliveredCountOutput = document.getElementById('delivered-count');
-    const completedCountOutput = document.getElementById('completed-count');
+    const alert = document.getElementById("alert");
 
-    function pendingCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('user.show-pending-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data);
-                    pendingCountOutput.innerHTML = data.pendingCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
-    }
-
-    function acceptedCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('user.show-accepted-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.acceptedCount);
-                    acceptedCountOutput.innerHTML = data.acceptedCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
-    }
-
-    function deliveredCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('user.show-delivered-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.deliveredCount);
-                    deliveredCountOutput.innerHTML = data.deliveredCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
-    }
-
-    function completedCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('user.show-completed-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.deliveredCount);
-                    completedCountOutput.innerHTML = data.completedCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
-    }
-
-    pendingCount();
-    acceptedCount();
-    deliveredCount();
-    completedCount();
+    setTimeout(function() {
+        alert.remove();
+    }, 3000);
 </script>
 @endsection

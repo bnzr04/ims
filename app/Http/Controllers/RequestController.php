@@ -153,39 +153,72 @@ class RequestController extends Controller
         ]);
     }
 
-    public function viewRequest($request)
+    public function viewRequests()
+    {
+        return view('user.sub-page.view-request');
+    }
+
+    public function viewRequest($request, $filter)
     {
         $user_id = Auth::user()->id;
 
+        if ($filter === "today") {
+            $from = Carbon::now()->startOfDay();
+            $to = Carbon::now()->endOfDay();
+        } else if ($filter === "this-week") {
+            $from = Carbon::now()->startOfWeek();
+            $to = Carbon::now()->endOfWeek();
+        } else if ($filter === "this-month") {
+            $from = Carbon::now()->startOfMonth();
+            $to = Carbon::now()->endOfMonth();
+        }
+
         if ($request === 'pending') {
+
             $items = ModelsRequest::where('user_id', $user_id)
+                ->whereBetween('created_at', [$from, $to])
                 ->where('status', 'pending')
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            $title = "pending";
         } else if ($request === 'accepted') {
+
             $items = ModelsRequest::where('user_id', $user_id)
+                ->whereBetween('created_at', [$from, $to])
                 ->where('status', 'accepted')
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            $title = "accepted";
         } else if ($request === 'delivered') {
+
             $items = ModelsRequest::where('user_id', $user_id)
+                ->whereBetween('created_at', [$from, $to])
                 ->where('status', 'delivered')
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            $title = "delivered";
         } else if ($request === 'completed') {
+
             $items = ModelsRequest::where('user_id', $user_id)
+                ->whereBetween('created_at', [$from, $to])
                 ->where('status', 'completed')
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            $title = "completed";
         }
 
         foreach ($items as $item) {
             $item->formatted_date = Carbon::parse($item->created_at)->format('F j, Y, g:i:s a');
         }
 
-
         return view('user.sub-page.view-request')->with([
             'items' => $items,
+            'title' => $title,
+            'filter' => $filter,
             'request' => $request
         ]);
     }
@@ -474,9 +507,9 @@ class RequestController extends Controller
                 'updated_at' => now()
             ]);
 
-            return back()->with('success', 'Request completed');
+            return redirect()->route('user.viewRequest', ['request' => 'delivered', 'filter' => 'today'])->with('success', 'Request completed');
         } else {
-            return back()->with('error', "Request doesn't exist.");
+            return redirect()->route('user.viewRequest', ['request' => 'delivered', 'filter' => 'today'])->with('error', "Request doesn't exist.");
         }
     }
 }

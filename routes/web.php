@@ -45,6 +45,7 @@ All Normal Users Routes List
 Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function () {
 
     Route::get('/home', [UserController::class, 'userHome'])->name('user.home');
+    Route::get('/dashboard-data', [UserController::class, 'dashboardData'])->name('user.dashboard-data');
 
     ////////Request routes////////
     Route::get('/request', [RequestController::class, 'request'])->name('user.request');
@@ -60,7 +61,8 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
     Route::get('/show-delivered-requests', [RequestController::class, 'showDeliveredRequest'])->name('user.show-delivered-requests');
     Route::get('/show-completed-requests', [RequestController::class, 'showCompletedRequest'])->name('user.show-completed-requests');
 
-    Route::get('/view-request/{request}', [RequestController::class, 'viewRequest'])->name('user.viewRequest');
+
+    Route::get('/view-request/{request}/{filter}', [RequestController::class, 'viewRequest'])->name('user.viewRequest');
 });
 
 /*------------------------------------------

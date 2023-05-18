@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Session
                     <h2>Requests</h2>
                 </div>
                 <!-- <div class="container-lg">
-                    <a href="{{ route('manager.doctor-list') }}" title="doctors list"><img src="{{ asset('/icons/medical-team.png') }}" alt="doctor" width="25px"></a>
+                    <a href="" title="doctors list"><img src="{{ asset('/icons/medical-team.png') }}" alt="doctor" width="25px"></a>
                 </div> -->
                 <div class="container-lg pt-3 d-flex">
                     <form id="pending_form">
