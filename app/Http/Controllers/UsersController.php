@@ -71,11 +71,7 @@ class UsersController extends Controller
         $user_id = $user->id; // Get the ID of the authenticated user
         $dept = $user->dept; // Get the depart if the user is manager
 
-        if ($user->type === "manager") {
-            $user_type = $user->type . " (" . $dept . ")"; // Get the department (dept) of the authenticated manager
-        } else {
-            $user_type = $user->type;
-        }
+        $user_type = $user->type;
 
         // Get the SQL query being executed
         $sql = DB::getQueryLog();

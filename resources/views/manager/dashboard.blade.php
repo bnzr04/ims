@@ -7,7 +7,7 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 py-1">
+            <div id="content" class="container-lg mt-2">
                 <h2>Dashboard</h2>
                 <div class="container-lg p-2 d-flex" style="flex-wrap:wrap;">
                     <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#005073;color:white">
@@ -31,45 +31,46 @@
                         <h3 id="completed-today"></h3>
                     </div>
                 </div>
+
+                <div class="container-lg">
+                    <iframe src="{{ route('manager.show-pending') }}" frameborder="0" class="border shadow" style="height:250px;width:30%;"></iframe>
+                </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', "{{ route('manager.dashboard-display') }}", true);
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            console.log(data);
-            var totalItemsOutput = document.getElementById("total-items");
-            var inStocksOutput = document.getElementById("in-stocks");
-            var pendingRequestOutput = document.getElementById("pending-request");
-            var completedTodayOutput = document.getElementById("completed-today");
-            var adminOutput = document.getElementById("admins");
-            var managerOutput = document.getElementById("managers");
-            var userOutput = document.getElementById("users");
+    function dataUpdate() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', "{{ route('manager.dashboard-display') }}", true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                // console.log(data);
+                var totalItemsOutput = document.getElementById("total-items");
+                var inStocksOutput = document.getElementById("in-stocks");
+                var pendingRequestOutput = document.getElementById("pending-request");
+                var completedTodayOutput = document.getElementById("completed-today");
+                var adminOutput = document.getElementById("admins");
+                var managerOutput = document.getElementById("managers");
+                var userOutput = document.getElementById("users");
 
-            //display total items
-            totalItemsOutput.innerHTML = data.total_items;
-            //display in stocks items
-            inStocksOutput.innerHTML = data.in_stocks.count;
-            //display pending request number
-            pendingRequestOutput.innerHTML = data.pending_request;
-            //display today completed request
-            completedTodayOutput.innerHTML = data.completed_today;
+                //display total items
+                totalItemsOutput.innerHTML = data.total_items;
+                //display in stocks items
+                inStocksOutput.innerHTML = data.in_stocks.count;
+                //display pending request number
+                pendingRequestOutput.innerHTML = data.pending_request;
+                //display today completed request
+                completedTodayOutput.innerHTML = data.completed_today;
+            } else {
+                console.log('Error: ' + xhr.status);
+            }
+        };
+        xhr.send();
+    }
 
-            //display admins
-            adminOutput.innerHTML = data.admins;
-            //display managers
-            managerOutput.innerHTML = data.managers;
-            //display users
-            userOutput.innerHTML = data.users;
-
-        } else {
-            console.log('Error: ' + xhr.status);
-        }
-    };
-    xhr.send();
+    dataUpdate();
+    setInterval(dataUpdate, 10000);
 </script>
 @endsection

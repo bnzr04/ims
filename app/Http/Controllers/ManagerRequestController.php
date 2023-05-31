@@ -16,78 +16,13 @@ class ManagerRequestController extends Controller
     //show requests
     public function viewRequest()
     {
-
         return view('manager.requests');
     }
 
-    //show requests
-    // public function showRequest()
-    // {
-    //     $user = Auth::user();
-
-    //     $userType = $user->type;
-    //     $userDept = $user->dept;
-
-    //     if ($userType === 'manager') {
-
-    //         //if the manager is pharmacy department
-    //         if ($userDept === 'pharmacy') {
-    //             $pending = ModelsRequest::where('status', '!=', 'completed')
-    //                 ->where('request_to', 'pharmacy')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($pending) {
-    //                     $pending->formatted_date = Carbon::parse($pending->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //             $accepted = ModelsRequest::where('status', 'accepted')
-    //                 ->where('request_to', 'pharmacy')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-    //                     $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //             $delivered = ModelsRequest::where('status', 'delivered')
-    //                 ->where('request_to', 'pharmacy')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-    //                     $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //             $completed = ModelsRequest::where('status', 'completed')
-    //                 ->where('request_to', 'pharmacy')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-    //                     $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //         }
-
-    //         //if the manager is csr department
-    //         elseif ($userDept === 'csr') {
-    //             $pending = ModelsRequest::where('status', 'pending')
-    //                 ->where('request_to', 'csr')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($pending) {
-    //                     $pending->formatted_date = Carbon::parse($pending->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //             $accepted = ModelsRequest::where('status', 'accepted')
-    //                 ->where('request_to', 'csr')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-    //                     $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //             $delivered = ModelsRequest::where('status', 'delivered')
-    //                 ->where('request_to', 'csr')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-    //                     $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //             $completed = ModelsRequest::where('status', 'completed')
-    //                 ->where('request_to', 'csr')
-    //                 ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-    //                     $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-    //                 });
-    //         }
-
-    //         $data = [
-    //             'pending' => $pending,
-    //             'accepted' => $accepted,
-    //             'delivered' => $delivered,
-    //             'completed' => $completed,
-    //         ];
-
-    //         return response()->json($data);
-    //     }
-    // }
+    public function showPending()
+    {
+        return view('manager.sub-page.requests.show-pending');
+    }
 
     public function showPendingRequest()
     {
@@ -236,11 +171,6 @@ class ManagerRequestController extends Controller
         $user_type = $user->type;
         $user_name = $user->name;
 
-        if ($user_type === 'manager') {
-            $user_type = $user_type . " (" . $user_name . ")";
-        }
-
-
         if ($request) {
             $request->accepted_by_user_id = $user_id;
             $request->accepted_by_user_name = $user_name;
@@ -258,10 +188,6 @@ class ManagerRequestController extends Controller
 
             //Log Message
             $message = "Request ID: " . $rid . ", request is accepted.";
-
-            if ($user_type === 'manager') {
-                $user_type = $user_type . " (" . $user_name . ")";
-            }
 
             // Log the data to the logs table
             Log::create([
@@ -310,10 +236,6 @@ class ManagerRequestController extends Controller
             //Log Message
             $message = "Request ID: " . $rid . ", request is delivered and mark as completed.";
 
-            if ($user_type === 'manager') {
-                $user_type = $user_type . " (" . $user_name . ")";
-            }
-
             // Log the data to the logs table
             Log::create([
                 'user_id' => $user_id,
@@ -360,10 +282,6 @@ class ManagerRequestController extends Controller
 
             //Log Message
             $message = "Request ID: " . $rid . ", request is delivered.";
-
-            if ($user_type === 'manager') {
-                $user_type = $user_type . " (" . $user_name . ")";
-            }
 
             // Log the data to the logs table
             Log::create([
@@ -416,6 +334,8 @@ class ManagerRequestController extends Controller
         $today = $request->input('today');
         $yesterday = $request->input('yesterday');
         $thisMonth = $request->input('this-month');
+        $dateFrom = $request->input('from');
+        $dateTo = $request->input('to');
 
         $user = Auth::user();
         $user_id = $user->id;
@@ -450,14 +370,13 @@ class ManagerRequestController extends Controller
                 ->where('accepted_by_user_id', $user_id)
                 ->orderBy('updated_at', 'desc')
                 ->get();
-        } else {
+        } else if ($dateFrom && $dateTo) {
 
-            $from = $request->input('from');
-            $to = $request->input('to');
-            $date_to = date('Y-m-d H:i:s', strtotime($to . ' +1 day'));
+            $from = date('Y-m-d', strtotime($dateFrom));
+            $to = date('Y-m-d', strtotime($dateTo . ' +1 day'));
 
             $data = ModelsRequest::where('status', 'completed')
-                ->whereBetween('updated_at', [$from, $date_to])
+                ->whereBetween('updated_at', [$from, $to])
                 ->where('accepted_by_user_id', $user_id)
                 ->orderBy('updated_at', 'desc')
                 ->get();

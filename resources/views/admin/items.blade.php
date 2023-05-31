@@ -4,6 +4,17 @@ use Illuminate\Support\Facades\Session
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
+<style>
+    .level {
+        text-decoration: none;
+        color: black;
+    }
+
+    .level:hover {
+        text-decoration: underline;
+        color: black;
+    }
+</style>
 <div class="container-fluid ">
     <div class="row min-vh-100">
         <div class="col-md-3 col-lg-2 sidebar p-0 bg-dark ">
@@ -48,19 +59,25 @@ use Illuminate\Support\Facades\Session
                     <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
                         <div class="container-sm d-flex p-0" style="align-items: center;">
                             <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#00CDCD">&nbsp;</div>
-                            <p class="m-0">Over Max Limit</p>
+                            <p class="m-0"><a href="{{ route('admin.items') }}?filter=max" class="level">Over Max Limit</a></p>
                         </div>
                         <div class="container-sm d-flex p-0" style="align-items: center;">
                             <div class="m-1" style="width:40px;height:100%;background-color:#1ea200">&nbsp;</div>
-                            <p class="m-0">Safe Level</p>
+                            <p class="m-0"><a href="{{ route('admin.items') }}?filter=safe" class="level">Safe Level</a></p>
                         </div>
                         <div class="container-sm d-flex p-0" style="align-items: center;">
                             <div class="m-1" style="width:40px;height:100%;background-color:#d67b00">&nbsp;</div>
-                            <p class="m-0">Warning Level</p>
+                            <p class="m-0"><a href="{{ route('admin.items') }}?filter=warning" class="level">Warning Level</a></p>
                         </div>
                         <div class="container-sm d-flex p-0" style="align-items: center;">
                             <div class="m-1" style="width:40px;height:100%;background-color:#dc0f00">&nbsp;</div>
-                            <p class="m-0">No Stocks</p>
+                            <p class="m-0"><a href="{{ route('admin.items') }}?filter=no-stocks" class="level">No Stocks</a></p>
+                        </div>
+                    </div>
+                    <div class="container-sm m-0 p-0" style="width:100%;max-width:300px;">
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcd772">&nbsp;</div>
+                            <p class="m-0">Has Expired/Expiring Stocks</p>
                         </div>
                     </div>
 
@@ -100,7 +117,7 @@ use Illuminate\Support\Facades\Session
                         </thead>
                         <tbody>
                             @forelse($items as $item)
-                            <tr style="border-bottom: 1px black solid;">
+                            <tr style="border-bottom: 1px black solid;{{ $item->hasExpiredStocks || $item->isExpiringSoon ? 'background-color:#fcd772' : '' }}">
                                 <th style="align-content:center">{{ $item->id }}</th>
                                 <td class="text-capitalize">{{ $item->name }}</td>
                                 <td class="text-capitalize">{{ $item->description }}</td>

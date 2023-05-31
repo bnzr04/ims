@@ -47,7 +47,7 @@ use Illuminate\Support\Facades\Session;
                                 <select name="dept" class="form-control" id="dept" style="text-transform:capitalize;">
                                     <option value="{{ $user->dept == 'pharmacy' ? 0 : ( $user->dept == 'csr' ? 1 : '' ) }}">{{ $user->type == 'manager' ? $user->dept : '' }}</option>
                                     <option value="0">Pharmacy</option>
-                                    <option value="1">Csr</option>
+                                    <!-- <option value="1">Csr</option> -->
                                 </select>
                                 @error('dept')
                                 <div class="alert alert-danger">{{ $message }}</div>

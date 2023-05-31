@@ -81,11 +81,18 @@
     window.APP_URL = "{{ url('') }}";
 
     // Get today's date
-    var today = new Date().toISOString().split('T')[0];
+    var today = new Date();
 
-    // Set the maximum value for a date input field to today's date
-    document.getElementById("date_from").setAttribute("max", today);
-    document.getElementById("date_to").setAttribute("max", today);
+    // Get tomorrow's date
+    var tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Format tomorrow's date as a string
+    var tomorrowString = tomorrow.toISOString().split('T')[0];
+
+    // Set the maximum value for a date input field to tomorrow's date
+    document.getElementById("date_from").setAttribute("max", tomorrowString);
+    document.getElementById("date_to").setAttribute("max", tomorrowString);
 
     const tableTitle = document.getElementById("title");
 
@@ -112,7 +119,7 @@
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='10'>No request...</td></tr>";
                 }
             } else {
                 console.log('Error: ' + xhr.status);
@@ -155,7 +162,7 @@
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='10'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);
@@ -194,7 +201,7 @@
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='10'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);
@@ -233,7 +240,7 @@
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>No request...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='10'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);
@@ -250,18 +257,22 @@
     form.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const fromDate = new Date(fromDateInput.value);
-        const toDate = new Date(toDateInput.value);
+        var fromDate = fromDateInput.value;
+        var toDate = toDateInput.value;
 
-        // Format the dates into a readable format
-        const options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        };
+        var fromDateStr = new Date(fromDate);
+        var toDateStr = new Date(toDate);
 
-        const fromDateStr = fromDate.toLocaleDateString('en-US', options);
-        const toDateStr = toDate.toLocaleDateString('en-US', options);
+        var monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        var fromFormattedDate = monthNames[fromDateStr.getMonth()] + " " +
+            fromDateStr.getDate() + ", " + fromDateStr.getFullYear();
+
+        var toFormattedDate = monthNames[toDateStr.getMonth()] + " " +
+            toDateStr.getDate() + ", " + toDateStr.getFullYear();
 
         const xhr = new XMLHttpRequest();
         xhr.open('GET', `{{ route('manager.filter-transaction') }}?from=${fromDate}&to=${toDate}`);
@@ -271,7 +282,7 @@
                 var transaction_table = document.querySelector('#transaction_table');
                 transaction_table.innerHTML = '';
 
-                tableTitle.innerHTML = "From " + fromDateStr + " to " + toDateStr;
+                tableTitle.innerHTML = "From " + fromFormattedDate + " to " + toFormattedDate;
                 // console.log(data);
 
                 for (var i = 0; i < data.length; i++) {
@@ -284,7 +295,7 @@
                 }
 
                 if (data.length === 0) {
-                    transaction_table.innerHTML += "<tr><td colspan='8'>Norequest...</td></tr>";
+                    transaction_table.innerHTML += "<tr><td colspan='10'>No request...</td></tr>";
                 }
             } else {
                 var data = JSON.parse(xhr.responseText);

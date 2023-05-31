@@ -158,9 +158,12 @@ class RequestController extends Controller
         return view('user.sub-page.view-request');
     }
 
-    public function viewRequest($request, $filter)
+    public function viewRequest(Request $requests, $request, $filter)
     {
         $user_id = Auth::user()->id;
+
+        $date_from = $requests->input("date_from");
+        $date_to = $requests->input("date_to");
 
         if ($filter === "today") {
             $from = Carbon::now()->startOfDay();
@@ -171,6 +174,13 @@ class RequestController extends Controller
         } else if ($filter === "this-month") {
             $from = Carbon::now()->startOfMonth();
             $to = Carbon::now()->endOfMonth();
+        } else if ($date_from && $date_to) {
+
+            $from = date('Y-m-d', strtotime($date_from));
+            $to = date('Y-m-d', strtotime($date_to . '+1day'));
+
+            $dateFrom = Carbon::parse($from)->format('F j, Y');
+            $dateTo = Carbon::parse(strtotime($date_to . '+1day'))->format('F j, Y');
         }
 
         if ($request === 'pending') {
@@ -215,12 +225,23 @@ class RequestController extends Controller
             $item->formatted_date = Carbon::parse($item->created_at)->format('F j, Y, g:i:s a');
         }
 
-        return view('user.sub-page.view-request')->with([
-            'items' => $items,
-            'title' => $title,
-            'filter' => $filter,
-            'request' => $request
-        ]);
+        if ($date_from && $date_to) {
+            return view('user.sub-page.view-request')->with([
+                'items' => $items,
+                'title' => $title,
+                'filter' => $filter,
+                'request' => $request,
+                'dateFrom' => $dateFrom,
+                'dateTo' => $dateTo,
+            ]);
+        } else {
+            return view('user.sub-page.view-request')->with([
+                'items' => $items,
+                'title' => $title,
+                'filter' => $filter,
+                'request' => $request
+            ]);
+        }
     }
 
     public function itemRequest(Request $request, $id)
@@ -469,7 +490,7 @@ class RequestController extends Controller
 
 
     //this will mark status as received
-    public function receiveRequest($rid)
+    public function receiveRequest(Request $request, $rid)
     {
         //Enable Query Log
         DB::enableQueryLog();
@@ -480,8 +501,11 @@ class RequestController extends Controller
         $user_type = $user->type;
         $user_name = $user->name;
 
+        $receiverName = $request->receiver_name;
+
         $request = ModelsRequest::find($rid);
         if ($request) {
+            $request->receiver = $receiverName;
             $request->status = 'completed';
             $request->save();
 

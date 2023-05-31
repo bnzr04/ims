@@ -1,6 +1,9 @@
 @php
 use Illuminate\Support\Facades\Session
 @endphp
+@php
+use Carbon\Carbon
+@endphp
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
@@ -46,6 +49,23 @@ use Illuminate\Support\Facades\Session
                     <h4>TOTAL STOCKS: <span class="total_quantity" data-warning-level="{{ $item->warning_level }}" data-max-limit="{{ $item->max_limit }}">{{ $total_stocks }}</span></h4>
                 </div>
 
+                <div class="container-sm p-0 mt-2 d-flex">
+                    <div class="container-sm m-0 p-0" style="width:100%;max-width:400px;">
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fa9a93">&nbsp;</div>
+                            <p class="m-0">Expired</p>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fa9f50">&nbsp;</div>
+                            <p class="m-0">Less Than Month Before Expiration</p>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcc74c">&nbsp;</div>
+                            <p class="m-0">1 Month Before Expiration</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="container-lg p-0 pb-3 pt-2 px-2 shadow-lg rounded">
                     <div class="container-lg p-0 overflow-auto" style="max-height: 300px;">
 
@@ -70,7 +90,7 @@ use Illuminate\Support\Facades\Session
                             <tbody>
 
                                 @foreach($stocks as $stock)
-                                <tr>
+                                <tr style="{{ $stock->exp_date <= Carbon::now()->format('Y-m-d') ? 'background-color:#fa9a93' : ($stock->exp_date < Carbon::now()->addMonth()->format('Y-m-d') ? 'background-color:#fa9f50' : ($stock->exp_date <= Carbon::now()->addMonth()->format('Y-m-d') ? 'background-color:#fcc74c' : '')) }}">
                                     <th>{{ $stock->id }}</th>
                                     <td>{{ $stock->created_at }}</td>
                                     <td>{{ $stock->updated_at }}</td>

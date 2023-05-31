@@ -82,7 +82,7 @@ class LogController extends Controller
     public function endLog($user_id, $user_type, $user_dept, $message)
     {
         if ($user_type === 'manager') {
-            $user_type = $user_type . " (" . $user_dept . ")";
+            $user_type = $user_type;
         }
 
         // Get the SQL query being executed

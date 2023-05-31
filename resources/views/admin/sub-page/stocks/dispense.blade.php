@@ -81,10 +81,10 @@
                         @csrf
                         <div class="container-lg d-flex" style="width:100%;align-items: center;">
                             <label for="date_from">From</label>
-                            <input type="date" class="form-control mx-1" name="date_from" id="date_from" required>
+                            <input type="date" class="form-control mx-1" name="date_from" id="date_from1" required>
 
                             <label for="date_to">To</label>
-                            <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY" required>
+                            <input type="date" class="form-control mx-1" name="date_to" id="date_to1" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY" required>
                             <button type="submit" title="Download Specific Date Report" class="btn btn-outline-success">Download</button>
                         </div>
                     </form>
@@ -95,12 +95,21 @@
 </div>
 <script>
     // Get today's date
-    var today = new Date().toISOString().split('T')[0];
+    var today = new Date();
 
-    // Set the maximum value for a date input field to today's date
-    document.getElementById("date_from").setAttribute("max", today);
-    document.getElementById("date_to").setAttribute("max", today);
+    // Get tomorrow's date
+    var tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
 
+    // Format tomorrow's date as a string
+    var tomorrowString = tomorrow.toISOString().split('T')[0];
+
+    // Set the maximum value for a date input field to tomorrow's date
+    document.getElementById("date_from").setAttribute("max", tomorrowString);
+    document.getElementById("date_to").setAttribute("max", tomorrowString);
+
+    document.getElementById("date_from1").setAttribute("max", tomorrowString);
+    document.getElementById("date_to1").setAttribute("max", tomorrowString);
 
     function showDispense() {
         var xhr = new XMLHttpRequest();

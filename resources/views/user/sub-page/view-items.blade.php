@@ -21,6 +21,9 @@
                                 <th scope="col" style="border: white 1px solid;">Requester</th>
                                 <th scope="col" style="border: white 1px solid;">Request To</th>
                                 <th scope="col" style="border: white 1px solid;">Request status</th>
+                                @if($request->status === "completed")
+                                <th scope="col" style="border: white 1px solid;">Receiver</th>
+                                @endif
                                 @if(!is_null($request->accepted_by_user_name))
                                 <th scope="col" style="border: white 1px solid;">Accepted By</th>
                                 @endif
@@ -34,6 +37,9 @@
                                 <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ $request->request_by }}</td>
                                 <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ $request->request_to }}</td>
                                 <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ $request->status }}</td>
+                                @if($request->status === "completed")
+                                <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ is_null($request->receiver) ? "-" : $request->receiver }}</td>
+                                @endif
                                 @if(!is_null($request->accepted_by_user_name))
                                 <td scope="col" class="text-capitalize" style="border: gray 1px solid;">{{ is_null($request->accepted_by_user_name) ? "-" : $request->accepted_by_user_name }}</td>
                                 @endif
@@ -107,23 +113,23 @@
                         @csrf
                         <div class="container-md d-flex m-0 p-0" style="flex-direction:column;">
                             <div class="container-md p-0">
-                                <label for="receiver_name" class="px-1"><strong>RECEIVER NAME</strong></label>
+                                <label for="receiver_name" class="px-1" style="letter-spacing: 3px;"><strong>RECEIVER NAME</strong></label>
                             </div>
 
                             <div class="container-md p-0 mt-2">
                                 <div class="container-md">
                                     <label for="requester">Requester</label>
-                                    <input type="radio" name="receiver_name" id="requester" value="{{ $request->request_by }}" onchange="checkOtherOption()">
+                                    <input type="radio" name="receiver_name" id="requester" onchange="getRequesterValue()" value="{{ $request->request_by }}" checked>
                                 </div>
 
                                 <div class="container-md">
                                     <label for="other">Other</label>
-                                    <input type="radio" name="receiver_name" id="other" onchange="checkOtherOption()">
-                                    <input type="text" class="form-control" name="receiver_name" id="receiver_name" style="max-width: 400px; display:none;">
+                                    <input type="radio" name="receiver_name" id="other" onchange="getOtherRequesterValue()">
+                                    <input type="text" class="form-control" id="receiver_name" style="max-width: 300px;" oninput="onInputReceiverName()">
                                 </div>
 
-                                <div class="container-md mt-1">
-                                    <button type="submit" class="btn btn-warning shadow">Received</button>
+                                <div class="container-md mt-3">
+                                    <button type="submit" class="btn btn-warning shadow" style="letter-spacing: 3px;">Received</button>
                                 </div>
                             </div>
                         </div>
@@ -135,20 +141,46 @@
     </div>
 </div>
 <script>
-    function checkOtherOption() {
-        const requesterRadio = document.getElementById("requester");
-        const otherRadio = document.getElementById("other");
-        const receiverNameInput = document.getElementById("receiver_name");
+    const requesterRadio = document.getElementById("requester");
+    const otherRadio = document.getElementById("other");
+    const receiverNameInput = document.getElementById("receiver_name");
 
-        if (otherRadio.checked) {
-            const receiverName = receiverNameInput.value;
-            receiverNameInput.style.display = "block";
-            console.log(receiverName);
-        } else if (requesterRadio.checked) {
-            receiverNameInput.value = "";
-            receiverNameInput.style.display = "none";
+    if (requesterRadio.checked) {
+        if (requesterRadio.value !== "") {
             console.log(requesterRadio.value);
         }
+    }
+
+    function getOtherRequesterValue() {
+        if (otherRadio.checked) {
+            receiverNameInput.required = true;
+            if (receiverNameInput.value.trim() !== "") {
+                otherRadio.value = receiverNameInput.value;
+                console.log(otherRadio.value);
+            } else {
+                receiverNameInput.required = true;
+            }
+        }
+    }
+
+    function onInputReceiverName() {
+        receiverNameInput.required = true;
+        if (receiverNameInput.value.trim() !== "") {
+            otherRadio.value = receiverNameInput.value.trim();
+            console.log(otherRadio.value);
+            receiverNameInput.setCustomValidity("");
+        } else {
+            receiverNameInput.setCustomValidity("Receiver name is required.");
+            console.log(otherRadio.value);
+        }
+    }
+
+    function getRequesterValue() {
+        receiverNameInput.setCustomValidity("");
+        receiverNameInput.required = false;
+        receiverName = requesterRadio.value;
+        requesterRadio.value = receiverName;
+        console.log(receiverName);
     }
 </script>
 @endsection

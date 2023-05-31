@@ -40,7 +40,7 @@ class StocksController extends Controller
     public function endLog($user_id, $user_type, $user_dept, $message)
     {
         if ($user_type === 'manager') {
-            $user_type = $user_type . " (" . $user_dept . ")";
+            $user_type = $user_type;
         }
 
         // Get the SQL query being executed
@@ -84,13 +84,40 @@ class StocksController extends Controller
     public function stocks(Request $request)
     {
         $user = Auth::user();
+
+        //This will initiate all the categories available
         $categories = Item::distinct('category')->pluck('category');
 
+        //This will will get the request from search input
         $search = $request->input("search");
+
+        //This will will get the request from filter input
+        $filter = $request->input('filter');
 
         //get the requested category
         $category = $request->category;
 
+        $stocks = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
+            ->select(
+                'items.id',
+                'items.name',
+                'items.description',
+                'items.category',
+                'items.max_limit',
+                'items.warning_level',
+                DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
+                DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
+                DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
+            )
+            ->groupBy(
+                'items.id',
+                'items.name',
+                'items.description',
+                'items.category',
+                'items.max_limit',
+                'items.warning_level'
+            )
+            ->orderBy('name');
 
         if ($category) {
             $stocks = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
@@ -114,8 +141,8 @@ class StocksController extends Controller
                     'items.warning_level',
                 )
                 ->where('items.category', $category)
-                ->get();
-        } elseif ($search) {
+                ->orderBy('name');
+        } else if ($search) {
             $stocks = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
                 ->select(
                     'items.id',
@@ -140,30 +167,38 @@ class StocksController extends Controller
                     'items.max_limit',
                     'items.warning_level',
                 )
-                ->orderBy('name')
-                ->get();
-        } else {
-            $stocks = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select(
-                    'items.id',
-                    'items.name',
-                    'items.description',
-                    'items.category',
-                    'items.max_limit',
-                    'items.warning_level',
-                    DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
-                    DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
-                    DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
-                )
-                ->groupBy(
-                    'items.id',
-                    'items.name',
-                    'items.description',
-                    'items.category',
-                    'items.max_limit',
-                    'items.warning_level'
-                )
-                ->get();
+                ->orderBy('name');
+        } else if ($filter === 'max') {
+            $stocks = $stocks->havingRaw('total_quantity > items.max_limit')->orderBy('items.name');
+        } else if ($filter === 'max') {
+            $stocks = $stocks->havingRaw('total_quantity > items.max_limit')->orderBy('items.name');
+        } else if ($filter === 'safe') {
+            $stocks = $stocks->havingRaw('total_quantity <= items.max_limit AND total_quantity >= (items.max_limit * (items.warning_level / 100))')->orderBy('items.name');
+        } else if ($filter === 'warning') {
+            $stocks = $stocks->havingRaw('total_quantity < items.max_limit * (warning_level / 100)')->orderBy('items.name');
+        } else if ($filter === 'no-stocks') {
+            $stocks = $stocks->whereNotIn('items.id', function ($query) {
+                $query->select('item_id')
+                    ->from('item_stocks')
+                    ->groupBy('item_id')
+                    ->havingRaw('SUM(stock_qty) IS NOT NULL');
+            })
+                ->orderBy('items.name');
+        }
+
+        $stocks = $stocks->get();
+
+        foreach ($stocks as $item) {
+            $hasExpiredStocks = Stock::where('item_id', $item->id)
+                ->where('exp_date', '<', Carbon::now()->format('Y-m-d'))
+                ->exists();
+
+            $isExpiringSoon = Stock::where('item_id', $item->id)
+                ->where('exp_date', '<=', Carbon::now()->addMonth()->format('Y-m-d'))
+                ->exists();
+
+            $item->hasExpiredStocks = $hasExpiredStocks;
+            $item->isExpiringSoon = $isExpiringSoon;
         }
 
         if ($user->type === 'manager') {
@@ -201,7 +236,7 @@ class StocksController extends Controller
                     ->get();
 
                 foreach ($stocks as $stock) {
-                    $stock->exp_date = Carbon::parse($stock->exp_date)->format("m-d-Y");
+                    $stock->exp_date = Carbon::parse($stock->exp_date)->format("Y-m-d");
                 }
 
                 //get total stocks by item id
@@ -210,6 +245,7 @@ class StocksController extends Controller
                     ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
                     ->get();
             }
+
             if ($stocks) {
                 return view('manager.sub-page.stocks.add-to-stock')->with([
                     'item' => $item,
@@ -231,7 +267,7 @@ class StocksController extends Controller
                 ->get();
 
             foreach ($stocks as $stock) {
-                $stock->exp_date = Carbon::parse($stock->exp_date)->format("m-d-Y");
+                $stock->exp_date = Carbon::parse($stock->exp_date)->format("Y-m-d");
             }
 
 

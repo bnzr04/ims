@@ -41,37 +41,25 @@
     const delivered = document.getElementById("delivered-request");
     const completed = document.getElementById("completed-request");
 
-    setInterval(function() {
+    function dataUpdate() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', "{{ route('user.dashboard-data') }}", true);
         xhr.onload = function() {
             if (xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
-                console.log(data);
+                // console.log(data);
 
-                // setInterval(function() {
                 pending.innerHTML = "";
                 pending.innerHTML = data.pending;
-                // console.log(data.pending);
-                // }, 1000);
 
-                // setInterval(function() {
                 accepted.innerHTML = "";
                 accepted.innerHTML = data.accepted;
-                // console.log(data.accepted);
-                // }, 1000);
 
-                // setInterval(function() {
                 delivered.innerHTML = "";
                 delivered.innerHTML = data.delivered;
-                // console.log(data.delivered);
-                // }, 1000);
 
-                // setInterval(function() {
                 completed.innerHTML = "";
                 completed.innerHTML = data.completed;
-                // console.log(data.completed);
-                // }, 1000);
 
             } else {
                 console.log('Error: ' + xhr.status);
@@ -79,6 +67,9 @@
         };
 
         xhr.send();
-    }, 1000);
+    }
+
+    dataUpdate();
+    setInterval(dataUpdate, 10000);
 </script>
 @endsection

@@ -17,24 +17,6 @@ class AdminRequestController extends Controller
     //this will show the request view
     public function adminRequest()
     {
-        // $pending = ModelsRequest::where('status', 'pending')
-        //     ->orderByDesc('updated_at')->get()->each(function ($pending) {
-        //         $pending->formatted_date = Carbon::parse($pending->updated_at)->format('F j, Y, g:i:s a');
-        //     });
-        // $accepted = ModelsRequest::where('status', 'accepted')
-        //     ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-        //         $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-        //     });
-        // $delivered = ModelsRequest::where('status', 'delivered')
-        //     ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-        //         $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-        //     });
-        // $completed = ModelsRequest::where('status', 'completed')
-        //     ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-        //         $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-        //     });
-
-
         return view('admin.request');
     }
 
@@ -44,14 +26,9 @@ class AdminRequestController extends Controller
             ->orderByDesc('updated_at')->get()->each(function ($pending) {
                 $pending->formatted_date = Carbon::parse($pending->created_at)->format('F j, Y, g:i:s a');
             });
-        // $completed = ModelsRequest::where('status', 'completed')
-        //     ->orderByDesc('updated_at')->get()->each(function ($accepted) {
-        //         $accepted->formatted_date = Carbon::parse($accepted->updated_at)->format('F j, Y, g:i:s a');
-        //     });
 
         $requests = [
             'pending' => $pending,
-            // 'completed' => $completed,
 
         ];
 
@@ -133,7 +110,6 @@ class AdminRequestController extends Controller
         $items = Request_Item::where('request_id', $id)->get();
 
         $requestItems = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            // ->join('item_stocks', 'request_items.stock_id', '=', 'item_stocks.id')
             ->select('request_items.*', 'items.*')
             ->where('request_items.request_id', $id)
             ->orderBy('request_items.created_at', 'asc')
@@ -323,14 +299,24 @@ class AdminRequestController extends Controller
     //get transactions/request data
     public function showTransaction()
     {
-        $transc = ModelsRequest::where('status', 'completed')->orderBy('updated_at', 'desc')->get();
+        $user = Auth::user();
+        $user_id = $user->id;
 
-        foreach ($transc as $trans) {
+        $from = Carbon::now()->startOfDay();
+        $to = Carbon::now()->endOfDay();
+
+        $data = ModelsRequest::where('status', 'completed')
+            ->whereBetween('updated_at', [$from, $to])
+            ->where('accepted_by_user_id', $user_id)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        foreach ($data as $trans) {
             $trans->formatted_date =
                 Carbon::parse($trans->updated_at)->format('F j, Y, g:i:s a');
         }
 
-        return response()->json($transc);
+        return response()->json($data);
     }
 
     //filter transaction

@@ -92,6 +92,7 @@
         xhr.send();
     }
 
-    setInterval(dashboard, 1000);
+    dashboard();
+    setInterval(dashboard, 10000);
 </script>
 @endsection

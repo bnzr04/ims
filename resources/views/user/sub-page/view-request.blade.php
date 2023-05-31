@@ -42,17 +42,19 @@ use Illuminate\Support\Facades\Session
                                     <a href="{{ route('user.viewRequest', ['request' => $title, 'filter' => 'this-week']) }}" class="btn btn-outline-success">This Week</a>
                                     <a href="{{ route('user.viewRequest', ['request' => $title, 'filter' => 'this-month']) }}" class="btn btn-outline-success">This Month</a>
                                 </div>
-                                <div class="d-flex" style="align-items: center;width:100%;max-width:500px">
-                                    <label for="date_from">From</label>
-                                    <input type="date" class="form-control mx-1" name="date_from" id="date_from">
+                                <form action="{{ route('user.viewRequest',['request' => $title,'filter' => 'filter']) }}">
+                                    <div class="d-flex" style="align-items: center;width:100%;max-width:500px">
+                                        <label for="date_from">From</label>
+                                        <input type="date" class="form-control mx-1" name="date_from" id="date_from" required>
 
-                                    <label for="date_to">To</label>
-                                    <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY">
-                                    <button type="submit" class="btn btn-outline-success">Filter</button>
-                                </div>
+                                        <label for="date_to">To</label>
+                                        <input type="date" class="form-control mx-1" name="date_to" id="date_to" pattern="\d{2}/\d{2}/\d{4}" placeholder="MM/DD/YYYY" required>
+                                        <button type="submit" class="btn btn-outline-success">Filter</button>
+                                    </div>
+                                </form>
                             </div>
                             <div class="container-lg p-0 mt-2">
-                                <h5>{{ $filter == "today" ? "Today" : ($filter == "this-week" ? "This Week" : ($filter == "this-month" ? "This Month" : "")) }} Requests</h5>
+                                <h5>{{ $filter == "today" ? "Today" : ($filter == "this-week" ? "This Week" : ($filter == "this-month" ? "This Month" : ($filter === "filter" ? "From " . $dateFrom . " - " . $dateTo : ""))) }} Requests</h5>
                             </div>
                         </div>
                     </div>
@@ -107,5 +109,19 @@ use Illuminate\Support\Facades\Session
     setTimeout(function() {
         alert.remove();
     }, 3000);
+
+    // Get today's date
+    var today = new Date();
+
+    // Get tomorrow's date
+    var tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Format tomorrow's date as a string
+    var tomorrowString = tomorrow.toISOString().split('T')[0];
+
+    // Set the maximum value for a date input field to tomorrow's date
+    document.getElementById("date_from").setAttribute("max", tomorrowString);
+    document.getElementById("date_to").setAttribute("max", tomorrowString);
 </script>
 @endsection

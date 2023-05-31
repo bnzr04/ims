@@ -68,10 +68,17 @@
 </div>
 <script>
     // Get today's date
-    var today = new Date().toISOString().split('T')[0];
+    var today = new Date();
 
-    // Set the maximum value for a date input field to today's date
-    document.getElementById("date_from").setAttribute("max", today);
-    document.getElementById("date_to").setAttribute("max", today);
+    // Get tomorrow's date
+    var tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Format tomorrow's date as a string
+    var tomorrowString = tomorrow.toISOString().split('T')[0];
+
+    // Set the maximum value for a date input field to tomorrow's date
+    document.getElementById("date_from").setAttribute("max", tomorrowString);
+    document.getElementById("date_to").setAttribute("max", tomorrowString);
 </script>
 @endsection

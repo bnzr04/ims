@@ -79,59 +79,53 @@ use Illuminate\Support\Facades\Session
     const title = document.getElementById("title");
     const requestTbody = document.querySelector('#request_table');
 
-    var pendingInterval = setInterval(pendingUpdate, 1000);
+    var pendingInterval = setInterval(pendingUpdate, 10000);
     var acceptedInterval;
     var deliveredInterval;
 
     function pendingCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('admin.show-pending-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data);
-                    pendingCountOutput.innerHTML = data.pendingCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
+        $.ajax({
+            url: "{{ route('admin.show-pending-requests') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // console.log(data);
+                pendingCountOutput.innerHTML = data.pendingCount;
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + xhr.status);
+            }
+        });
     }
 
     function acceptedCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('admin.show-accepted-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.acceptedCount);
-                    acceptedCountOutput.innerHTML = data.acceptedCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
+        $.ajax({
+            url: "{{ route('admin.show-accepted-requests') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // console.log(data.acceptedCount);
+                acceptedCountOutput.innerHTML = data.acceptedCount;
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + xhr.status);
+            }
+        });
     }
 
     function deliveredCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('admin.show-delivered-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.deliveredCount);
-                    deliveredCountOutput.innerHTML = data.deliveredCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
+        $.ajax({
+            url: "{{ route('admin.show-delivered-requests') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // console.log(data.deliveredCount);
+                deliveredCountOutput.innerHTML = data.deliveredCount;
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + xhr.status);
+            }
+        });
     }
 
     function pendingUpdate() {
@@ -142,7 +136,7 @@ use Illuminate\Support\Facades\Session
             if (xhr.status === 200) {
                 var data = xhr.response;
                 title.innerHTML = "Pending request";
-                // console.log(data);
+                console.log(data);
                 // Update the table with the new data
 
                 requestTbody.innerHTML = "";
@@ -166,16 +160,7 @@ use Illuminate\Support\Facades\Session
         xhr.send();
     }
 
-    pendingForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        pendingInterval = setInterval(pendingUpdate, 1000);
-    });
-
-    acceptedForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        clearInterval(pendingInterval);
+    function acceptedUpdate() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "{{ route('admin.show-accepted-requests') }}");
         xhr.responseType = "json";
@@ -204,12 +189,9 @@ use Illuminate\Support\Facades\Session
             }
         };
         xhr.send();
-    });
+    }
 
-    deliveredForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        clearInterval(pendingInterval);
+    function deliveredUpdate() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "{{ route('admin.show-delivered-requests') }}");
         xhr.responseType = "json";
@@ -238,12 +220,39 @@ use Illuminate\Support\Facades\Session
             }
         };
         xhr.send();
+    }
+
+    pendingForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        pendingUpdate();
+        pendingInterval = setInterval(pendingUpdate, 10000);
     });
 
+    acceptedForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        clearInterval(pendingInterval);
+        acceptedUpdate();
+    });
+
+    deliveredForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        clearInterval(pendingInterval);
+        deliveredUpdate();
+    });
 
     pendingCount();
     acceptedCount();
     deliveredCount();
+
+    var pendingCountInterval = setInterval(pendingCount, 10000);
+    var acceptedCountInterval = setInterval(acceptedCount, 10000);
+    var deliveredCountInterval = setInterval(deliveredCount, 10000);
+
+    pendingUpdate();
+
 
     setTimeout(function() {
         document.getElementById('alert').style.display = 'none';

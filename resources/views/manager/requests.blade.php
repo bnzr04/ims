@@ -88,7 +88,7 @@ use Illuminate\Support\Facades\Session
     const title = document.getElementById("title");
     const requestTbody = document.querySelector('#request_table');
 
-    var pendingInterval = setInterval(pendingUpdate, 1000);
+    var pendingInterval = setInterval(pendingUpdate, 30000);
     var acceptedInterval;
     var deliveredInterval;
 
@@ -101,63 +101,57 @@ use Illuminate\Support\Facades\Session
     var previousCount = 0;
 
     function pendingCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('manager.show-pending-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.pending);
-                    var currentCount = data.pending.length;
+        $.ajax({
+            url: "{{ route('manager.show-pending-requests') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // console.log(data.pendingCount);
+                var currentCount = data.pending.length;
 
-                    if (currentCount > previousCount) {
-                        playNotificationSound();
-                        console.log(currentCount);
-                    }
-
-                    previousCount = currentCount;
-
-                    pendingCountOutput.innerHTML = data.pendingCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
+                if (currentCount > previousCount) {
+                    playNotificationSound();
+                    // console.log(currentCount);
                 }
-            });
-        }, 1000);
+
+                previousCount = currentCount;
+
+                pendingCountOutput.innerHTML = data.pendingCount;
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + xhr.status);
+            }
+        });
     }
 
     function acceptedCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('manager.show-accepted-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.acceptedCount);
-                    acceptedCountOutput.innerHTML = data.acceptedCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
+        $.ajax({
+            url: "{{ route('manager.show-accepted-requests') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // console.log(data.acceptedCount);
+                acceptedCountOutput.innerHTML = data.acceptedCount;
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + xhr.status);
+            }
+        });
     }
 
     function deliveredCount() {
-        setInterval(function() {
-            $.ajax({
-                url: "{{ route('manager.show-delivered-requests') }}",
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // console.log(data.deliveredCount);
-                    deliveredCountOutput.innerHTML = data.deliveredCount;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error: ' + xhr.status);
-                }
-            });
-        }, 1000);
+        $.ajax({
+            url: "{{ route('manager.show-delivered-requests') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // console.log(data.deliveredCount);
+                deliveredCountOutput.innerHTML = data.deliveredCount;
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + xhr.status);
+            }
+        });
     }
 
     function pendingUpdate() {
@@ -194,7 +188,8 @@ use Illuminate\Support\Facades\Session
 
     pendingForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        pendingInterval = setInterval(pendingUpdate, 1000);
+        pendingUpdate();
+        pendingInterval = setInterval(pendingUpdate, 30000);
     });
 
     acceptedForm.addEventListener('submit', (event) => {
@@ -268,6 +263,12 @@ use Illuminate\Support\Facades\Session
     pendingCount();
     acceptedCount();
     deliveredCount();
+
+    var pendingCountInterval = setInterval(pendingCount, 30000);
+    var acceptedCountInterval = setInterval(acceptedCount, 30000);
+    var deliveredCountInterval = setInterval(deliveredCount, 30000);
+
+    pendingUpdate();
 
     setTimeout(function() {
         document.getElementById('alert').style.display = 'none';

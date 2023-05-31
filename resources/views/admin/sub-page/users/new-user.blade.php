@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Session;
                                 <select name="dept" class="form-control" id="dept">
                                     <option value="">Select</option>
                                     <option value="0">Pharmacy</option>
-                                    <option value="1">Csr</option>
+                                    <!-- <option value="1">Csr</option> -->
                                 </select>
                                 @error('dept')
                                 <div class="alert alert-danger">{{ $message }}</div>
