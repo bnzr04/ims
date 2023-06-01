@@ -33,6 +33,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/', [HomeController::class, 'login'])->name('home');
     Route::get('/login', [HomeController::class, 'login'])->name('login');
     Route::get('/info', [HomeController::class, 'showInfo'])->name('info');
+    Route::get('/add-to-stocks/{id}', [HomeController::class, 'addToStocks'])->name('add-to-stocks');
     Route::get('/dashboard-display', [HomeController::class, 'dashboardDisplay'])->name('dashboard-display');
 });
 
