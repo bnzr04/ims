@@ -19,13 +19,13 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <div class="container-lg">
+                <div class="container-fluid">
                     <a href="{{ route('manager.stocks') }}" class="btn btn-secondary mt-2 mb-1">Back</a>
                     <hr>
                     <h2>STOCKS</h2>
                 </div>
-                <div class="container-lg">
-                    <div class="container-sm p-0 px- d-flex">
+                <div class="container-fluid">
+                    <div class="container-fluid p-0 px- d-flex">
                         <form action="" method="get">
                             <div class="input-group" style="width: 100%;max-width: 400px">
                                 <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search" value="{{ $search }}">
@@ -52,7 +52,7 @@
 
                     </div>
 
-                    <div class="container-sm p-0 mt-2 d-flex">
+                    <div class="container-fluid p-0 mt-2 d-flex">
 
                         <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
                             <div class="container-sm d-flex p-0" style="align-items: center;">
@@ -85,56 +85,51 @@
                                     @csrf
                                     <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                                 </form>
-
-                                <form action="{{ route('manager.dispense') }}" method="get" class="m-1">
-                                    <button class="btn btn-secondary">Dispense report</button>
-                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="container-lg px-2 pb-4 mb-4 rounded shadow bg-white">
 
 
-                    <div class=" container-lg p-0 border" style="height: 400px;overflow:auto;">
-                        <table class="table">
-                            <thead class="bg-success text-white" style="position: sticky;top: 0;">
-                                <tr>
-                                    <th scope="col">Item ID</th>
-                                    <th scope="col">Item Name</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Category</th>
-                                    <th scope="col">Batches</th>
-                                    <th scope="col">Total Stocks</th>
-                                    <th scope="col">Latest Date Stocked</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse( $stocks as $stock )
-                                <tr style="border-bottom: 1px black solid;{{ $stock->hasExpiredStocks || $stock->isExpiringSoon ? 'background-color:#fcd772' : ''}}">
-                                    <th scope="row">{{ $stock->id }}</th>
-                                    <th>{{ $stock->name }}</th>
-                                    <td>{{ $stock->description }}</td>
-                                    <td>{{ $stock->category }}</td>
-                                    <td>{{ $stock->stocks_batch}}</td>
-                                    <th class="total_quantity" data-warning-level="{{ $stock->warning_level }}" data-max-limit="{{ $stock->max_limit }}">{{ $stock->total_quantity }}</th>
-                                    <th>{{ $stock->latest_stock }}</th>
-                                    <td>
-                                        <a href="{{ route('manager.add-to-stocks', ['id' => $stock->id]) }}" class="btn btn-outline-secondary">View Batches</a>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="7">
-                                        No Item stock...
-                                    </td>
-
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                <div class=" container-fluid p-0 border">
+                    <table class="table">
+                        <thead class="bg-success text-white" style="position: sticky;top: 55;">
+                            <tr>
+                                <th scope="col">Item ID</th>
+                                <th scope="col">Item Name</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Unit</th>
+                                <th scope="col">Batches</th>
+                                <th scope="col">Total Stocks</th>
+                                <th scope="col">Latest Date Stocked</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse( $stocks as $stock )
+                            <tr style="border-bottom: 1px black solid;{{ $stock->hasExpiredStocks || $stock->isExpiringSoon ? 'background-color:#fcd772' : ''}}">
+                                <th scope="row">{{ $stock->id }}</th>
+                                <th>{{ $stock->name }}</th>
+                                <td>{{ $stock->description }}</td>
+                                <td>{{ $stock->category }}</td>
+                                <td>{{ $stock->unit }}</td>
+                                <td>{{ $stock->stocks_batch}}</td>
+                                <th class="total_quantity" data-warning-level="{{ $stock->warning_level }}" data-max-limit="{{ $stock->max_limit }}">{{ $stock->total_quantity }}</th>
+                                <th>{{ $stock->latest_stock }}</th>
+                                <td>
+                                    <a href="{{ route('manager.add-to-stocks', ['id' => $stock->id]) }}" class="btn btn-outline-secondary">View Batches</a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7">
+                                    No Item stock...
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

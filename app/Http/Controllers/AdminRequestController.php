@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Canceled_Request;
 use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
@@ -121,6 +122,39 @@ class AdminRequestController extends Controller
             'items' => $items,
             'requestItems' => $requestItems,
         ]);
+    }
+
+    public function viewRequest($id)
+    {
+        $request = ModelsRequest::where('id', $id)->first();
+        $request->formatted_date = Carbon::parse($request->created_at)->format('F j, Y, g:i:s a');
+
+        $items = Request_Item::where('request_id', $id)->get();
+
+        $requestItems = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
+            ->select('request_items.*', 'items.*')
+            ->where('request_items.request_id', $id)
+            ->orderBy('request_items.created_at', 'asc')
+            ->get();
+
+        $canceled = Canceled_Request::where('request_id', $id)->first();
+
+        if ($canceled) {
+            $canceled->format_date = Carbon::parse($canceled->created_at)->format('F j, Y, g:i:s a');
+
+            return view('admin.sub-page.requests.view-request')->with([
+                'request' => $request,
+                'items' => $items,
+                'requestItems' => $requestItems,
+                'canceled' => $canceled,
+            ]);
+        } else {
+            return view('admin.sub-page.requests.view-request')->with([
+                'request' => $request,
+                'items' => $items,
+                'requestItems' => $requestItems,
+            ]);
+        }
     }
 
     //this will change the status of request to accepted
@@ -263,115 +297,5 @@ class AdminRequestController extends Controller
         } else {
             return back()->with('error', 'Request failed to mark as complete');
         }
-    }
-
-    public function generate_receipt($rid)
-    {
-        $user = Auth::user();
-        $user_name = $user->name;
-        $request = ModelsRequest::find($rid);
-        $items = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            ->where('request_id', $rid)->get();
-        $total_amount = 0; // initialize total amount to 0
-        foreach ($items as $item) {
-            $stock = Stock::select('stock_qty')
-                ->where('id', $item->stock_id)
-                ->first();
-            $item->remaining = empty($stock->stock_qty) ? "0" : $stock->stock_qty;
-            $item->amount = number_format($item->quantity * $item->price, 2);
-            $total_amount += $item->quantity * $item->price; // add item amount to total amount
-        }
-        $total_amount = number_format($total_amount, 2); // format total amount with 2 decimal places
-        return view("pdf.request")->with([
-            'request' => $request,
-            'items' => $items,
-            'total_amount' => $total_amount, // pass total amount to view
-        ]);
-    }
-
-
-    //Request transaction
-    public function transaction()
-    {
-        return view('admin.sub-page.transaction.transaction');
-    }
-
-    //get transactions/request data
-    public function showTransaction()
-    {
-        $user = Auth::user();
-        $user_id = $user->id;
-
-        $from = Carbon::now()->startOfDay();
-        $to = Carbon::now()->endOfDay();
-
-        $data = ModelsRequest::where('status', 'completed')
-            ->whereBetween('updated_at', [$from, $to])
-            ->where('accepted_by_user_id', $user_id)
-            ->orderBy('updated_at', 'desc')
-            ->get();
-
-        foreach ($data as $trans) {
-            $trans->formatted_date =
-                Carbon::parse($trans->updated_at)->format('F j, Y, g:i:s a');
-        }
-
-        return response()->json($data);
-    }
-
-    //filter transaction
-    public function filterTransaction(Request $request)
-    {
-        $today = $request->input('today');
-        $yesterday = $request->input('yesterday');
-        $thisMonth = $request->input('this-month');
-
-
-        if ($today) {
-            // Filter transactions that occurred today
-            $from = Carbon::now()->startOfDay();
-            $to = Carbon::now()->endOfDay();
-
-            $data = ModelsRequest::where('status', 'completed')
-                ->whereBetween('updated_at', [$from, $to])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-        } else if ($yesterday) {
-            // Filter transactions that occurred today
-            $from = Carbon::yesterday()->startOfDay();
-            $to = Carbon::yesterday()->endOfDay();
-
-            $data = ModelsRequest::where('status', 'completed')
-                ->whereBetween('updated_at', [$from, $to])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-        } else if ($thisMonth) {
-            // Filter transactions that occurred today
-            $from = Carbon::now()->startOfMonth();
-            $to = Carbon::now()->endOfMonth();
-
-            $data = ModelsRequest::where('status', 'completed')
-                ->whereBetween('updated_at', [$from, $to])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-        } else {
-
-            $from = $request->input('from');
-            $to = $request->input('to');
-            $date_to = date('Y-m-d', strtotime($to . ' +1 day'));
-
-            $data = ModelsRequest::where('status', 'completed')
-                ->whereBetween('updated_at', [$from, $date_to])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-        }
-
-
-        // Loop through the data and format the created_at timestamp
-        foreach ($data as $item) {
-            $item->formatted_date = date('F j, Y, g:i:s a', strtotime($item->updated_at));
-        }
-
-        return response()->json($data);
     }
 }

@@ -163,7 +163,7 @@
                     if (selectedItem[i].stock_id === stockId) {
                         alert(itemName + ' (' + stockExpDate + ')' + ' is already selected!');
                         var stock = true;
-                        break; // Exit the loop if a match is found
+                        break;
                     }
                 }
 
@@ -201,15 +201,13 @@
                         $('#quantity').val('');
                     }
                 }
-
-                // console.log(selectedItem);
             } else {
                 alert('Please fill all inputs to add the item!');
             }
         });
 
 
-        //remove button function
+        //if remove item button is clicked
         $('#requested-item-table').on('click', '#remove-item-btn', function() {
             var stockId = $(this).data('stock-id');
 
@@ -219,10 +217,9 @@
             selectedItem = selectedItem.filter(function(item) {
                 return item.stock_id !== stockId;
             });
-
-            // console.log(selectedItem);
         });
 
+        //if submit request button is clicked
         $('#submit-request-btn').on('click', function() {
 
             if (selectedItem.length !== 0) {
@@ -312,18 +309,6 @@
                 $btn.prop('disabled', false); // enable button again on alert
             }
         });
-
-
-        // function requesterNameAlert() {
-        //     var requestNameInput = document.getElementById("#request_by");
-        //     var requestName = requestNameInput.value;
-
-        //     if (requestName !== "") {
-        //         alert('test')
-        //     }
-        // }
-
-        // requesterNameAlert();
     });
 </script>
 @endsection

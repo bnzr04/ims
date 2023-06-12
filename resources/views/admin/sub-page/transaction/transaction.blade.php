@@ -8,14 +8,14 @@
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <div class="container-lg mt-2">
+                <div class="container-fluid mt-2">
                     <a href="{{ route('admin.requests') }}" class="btn btn-secondary">Back</a>
                 </div>
-                <div class="container-lg mt-3">
-                    <h3>Transactions</h3>
+                <div class="container-fluid mt-3">
+                    <h3>Complete Transactions</h3>
                 </div>
-                <div class="container-lg mt-3 p-2 pt-3 rounded shadow">
-                    <div class="container-md d-flex">
+                <div class="container-fluid mt-3 p-2 pt-3 rounded shadow">
+                    <div class="container-fluid d-flex">
 
                         <form id="today_form" class="m-0">
                             <div class="mx-1">
@@ -48,10 +48,10 @@
                             </div>
                         </form>
                     </div>
-                    <div class="container-lg">
+                    <div class="container-fluid">
                         <h5 id="title" class="mt-2"></h5>
                     </div>
-                    <div class="container-md mt-2 overflow-auto" style="height: 350px;">
+                    <div class="container-fluid mt-2 overflow-auto" style="height: 350px;">
                         <table class="table">
                             <thead class=" bg-success text-white" style="position: sticky;top:0;">
                                 <tr>
@@ -275,7 +275,7 @@
             toDateStr.getDate() + ", " + toDateStr.getFullYear();
 
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', `{{ route('admin.filter-transaction') }}?from=${fromDate}&to=${toDate}`);
+        xhr.open('GET', `{{ route('admin.filter-transaction') }}?filter=1&from=${fromDate}&to=${toDate}`);
         xhr.onload = function() {
             if (xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);

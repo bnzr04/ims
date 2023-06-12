@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-md navbar-light shadow-sm" style="background-color:#c9df8a;position: sticky;top: 0;z-index: 3;">
+<nav class="navbar navbar-expand-md navbar-light shadow-sm" style="background-color:#c9df8a;position: sticky;top: 0;z-index: 3;width:100%;">
     <div class="container">
         <a class="navbar-brand" href="">
-            {{ config('app.name', 'Laravel') }}
+            IMS PHARMACY
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
             <span class="navbar-toggler-icon"></span>

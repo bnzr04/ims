@@ -6,13 +6,16 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminRequestController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DispenseController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ManagerRequestController;
+use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\StocksController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UserController;
 
@@ -55,6 +58,7 @@ Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function 
     Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
     Route::get('/remove-item/{sid}/{id}', [RequestController::class, 'removeItem'])->name('user.remove-item');
     Route::post('/submit-request', [RequestController::class, 'submitRequest'])->name('user.submit-request');
+    Route::post('/cancel-request/{rid}', [RequestController::class, 'cancelRequest'])->name('user.cancel-request');
     Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request');
 
     Route::get('/show-pending-requests', [RequestController::class, 'showPendingRequest'])->name('user.show-pending-requests');
@@ -106,16 +110,18 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/add-to-stocks/{id}', [StocksController::class, 'addToStocks'])->name('admin.add-to-stocks');
     Route::post('/save-stock', [StocksController::class, 'saveStock'])->name('admin.save-stock');
     Route::get('/add-stock/{id}', [StocksController::class, 'addStock'])->name('admin.add-stock');
+    Route::post('/admin-update-stock/{id}', [StocksController::class, 'adminUpdateStock'])->name('admin.admin-update-stock');
     Route::post('/update-stock/{id}', [StocksController::class, 'updateStock'])->name('admin.update-stock');
     Route::get('/edit-stock/{id}', [StocksController::class, 'editStock'])->name('admin.edit-stock');
     Route::get('/delete-stock/{id}', [StocksController::class, 'deleteStock'])->name('admin.delete-stock');
     Route::post('/export-stocks', [StocksController::class, 'export'])->name('admin.export-stocks');
 
     ////////Dispense Report////////
-    Route::get('/dispense', [StocksController::class, 'dispense'])->name('admin.dispense');
-    Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('admin.get-dispense');
-    Route::get('/filter-dispense', [StocksController::class, 'dispenseFilter'])->name('admin.filter-dispense');
-    Route::post('/export-dispense', [StocksController::class, 'dispenseExport'])->name('admin.export-dispense');
+    Route::get('/dispense', [DispenseController::class, 'dispense'])->name('admin.dispense');
+    Route::get('/get-dispense', [DispenseController::class, 'getDispense'])->name('admin.get-dispense');
+    Route::get('/filter-dispense', [DispenseController::class, 'dispenseFilter'])->name('admin.filter-dispense');
+    Route::post('/export-dispense', [DispenseController::class, 'dispenseExport'])->name('admin.export-dispense');
+    Route::get('/fetch-record/{id}', [DispenseController::class, 'fetchRecord'])->name('admin.fetch-record');
 
     ////////Request module routes////////
     Route::get('/requests', [AdminRequestController::class, 'adminRequest'])->name('admin.requests');
@@ -124,15 +130,21 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::post('/accept-request/{rid}', [AdminRequestController::class, 'acceptRequest'])->name('admin.accept-request');
     Route::post('/deliver-request/{rid}', [AdminRequestController::class, 'deliverRequest'])->name('admin.deliver-request');
     Route::post('/complete-request/{rid}', [AdminRequestController::class, 'completeRequest'])->name('admin.complete-request');
-    Route::get('/generate-receipt/{rid}', [AdminRequestController::class, 'generate_receipt'])->name('admin.generate-receipt');
     Route::get('/show-pending-requests', [AdminRequestController::class, 'showPendingRequest'])->name('admin.show-pending-requests');
     Route::get('/show-accepted-requests', [AdminRequestController::class, 'showAcceptedRequest'])->name('admin.show-accepted-requests');
     Route::get('/show-delivered-requests', [AdminRequestController::class, 'showDeliveredRequest'])->name('admin.show-delivered-requests');
+    Route::get('/view-request/{id}', [AdminRequestController::class, 'viewRequest'])->name('admin.view-request');
+
+    //Receipt routes
+    Route::get('/generate-receipt/{rid}', [ReceiptController::class, 'generate_receipt'])->name('admin.generate-receipt');
 
     ////////Request transaction////////
-    Route::get('/transaction', [AdminRequestController::class, 'transaction'])->name('admin.transaction');
-    Route::get('/show-transaction', [AdminRequestController::class, 'showTransaction'])->name('admin.show-transaction');
-    Route::get('/filter-transaction', [AdminRequestController::class, 'filterTransaction'])->name('admin.filter-transaction');
+    Route::get('/transaction', [TransactionController::class, 'transaction'])->name('admin.transaction');
+    Route::get('/all-transaction', [TransactionController::class, 'allTransaction'])->name('admin.all-transaction');
+    Route::get('/show-transaction', [TransactionController::class, 'showTransaction'])->name('admin.show-transaction');
+    Route::get('/filter-transaction', [TransactionController::class, 'filterTransaction'])->name('admin.filter-transaction');
+    Route::get('/filter-all-transaction', [TransactionController::class, 'filterAllTransaction'])->name('admin.filter-all-transaction');
+    Route::get('/search-transaction', [TransactionController::class, 'searchRequestCodeOrPatientName'])->name('admin.search-transaction');
 });
 
 /*------------------------------------------
@@ -166,7 +178,7 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
 
     ////////Request module////////
     Route::get('/deployment', [ManagerController::class, 'deployment'])->name('manager.deployment');
-    Route::get('/requests', [ManagerRequestController::class, 'viewRequest'])->name('manager.requests');
+    Route::get('/requests', [ManagerRequestController::class, 'managerRequest'])->name('manager.requests');
     Route::get('/show-pending', [ManagerRequestController::class, 'showPending'])->name('manager.show-pending');
     Route::get('/show-pending-requests', [ManagerRequestController::class, 'showPendingRequest'])->name('manager.show-pending-requests');
     Route::get('/show-accepted-requests', [ManagerRequestController::class, 'showAcceptedRequest'])->name('manager.show-accepted-requests');
@@ -175,22 +187,27 @@ Route::prefix('manager')->middleware(['auth', 'user-access:manager'])->group(fun
     Route::post('/accept-request/{rid}', [ManagerRequestController::class, 'acceptRequest'])->name('manager.accept-request');
     Route::post('/deliver-request/{rid}', [ManagerRequestController::class, 'deliverRequest'])->name('manager.deliver-request');
     Route::post('/complete-request/{rid}', [ManagerRequestController::class, 'completeRequest'])->name('manager.complete-request');
+    Route::get('/view-request/{id}', [ManagerRequestController::class, 'viewRequest'])->name('manager.view-request');
 
     // Route::get('/doctor-list', [DoctorController::class, 'doctorList'])->name('manager.doctor-list');
     // Route::post('/save-doctor', [DoctorController::class, 'saveDoctor'])->name('manager.save-doctor');
 
-    Route::get('/generate-receipt/{rid}', [ManagerRequestController::class, 'generate_receipt'])->name('manager.generate-receipt');
+    Route::get('/generate-receipt/{rid}', [ReceiptController::class, 'generate_receipt'])->name('manager.generate-receipt');
 
     ////////Dispense Report////////
-    Route::get('/dispense', [StocksController::class, 'dispense'])->name('manager.dispense');
-    Route::get('/get-dispense', [StocksController::class, 'getDispense'])->name('manager.get-dispense');
-    Route::get('/filter-dispense', [StocksController::class, 'dispenseFilter'])->name('manager.filter-dispense');
-    Route::post('/export-dispense', [StocksController::class, 'dispenseExport'])->name('manager.export-dispense');
+    Route::get('/dispense', [DispenseController::class, 'dispense'])->name('manager.dispense');
+    Route::get('/get-dispense', [DispenseController::class, 'getDispense'])->name('manager.get-dispense');
+    Route::get('/filter-dispense', [DispenseController::class, 'dispenseFilter'])->name('manager.filter-dispense');
+    Route::post('/export-dispense', [DispenseController::class, 'dispenseExport'])->name('manager.export-dispense');
+    Route::get('/fetch-record/{id}', [DispenseController::class, 'fetchRecord'])->name('manager.fetch-record');
 
     ////////Transaction////////
-    Route::get('/transaction', [ManagerRequestController::class, 'transaction'])->name('manager.transaction');
-    Route::get('/show-transaction', [ManagerRequestController::class, 'showTransaction'])->name('manager.show-transaction');
-    Route::get('/filter-transaction', [ManagerRequestController::class, 'filterTransaction'])->name('manager.filter-transaction');
+    Route::get('/transaction', [TransactionController::class, 'transaction'])->name('manager.transaction');
+    Route::get('/all-transaction', [TransactionController::class, 'allTransaction'])->name('manager.all-transaction');
+    Route::get('/show-transaction', [TransactionController::class, 'showTransaction'])->name('manager.show-transaction');
+    Route::get('/filter-transaction', [TransactionController::class, 'filterTransaction'])->name('manager.filter-transaction');
+    Route::get('/filter-all-transaction', [TransactionController::class, 'filterAllTransaction'])->name('manager.filter-all-transaction');
+    Route::get('/search-transaction', [TransactionController::class, 'searchRequestCodeOrPatientName'])->name('manager.search-transaction');
 });
 
 ////////Logout////////

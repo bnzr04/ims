@@ -103,6 +103,7 @@ class StocksController extends Controller
                 'items.name',
                 'items.description',
                 'items.category',
+                'items.unit',
                 'items.max_limit',
                 'items.warning_level',
                 DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
@@ -114,6 +115,7 @@ class StocksController extends Controller
                 'items.name',
                 'items.description',
                 'items.category',
+                'items.unit',
                 'items.max_limit',
                 'items.warning_level'
             )
@@ -126,6 +128,7 @@ class StocksController extends Controller
                     'items.name',
                     'items.description',
                     'items.category',
+                    'items.unit',
                     'items.max_limit',
                     'items.warning_level',
                     DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
@@ -137,6 +140,7 @@ class StocksController extends Controller
                     'items.name',
                     'items.description',
                     'items.category',
+                    'items.unit',
                     'items.max_limit',
                     'items.warning_level',
                 )
@@ -149,6 +153,7 @@ class StocksController extends Controller
                     'items.name',
                     'items.description',
                     'items.category',
+                    'items.unit',
                     'items.max_limit',
                     'items.warning_level',
                     DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
@@ -164,6 +169,7 @@ class StocksController extends Controller
                     'items.name',
                     'items.description',
                     'items.category',
+                    'items.unit',
                     'items.max_limit',
                     'items.warning_level',
                 )
@@ -208,8 +214,12 @@ class StocksController extends Controller
         }
     }
 
-    public function addToStocks($id)
+    public function addToStocks(Request $request, $id)
     {
+        $pettyCash = $request->input("petty-cash");
+        $donation = $request->input("donation");
+        $lgu = $request->input("lgu");
+
         //get authenticated user data
         $user = Auth::user();
 
@@ -219,32 +229,58 @@ class StocksController extends Controller
         //find item by id set to request
         $item = Item::find($id);
 
+        $stocks = DB::table('item_stocks')
+            ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            ->select(
+                'items.*',
+                'item_stocks.*',
+                DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"),
+                DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at")
+            )
+            ->where('item_stocks.item_id', $id)
+            ->groupBy(
+                'item_stocks.id',
+                'item_stocks.item_id',
+                'item_stocks.stock_qty',
+                'item_stocks.exp_date',
+                'item_stocks.mode_acquisition',
+                'item_stocks.created_at',
+                'item_stocks.updated_at',
+                'items.id',
+                'items.name',
+                'items.category',
+                'items.description',
+                'items.unit',
+                'items.max_limit',
+                'items.warning_level',
+                'items.price',
+                'items.created_at',
+                'items.updated_at'
+            )
+            ->orderByDesc('item_stocks.created_at');
+
+        if ($pettyCash) {
+            $stocks->where('item_stocks.mode_acquisition', '=', 'Petty Cash');
+        } else if ($donation) {
+            $stocks->where('item_stocks.mode_acquisition', '=', 'Donation');
+        } else if ($lgu) {
+            $stocks->where('item_stocks.mode_acquisition', '=', 'LGU');
+        }
+
+        $stocks = $stocks->get(); // Retrieve the query results
+
+        foreach ($stocks as $stock) {
+            $stock->exp_date = Carbon::parse($stock->exp_date)->format('Y-m-d');
+        }
+
         //if the user is manager
         if ($user_type === 'manager') {
-            $user_dept = $user->dept;
 
-            //if the manager department is pharmacy
-            if ($user_dept === 'pharmacy') {
-
-                //get stocks information by item id
-                $stocks = DB::table('item_stocks')
-                    ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))
-                    ->where('item_stocks.item_id', $id)
-                    ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', 'items.created_at', 'items.updated_at',)
-                    ->orderByDesc('item_stocks.created_at')
-                    ->get();
-
-                foreach ($stocks as $stock) {
-                    $stock->exp_date = Carbon::parse($stock->exp_date)->format("Y-m-d");
-                }
-
-                //get total stocks by item id
-                $totalStocks = DB::table('item_stocks')
-                    ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
-                    ->get();
-            }
+            //get total stocks by item id
+            $totalStocks = DB::table('item_stocks')
+                ->join('items', 'item_stocks.item_id', '=', 'items.id')
+                ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
+                ->get();
 
             if ($stocks) {
                 return view('manager.sub-page.stocks.add-to-stock')->with([
@@ -259,23 +295,14 @@ class StocksController extends Controller
 
         //else the user is admin
         else {
-            $stocks = DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))->where('item_stocks.item_id', $id)
-                ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', 'items.created_at', 'items.updated_at',)
-                ->orderByDesc('item_stocks.created_at')
-                ->get();
-
-            foreach ($stocks as $stock) {
-                $stock->exp_date = Carbon::parse($stock->exp_date)->format("Y-m-d");
-            }
-
 
             $totalStocks = DB::table('item_stocks')
                 ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)->get();
+                ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))
+                ->where('item_stocks.item_id', $id)
+                ->get();
 
-            if ($stocks) {
+            if ($stocks->isNotEmpty()) {
                 return view('admin.sub-page.stocks.add-to-stock')->with([
                     'item' => $item,
                     'stocks' => $stocks,
@@ -309,7 +336,15 @@ class StocksController extends Controller
 
     public function editStock($id)
     {
-        return view('admin.sub-page.stocks.edit-stock');
+        $stock = Stock::find($id);
+        $stockItem = $stock->item_id;
+
+        $items = Item::find($stock->item_id);
+
+        $stock->formated_created_at = Carbon::parse($stock->created_at)->format('F d, Y h:i:s A');
+        $stock->formated_updated_at = Carbon::parse($stock->updated_at)->format('F d, Y h:i:s A');
+
+        return view('admin.sub-page.stocks.edit-stock')->with(['stock' => $stock, 'item' => $items]);
     }
 
     public function addStock($id)
@@ -338,6 +373,43 @@ class StocksController extends Controller
 
                 return view('admin.sub-page.stocks.add-stock')->with(['stock' => $stock, 'item' => $stockItem]);
             }
+        }
+    }
+
+    public function adminUpdateStock(Request $request)
+    {
+        $stockId = $request->input('stock_id');
+        $stockQty = $request->input('stock_qty');
+
+        $stock = Stock::find($stockId);
+
+        $itemId = $stock->item_id;
+        $oldQty = $stock->stock_qty;
+
+        if ($stock) {
+            $newQty = $stockQty;
+            $stock->stock_qty = $newQty;
+
+            list($user_id, $user_type, $user_dept) = $this->startLog();
+
+            if ($stock->save()) {
+
+                $message = "Stock batch id " . $stockId . " of Item id " . $itemId . " was updated the quantity from " . $oldQty . " to " . $newQty;
+
+                $this->endLog($user_id, $user_type, $user_dept, $message);
+
+                return response()->json([
+                    'success' => 'Stock quantity updated successfully',
+                ]);
+            } else {
+                return response()->json([
+                    'error' => 'Failed to update stock quantity',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => 'Stock batch cannot found.',
+            ]);
         }
     }
 
@@ -390,97 +462,5 @@ class StocksController extends Controller
         } else {
             return back()->with('error', 'Stock failed to delete.');
         }
-    }
-
-    ///////////////Dispense report///////////////
-    public function dispense()
-    {
-        $user = Auth::user();
-
-        if ($user->type === 'manager') {
-            return view('manager.sub-page.stocks.dispense');
-        } else {
-            return view('admin.sub-page.stocks.dispense');
-        }
-    }
-
-    public function getDispense()
-    {
-        $completedAndDeliveredId = ModelsRequest::whereIn('status', ['completed', 'delivered'])->pluck('id');
-
-        // Filter dispensed items that occurred today
-        $from = Carbon::now()->startOfDay();
-        $to = Carbon::now()->endOfDay();
-
-        $data = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            ->select('request_items.item_id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(request_items.quantity) as total_dispense'))
-            ->distinct()
-            ->whereIn('request_id', $completedAndDeliveredId)
-            ->whereBetween('request_items.updated_at', [$from, $to])
-            ->groupBy('request_items.item_id', 'items.name', 'items.description', 'items.category', 'items.unit')
-            ->orderBy('items.name', 'asc')
-            ->get();
-
-        return response()->json($data);
-    }
-
-    public function dispenseFilter(Request $request)
-    {
-        $completedAndDeliveredId = ModelsRequest::whereIn('status', ['completed', 'delivered'])->pluck('id');
-
-        $today = $request->input('today');
-        $yesterday = $request->input('yesterday');
-        $thisMonth = $request->input('this-month');
-
-
-        if ($today) {
-            // Filter dispensed items that occurred today
-            $from = Carbon::now()->startOfDay();
-            $to = Carbon::now()->endOfDay();
-        } elseif ($yesterday) {
-            // Filter dispensed items that occurred yesterday
-            $from = Carbon::yesterday()->startOfDay();
-            $to = Carbon::yesterday()->endOfDay();
-        } elseif ($thisMonth) {
-            // Filter dispensed items that occurred this month
-            $from = Carbon::now()->startOfMonth();
-            $to = Carbon::now()->endOfMonth();
-        } else {
-            // Filter dispensed items that occurred from selected date
-            $from = $request->input('date_from');
-            $to = $request->input('date_to');
-            $to = date('Y-m-d', strtotime($to . ' +1 day'));
-        }
-
-
-        $data = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            ->select('request_items.item_id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(request_items.quantity) as total_dispense'))
-            ->distinct()
-            ->whereIn('request_id', $completedAndDeliveredId)
-            ->whereBetween('request_items.updated_at', [$from, $to])
-            ->groupBy('request_items.item_id', 'items.name', 'items.description', 'items.category', 'items.unit')
-            ->orderBy('items.name', 'asc')
-            ->get();
-
-        return response()->json($data);
-    }
-
-
-    public function dispenseExport(Request $request)
-    {
-        $req =  ucfirst($request->input('filter'));
-
-        list($user_id, $user_type, $user_dept) = $this->startLog();
-
-        $message = "Dispensed " . $req . " Report Downloaded";
-
-        $filename = 'Pharma_Dispensed_Item' . Carbon::now()->format('Ymd-His') . '.xlsx';
-        $response = Excel::download(new DispenseExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-            'Content-Type' => 'application/vnd.ms-excel',
-        ]);
-
-        $this->endLog($user_id, $user_type, $user_dept, $message);
-
-        return $response;
     }
 }

@@ -12,24 +12,24 @@ use Illuminate\Support\Facades\Session
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 @if($request->status === 'pending' || $request->status === 'delivered')
-                <div class="container-lg p-0">
+                <div class="container-fluid p-0">
                     <a href="{{ route('admin.requests') }}" class="btn btn-secondary">Back</a>
                 </div>
                 @endif
 
                 @if($request->status === 'accepted')
-                <div class="container-lg p-0">
-                    <a href="{{ route('admin.requests') }}" class="btn btn-secondary" onclick="alert()">Back</a>
+                <div class="container-fluid p-0">
+                    <a href="{{ route('admin.requests') }}" class="btn btn-secondary" onclick="backAlert()">Back</a>
                 </div>
                 @endif
 
                 @if($request->status === 'completed')
-                <div class="container-lg p-0">
+                <div class="container-fluid p-0">
                     <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Back</a>
                 </div>
                 @endif
 
-                <div class="container-md mt-3 pt-2 pb-2 shadow lh-1 rounded overflow-auto">
+                <div class="container-fluid mt-3 pt-2 pb-2 shadow lh-1 rounded overflow-auto">
                     <h4>Request Details</h4>
                     <table class="table">
                         <thead class="bg-success text-white">
@@ -98,37 +98,37 @@ use Illuminate\Support\Facades\Session
                 </div>
                 @endif
 
-                <div class="container-lg p-0 border border-dark shadow p-3 mt-3 mb-2 bg-body rounded" style="height: 340px;">
+                <div class="container-fluid p-0 border border-dark shadow p-3 mt-3 mb-2 bg-body rounded" style="max-height:500px">
                     <h4>Requested Items</h4>
-                    <div class=" container-lg p-0" style="height:230px;overflow-y: auto;">
+                    <div class="container-fluid p-0" style="height:230px;overflow-y: auto;">
                         <table class="table">
                             <thead class="text-white bg-secondary" style="position: sticky;top: 0;z-index: 0;">
                                 <tr>
-                                    <th scope="col">Item ID</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Category</th>
-                                    <th scope="col">Unit</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">Stock ID</th>
-                                    <th scope="col">Mode Of Acq</th>
-                                    <th scope="col">Expiration</th>
+                                    <th scope="col" class="border">Item ID</th>
+                                    <th scope="col" class="border">Name</th>
+                                    <th scope="col" class="border">Description</th>
+                                    <th scope="col" class="border">Category</th>
+                                    <th scope="col" class="border">Unit</th>
+                                    <th scope="col" class="border">Price</th>
+                                    <th scope="col" class="border">Quantity</th>
+                                    <th scope="col" class="border">Stock ID</th>
+                                    <th scope="col" class="border">Mode Of Acq</th>
+                                    <th scope="col" class="border">Expiration</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($requestItems as $item)
                                 <tr>
                                     <td scope="col">{{ $item->item_id }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->name }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->description }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->category }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->unit }}</td>
-                                    <td scope="col" class="text-capitalize">{{ is_null($item->price) ? "-" : $item->price }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->quantity }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->stock_id }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->mode_acquisition }}</td>
-                                    <td scope="col" class="text-capitalize">{{ $item->exp_date }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->name }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->description }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->category }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->unit }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ is_null($item->price) ? "-" : $item->price }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->quantity }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->stock_id }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->mode_acquisition }}</td>
+                                    <td scope="col" class="text-capitalize border">{{ $item->exp_date }}</td>
                                 </tr>
                                 @empty
                                 <tr>
@@ -140,24 +140,26 @@ use Illuminate\Support\Facades\Session
                             </tbody>
                         </table>
                     </div>
-                    @if($request->status == 'pending')
-                    <form action="{{ route('admin.accept-request',['rid' => $request->id]) }}" method="post">
-                        @csrf
-                        <button type="submit" class="btn btn-primary shadow">Accept request</button>
-                    </form>
-                    @endif
-                    @if($request->status == 'accepted')
-                    <form action="{{ route('admin.deliver-request',['rid' => $request->id]) }}" method="post">
-                        @csrf
-                        <button type="submit" class="btn btn-warning shadow">Mark as delivered</button>
-                    </form>
-                    @endif
-                    @if($request->status == 'completed' || $request->status == 'delivered')
-                    <form action="{{ route('admin.generate-receipt',['rid' => $request->id]) }}" target="_blank" method="get" style="float: right;">
-                        @csrf
-                        <button type="submit" class="btn btn-success shadow">Print</button>
-                    </form>
-                    @endif
+                    <div class="container-fluid p-0 m-0" style="display:flex;">
+                        @if($request->status == 'pending')
+                        <form action="{{ route('admin.accept-request',['rid' => $request->id]) }}" class="p-0 m-0 mx-1" method="post">
+                            @csrf
+                            <button type="submit" class="btn btn-primary shadow">Accept request</button>
+                        </form>
+                        @endif
+                        @if($request->status == 'accepted')
+                        <form action="{{ route('admin.deliver-request',['rid' => $request->id]) }}" class="p-0 m-0 mx-1" method="post">
+                            @csrf
+                            <button type="submit" class="btn btn-warning shadow">Mark as delivered</button>
+                        </form>
+                        @endif
+                        @if($request->status == 'completed' || $request->status == 'delivered')
+                        <form action="{{ route('admin.generate-receipt',['rid' => $request->id]) }}" class="p-0 m-0" target="_blank" method="get" style="float: right;">
+                            @csrf
+                            <button type="submit" class="btn btn-success shadow">Print</button>
+                        </form>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -174,7 +176,7 @@ use Illuminate\Support\Facades\Session
         }
     }
 
-    function alert() {
+    function backAlert() {
         if (!confirm('Do you want to go back and finish the dispensing later?')) {
             event.preventDefault();
         }

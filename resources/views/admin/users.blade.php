@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Session;
                         <input type="text" class="form-control bg-white" placeholder="" aria-label="search" aria-describedby="addon-wrapping">
                     </div>
                 </div>
-                <div class="container-lg mt-2 p-0 rounded shadow" style="height: 400px;overflow:auto;">
+                <div class="container-fluid mt-2 p-0 rounded shadow" style="height: 400px;overflow:auto;">
                     <table class="table">
                         <thead class="bg-success text-white" style="position: sticky;top: 0;">
                             <tr>

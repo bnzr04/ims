@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Session
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
-                <div class="container-lg">
+                <div class="container-fluid">
                     <h2>Requests</h2>
                 </div>
-                <div class="container-lg pt-3 d-flex">
+                <div class="container-fluid pt-3 d-flex">
                     <form id="pending_form">
                         <button class="btn btn-outline-dark mx-1" id="pending">Pending (<span id="pending-count"></span>)</button>
                     </form>
@@ -25,11 +25,11 @@ use Illuminate\Support\Facades\Session
                         <button class="btn btn-outline-dark mx-1" id="delivered">Delivered (<span id="delivered-count"></span>)</button>
                     </form>
                 </div>
-                <div class="container-lg mt-1 p-2 border rounded shadow">
-                    <div class="container-md">
+                <div class="container-fluid mt-1 p-2 border rounded shadow">
+                    <div class="container-fluid">
                         <h5 id="title"></h5>
                     </div>
-                    <div class="container-md overflow-auto" style="height: 350px;">
+                    <div class="container-fluid overflow-auto" style="height: 350px;">
                         <table class="table">
                             <thead class=" bg-success text-white" style="position: sticky;top:0;">
                                 <tr>
@@ -58,7 +58,7 @@ use Illuminate\Support\Facades\Session
                 </div>
                 @endif
 
-                <div class="container-lg">
+                <div class="container-fluid">
                     <a href="{{ route('admin.transaction') }}" class="btn btn-secondary">Completed transactions</a>
                 </div>
             </div>

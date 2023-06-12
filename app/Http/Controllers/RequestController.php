@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Canceled_Request;
 use App\Models\Item;
 use App\Models\Log;
 use App\Models\Request as ModelsRequest;
@@ -219,6 +220,15 @@ class RequestController extends Controller
                 ->get();
 
             $title = "completed";
+        } else if ($request === 'canceled') {
+
+            $items = ModelsRequest::where('user_id', $user_id)
+                ->whereBetween('created_at', [$from, $to])
+                ->where('status', 'canceled')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $title = "canceled";
         }
 
         foreach ($items as $item) {
@@ -260,11 +270,6 @@ class RequestController extends Controller
         //Get today date
         $today = Carbon::today()->format('Y-m-d');
 
-        // foreach ($requestItems as $item) {
-        // $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
-        // $item->exp_date = $exp_date->format('m-d-Y');
-        // }
-
         if ($requested->request_to === 'pharmacy') {
 
             $items =
@@ -284,17 +289,25 @@ class RequestController extends Controller
                 ->get();
         }
 
-        // foreach ($items as $item) {
-        //     $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
-        //     $item->formatted_exp_date = $exp_date->format('m-d-Y');
-        // }
+        $canceled = Canceled_Request::where('request_id', $id)->first();
 
+        if ($canceled) {
 
-        return view('user.sub-page.view-items')->with([
-            'requestItems' => $requestItems,
-            'request' => $requested,
-            'items' => $items,
-        ]);
+            $canceled->format_date = Carbon::parse($canceled->created_at)->format('F j, Y, g:i:s a');
+
+            return view('user.sub-page.view-items')->with([
+                'requestItems' => $requestItems,
+                'request' => $requested,
+                'items' => $items,
+                'canceled' => $canceled,
+            ]);
+        } else {
+            return view('user.sub-page.view-items')->with([
+                'requestItems' => $requestItems,
+                'request' => $requested,
+                'items' => $items,
+            ]);
+        }
     }
 
     public function removeItem($sid, $id)
@@ -486,6 +499,97 @@ class RequestController extends Controller
             'requestedQty' => $requestedQty,
             'itemStock' => $itemStock,
         ]);
+    }
+
+    //cancel request
+    public function cancelRequest(Request $request, $rid)
+    {
+        //Enable Query Log
+        DB::enableQueryLog();
+
+        //get user details
+        $user = Auth::user();
+        $userId = $user->id;
+        $userType = $user->type;
+
+        $requestItems = Request_Item::where("request_id", $rid)->get();
+
+        //get the reason of cancelation
+        $cancelReason = $request->input("canceled_reason");
+
+        foreach ($requestItems as $item) {
+            //get the requested items details
+            $stockId = $item->stock_id;
+            $itemId =  $item->item_id;
+            $quantity = $item->quantity;
+
+            //get the current stock details
+            $stock = Stock::where("id", $stockId)->first();
+            $stockQty = Stock::select("stock_qty")->where("id", $stockId)->first();
+
+            //item quantity to return
+            $stock->stock_qty += $quantity;
+            $stock->save();
+
+            // Get the SQL query being executed
+            $sql = DB::getQueryLog();
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+            //Log Message
+            $message = "The requested " . $quantity . " of Item ID: " . $itemId . " from Stock ID: " . $stockId . " with Request ID: " . $rid . " is canceled.";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $userId,
+                'user_type' => $userType,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+
+        $canceledModel =  new Canceled_Request();
+        $canceledModel->request_id = $rid;
+        $canceledModel->reason = $cancelReason;
+        $canceledModel->save();
+
+        $theRequest = ModelsRequest::where("id", $rid)->first();
+        $theRequest->status = "canceled";
+        $theRequest->save();
+
+        // Get the SQL query being executed
+        $sql = DB::getQueryLog();
+        if (is_array($sql) && count($sql) > 0) {
+            $last_query = end($sql)['query'];
+        } else {
+            $last_query = 'No query log found.';
+        }
+
+        if ($theRequest) {
+            //Log Message
+            $message = "Request ID: " . $rid . " is marked as canceled";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $userId,
+                'user_type' => $userType,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+
+        if ($stock) {
+            return back()->with("success", "The request is successfully canceled.");
+        } else {
+            return back()->with("error", "The request is failed to canceled.");
+        }
     }
 
 

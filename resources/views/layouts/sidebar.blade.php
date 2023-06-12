@@ -7,8 +7,9 @@
             <li><a href="{{ route('admin.dashboard') }}" class="nav-link text-white">Dashboard</a></li>
             <li><a href="{{ route('admin.users') }}" class="nav-link text-white">Users</a></li>
             <li><a href="{{ route('admin.items') }}" class="nav-link text-white">Items & Stocks</a></li>
-            <!-- <li><a href="{{ route('admin.deployment') }}" class="nav-link">Deployment</a></li> -->
             <li><a href="{{ route('admin.requests') }}" class="nav-link text-white">Requests</a></li>
+            <li><a href="{{ route('admin.all-transaction') }}" class="nav-link text-white">Transactions</a></li>
+            <li><a href="{{ route('admin.dispense') }}" class="nav-link text-white">Dispense</a></li>
             <li><a href="{{ route('admin.log-index') }}" class="nav-link text-white">Log</a></li>
             @endif
 
@@ -16,8 +17,9 @@
             @if( Auth::user()->type == 'manager' )
             <li><a href="{{ route('manager.home') }}" class="nav-link text-white">Dashboard</a></li>
             <li><a href="{{ route('manager.stocks') }}" class="nav-link text-white">Items & Stocks</a></li>
-            <!-- <li><a href="{{ route('manager.deployment') }}" class="nav-link">Deployment</a></li> -->
             <li><a href="{{ route('manager.requests') }}" class="nav-link text-white">Requests</a></li>
+            <li><a href="{{ route('manager.all-transaction') }}" class="nav-link text-white">Transactions</a></li>
+            <li><a href="{{ route('manager.dispense') }}" class="nav-link text-white">Dispense</a></li>
             @endif
 
             {{--User links--}}

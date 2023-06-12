@@ -7,20 +7,31 @@ use Carbon\Carbon
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
+<style>
+    #filter_link {
+        text-decoration: none;
+        color: black;
+    }
+
+    #filter_link:hover {
+        text-decoration: underline;
+        color: black;
+    }
+</style>
 <div class="container-fluid ">
     <div class="row min-vh-100">
         <div class="col-md-3 col-lg-2 sidebar p-0 bg-dark ">
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div class="container-lg pt-2">
+            <div class="container-fluid pt-2">
                 <a href="{{ route('manager.stocks') }}" class="btn btn-secondary">Back to Items</a>
                 <a href="{{ route('manager.AllStocks') }}" class="btn btn-secondary">Back to Stocks</a>
             </div>
 
-            <div id="content container-lg" class="p-3">
+            <div id="content container-fluid" class="p-3">
 
-                <div class="container-lg">
+                <div class="container-fluid">
                     <h4>ITEM DESCRIPTION:</h4>
                     <table class="table mt-2 mb-4 overflow-x-auto">
                         <thead class="bg-success text-white">
@@ -45,29 +56,45 @@ use Carbon\Carbon
                 </div>
 
 
-                <div class="container-lg px-3">
+                <div class="container-fluid px-3">
                     <h4>TOTAL STOCKS: <span class="total_quantity" data-warning-level="{{ $item->warning_level }}" data-max-limit="{{ $item->max_limit }}">{{ $total_stocks }}</span></h4>
                 </div>
 
-                <div class="container-sm p-0 mt-2 d-flex">
-                    <div class="container-sm m-0 p-0" style="width:100%;max-width:400px;">
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fa9a93">&nbsp;</div>
-                            <p class="m-0">Expired</p>
+                <div class="container-fluid p-0 mt-2 d-flex">
+                    <div class="container-fluid m-0">
+                        <div class="container-fluid m-0 p-0" style="width:100%;max-width:400px;">
+                            <div class="container-fluid d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fa9a93">&nbsp;</div>
+                                <p class="m-0">Expired</p>
+                            </div>
+                            <div class="container-fluid d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fa9f50">&nbsp;</div>
+                                <p class="m-0">Less Than Month Before Expiration</p>
+                            </div>
+                            <div class="container-fluid d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcc74c">&nbsp;</div>
+                                <p class="m-0">1 Month Before Expiration</p>
+                            </div>
                         </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fa9f50">&nbsp;</div>
-                            <p class="m-0">Less Than Month Before Expiration</p>
+                    </div>
+                    <div class="container-fluid m-0">
+                        <div class="container-fluid d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a id="filter_link" href="{{ route('manager.add-to-stocks',['id' => $item->id]) }}">All</a></p>
                         </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcc74c">&nbsp;</div>
-                            <p class="m-0">1 Month Before Expiration</p>
+                        <div class="container-fluid d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a id="filter_link" href="{{ route('manager.add-to-stocks',['id' => $item->id]) }}?petty-cash=1">Petty Cash</a></p>
+                        </div>
+                        <div class="container-fluid d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a id="filter_link" href="{{ route('manager.add-to-stocks',['id' => $item->id]) }}?donation=1">Donation</a></p>
+                        </div>
+                        <div class="container-fluid d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a id="filter_link" href="{{ route('manager.add-to-stocks',['id' => $item->id]) }}?lgu=1">LGU</a></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="container-lg p-0 pb-3 pt-2 px-2 shadow-lg rounded">
-                    <div class="container-lg p-0 overflow-auto" style="max-height: 300px;">
+                <div class="container-fluid p-0 pb-3 pt-2 px-2 shadow-lg rounded">
+                    <div class="container-fluid p-0 overflow-auto" style="max-height: 300px;">
 
                         <table class="table">
 
@@ -111,24 +138,24 @@ use Carbon\Carbon
 
                 <hr>
 
-                <div class="container-lg p-3 rounded shadow-lg" style="width: 100%;max-width: 500px;display:flex;flex-direction:column;align-items:center">
+                <div class="container-fluid p-3 rounded shadow-lg" style="width: 100%;max-width: 500px;display:flex;flex-direction:column;align-items:center">
                     <form action="{{ route('manager.save-stock') }}" method="post">
                         @csrf
                         <div class="modal-body p-2" style="width:100%;max-width:300px">
                             <h5>ADD NEW STOCKS BATCH:</h5>
                             <input type="hidden" class="form-control" name="item_id" id="item_id" value="{{ $item->id }}">
 
-                            <div class="container-sm mb-1">
+                            <div class="container-fluid mb-1">
                                 <label for="stock_qty">Quantity</label>
                                 <input type="number" min="1" class="form-control" name="stock_qty" id="stock_qty" required>
                             </div>
 
-                            <div class="container-sm mb-1">
+                            <div class="container-fluid mb-1">
                                 <label for="exp_date">Expiration Date</label>
                                 <input type="date" class="form-control" name="exp_date" id="exp_date" required>
                             </div>
 
-                            <div class="container-sm mt-1">
+                            <div class="container-fluid mt-1">
                                 <label for="mode_acq">Mode of acquisition</label>
                                 <input type="text" class="form-control" name="mode_acq" id="mode_acq_input" list="mode_acq" required>
                                 <datalist id="mode_acq">
@@ -222,30 +249,5 @@ use Carbon\Carbon
     }
 
     threshold();
-
-    // const expDateOutput = document.getElementById('exp-date');
-
-    // // Create a new Date object
-    // var today = new Date();
-
-    // // Get the day, month, and year
-    // var day = today.getDate();
-    // var month = today.getMonth() + 1; // Months are zero-based, so we add 1
-    // var year = today.getFullYear();
-
-    // // Add leading zeros if necessary
-    // if (day < 10) {
-    //     day = '0' + day;
-    // }
-
-    // if (month < 10) {
-    //     month = '0' + month;
-    // }
-
-    // // Format the date today as "DD-MM-YYYY"
-    // var formattedDate = month + '-' + day + '-' + year;
-
-    // console.log(formattedDate);
-    // console.log(expDateOutput.innerHTML);
 </script>
 @endsection

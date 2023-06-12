@@ -85,13 +85,59 @@ class ItemController extends Controller
     }
 
     //Export items data
-    public function export()
+    public function export(Request $request)
     {
+        //Enable query log
+        DB::enableQueryLog();
+
+        $filter = $request->input('filter');
+        ItemExport::$filter = $filter;
+
         $user = Auth::user();
+        $user_id = $user->id;
         $user_type = $user->type;
 
-        $filename = 'Pharma_items_' . Carbon::now()->format('Ymd-His') . '.xlsx';
-        return Excel::download(new ItemExport($filename), $filename, \Maatwebsite\Excel\Excel::XLSX, [
+        switch ($filter) {
+            case 'max':
+                $firstFilename = "Pharma_Items_Over_Max";
+                break;
+            case 'safe':
+                $firstFilename = "Pharma_Items_Safe_Level";
+                break;
+            case 'warning':
+                $firstFilename = "Pharma_Items_Warning_Level";
+                break;
+            case 'no-stocks':
+                $firstFilename = "Pharma_Items_No_Stocks";
+                break;
+            default:
+                $firstFilename = "Pharma_Items";
+        }
+
+        // Get the SQL query being executed
+        $sql = DB::getQueryLog();
+        if (is_array($sql) && count($sql) > 0) {
+            $last_query = end($sql)['query'];
+        } else {
+            $last_query = 'No query log found.';
+        }
+
+        $filename = $firstFilename . Carbon::now()->format('Ymd-His') . '.xlsx';
+
+        //Log Message
+        $message = "Downloaded a report as " . $filename;
+
+        // Log the data to the logs table
+        Log::create([
+            'user_id' => $user_id,
+            'user_type' => $user_type,
+            'message' => $message,
+            'query' => $last_query,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return Excel::download(new ItemExport(), $filename, \Maatwebsite\Excel\Excel::XLSX, [
             'Content-Type' => 'application/vnd.ms-excel',
         ]);
     }

@@ -33,7 +33,7 @@ class DispenseExport implements FromCollection, WithHeadings, WithMapping, WithS
             $title = Carbon::yesterday()->format('F d, Y');
         } elseif ($filter === 'this-month') {
             $from = Carbon::now()->startOfMonth()->format('F d, Y');
-            $to = Carbon::now()->endOfMonth()->format('F d, Y');
+            $to = Carbon::now()->startOfDay()->format('F d, Y');
             $title = "From: " . $from . " - To: " . $to;
         } else {
             $from = Carbon::parse(request()->input('date_from'))->format('F d, Y');

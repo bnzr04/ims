@@ -8,7 +8,7 @@
             <div class="card shadow-lg" style="color:white;">
                 <div class="card-header text-center" style="background-color:#77ab59;letter-spacing: 5px; align-items:center">
                     <img src="{{asset('logos/amante-logo.png')}}" alt="">
-                    <h3 class="mt-3">LOGIN</h3>
+                    <h3 class="mt-3">IMS PHARMACY</h3>
                 </div>
 
                 <div class="card-body" style="background-color:#36802d;">

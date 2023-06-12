@@ -9,7 +9,7 @@
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 <h1>Dashboard</h1>
-                <div class="container-lg p-2 d-flex" style="flex-wrap:wrap;">
+                <div class="container-fluid p-2 d-flex" style="flex-wrap:wrap;">
                     <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#005073;color:white">
                         Total Items
                         <hr>

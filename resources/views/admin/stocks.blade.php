@@ -18,14 +18,14 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 py-1">
-                <div class="container-lg">
+            <div id="content" class="py-1">
+                <div class="container-fluid">
                     <a href="{{ route('admin.items') }}" class="btn btn-secondary mt-2 mb-1">Back</a>
                     <hr>
                     <h2>STOCKS</h2>
                 </div>
-                <div class="container-lg">
-                    <div class="container-sm p-0 px- d-flex">
+                <div class="container-fluid">
+                    <div class="container-fluid p-0 px- d-flex">
                         <form action="" method="get">
                             <div class="input-group" style="width: 100%;max-width: 400px">
                                 <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search" value="{{ $search }}">
@@ -34,7 +34,7 @@
                         </form>
 
                         <form action="" method="get" class="mx-2">
-                            <div class="container-sm p-0 d-flex input-group" style="width: 100%;max-width: 400px">
+                            <div class="container-fluid p-0 d-flex input-group" style="width: 100%;max-width: 400px">
                                 <select name="category" class="form-select text-capitalize" id="category">
                                     @if($category !== null)
                                     <option value="{{ $category }}" class="text-capitalize">{{ $category }}</option>
@@ -52,53 +52,46 @@
 
                     </div>
 
-                    <div class="container-sm p-0 mt-2 d-flex">
+                    <div class="container-fluid p-0 mt-2 d-flex">
 
-                        <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
+                        <div class="container-fluid m-0 p-0" style="width:100%;max-width:200px;">
                             <div class="container-sm d-flex p-0" style="align-items: center;">
                                 <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#00CDCD">&nbsp;</div>
                                 <p class="m-0"><a href="{{ route('admin.stocks') }}?filter=max" class="level">Over Max Limit</a></p>
                             </div>
-                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="container-fluid d-flex p-0" style="align-items: center;">
                                 <div class="m-1" style="width:40px;height:100%;background-color:#1ea200">&nbsp;</div>
                                 <p class="m-0"><a href="{{ route('admin.stocks') }}?filter=safe" class="level">Safe Level</a></p>
                             </div>
-                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="container-fluid d-flex p-0" style="align-items: center;">
                                 <div class="m-1" style="width:40px;height:100%;background-color:#d67b00">&nbsp;</div>
                                 <p class="m-0"><a href="{{ route('admin.stocks') }}?filter=warning" class="level">Warning Level</a></p>
                             </div>
-                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <div class="container-fluid d-flex p-0" style="align-items: center;">
                                 <div class="m-1" style="width:40px;height:100%;background-color:#dc0f00">&nbsp;</div>
                                 <p class="m-0"><a href="{{ route('admin.stocks') }}?filter=no-stocks" class="level">No Stocks</a></p>
                             </div>
                         </div>
-                        <div class="container-sm m-0 p-0" style="width:100%;max-width:300px;">
+                        <div class="container-fluid m-0 p-0" style="width:100%;max-width:300px;">
                             <div class="container-sm d-flex p-0" style="align-items: center;">
                                 <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcd772">&nbsp;</div>
                                 <p class="m-0">Has Expired/Expiring Stocks</p>
                             </div>
                         </div>
 
-                        <div class="container-lg p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:300px;flex-direction:column-reverse">
+                        <div class="container-fluid p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:300px;flex-direction:column-reverse">
                             <div class="container-sm d-flex m-0 p-1">
                                 <form action="{{ route('admin.export-stocks') }}" method="post" class="m-0 d-flex">
                                     @csrf
-                                    <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
-                                </form>
-
-                                <form action="{{ route('admin.dispense') }}" method="get" class="m-1">
-                                    <button class="btn btn-secondary">Dispense report</button>
+                                    <button class="btn btn-light border border-secondary" title="Download Stock Batches Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                                 </form>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="container-lg px-2 pb-4 mb-4 rounded shadow bg-white">
 
-
-                    <div class=" container-lg p-0 border" style="height: 400px;overflow:auto;">
+                    <div class="container-fluid p-0 m-1">
                         <table class="table">
-                            <thead class="bg-success text-white" style="position: sticky;top: 0;">
+                            <thead class="bg-success text-white" style="position: sticky;top: 55;">
                                 <tr>
                                     <th scope="col">Item ID</th>
                                     <th scope="col">Item Name</th>
@@ -129,7 +122,6 @@
                                     <td colspan="7">
                                         No Item stock...
                                     </td>
-
                                 </tr>
                                 @endforelse
                             </tbody>

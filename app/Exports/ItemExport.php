@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Item;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -16,6 +17,8 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize, WithMapping, WithColumnFormatting
 {
+
+    public static $filter;
 
     public function fileName(): string
     {
@@ -31,7 +34,7 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
             ],
             [],
             [
-                'Item ID', 'Item name', 'Description', 'Category', 'Unit', 'Total Stocks'
+                'Item name', 'Description', 'Category', 'Unit', 'Total Stocks'
             ]
         ];
     }
@@ -42,42 +45,42 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
     //data collection
     public function collection()
     {
-        // $user = Auth::user();
-        // $user_type = $user->type;
+        $query = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level')
+            ->orderBy('items.name');
 
-        // if ($user_type === 'manager') {
-        //     $user_dept = $user->dept;
+        $items = $query->get();
 
-        //     if ($user_dept === 'pharmacy') {
-        //         $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-        //             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-        //             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-        //             ->where('items.category', '!=', 'medical supply')
-        //             ->orderBy('items.name')->get();
+        foreach ($items as $item) {
+            $item->warning_level = $item->warning_level / 100;
+        }
 
-        //         return $items;
-        //     } elseif ($user_dept === 'csr') {
-        //         $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-        //             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-        //             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-        //             ->where('items.category', 'medical supply')
-        //             ->orderBy('items.name')->get();
+        if (self::$filter) {
+            switch (self::$filter) {
+                case 'max':
+                    $query->havingRaw('total_quantity > max_limit');
+                    break;
+                case 'safe':
+                    $query->havingRaw('total_quantity > max_limit * (warning_level / 100)')
+                        ->havingRaw('total_quantity <= max_limit');
+                    break;
+                case 'warning':
+                    $query->havingRaw('total_quantity <= (warning_level / 100) * max_limit ');
+                    break;
+                case 'no-stocks':
+                    $query->whereNotExists(function ($query) {
+                        $query->select(DB::raw(1))
+                            ->from('item_stocks')
+                            ->whereRaw('items.id = item_stocks.item_id');
+                    });
+                    break;
+            }
+        }
 
-        //         return $items;
-        //     }
-        // } else {
-
-
-        $items = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit',)
-            ->orderBy('items.name')->get();
+        $items = $query->get();
 
         return $items;
-
-
-        // }
-
     }
 
     //style of excel file
@@ -98,7 +101,6 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
     {
         return [
             [
-                $row->id,
                 $row->name,
                 $row->description,
                 $row->category,

@@ -30,6 +30,11 @@
                         <hr>
                         <h3><a href="{{ route('user.viewRequest', ['request' => 'completed', 'filter' => 'today']) }}" id="completed-request" style="color:white;"></a></h3>
                     </div>
+                    <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#e21e10;color:white">
+                        Canceled Request
+                        <hr>
+                        <h3><a href="{{ route('user.viewRequest', ['request' => 'canceled', 'filter' => 'today']) }}" id="canceled-request" style="color:white;"></a></h3>
+                    </div>
                 </div>
             </div>
         </div>
@@ -40,6 +45,7 @@
     const accepted = document.getElementById("accepted-request");
     const delivered = document.getElementById("delivered-request");
     const completed = document.getElementById("completed-request");
+    const canceled = document.getElementById("canceled-request");
 
     function dataUpdate() {
         var xhr = new XMLHttpRequest();
@@ -60,6 +66,9 @@
 
                 completed.innerHTML = "";
                 completed.innerHTML = data.completed;
+
+                canceled.innerHTML = "";
+                canceled.innerHTML = data.canceled;
 
             } else {
                 console.log('Error: ' + xhr.status);

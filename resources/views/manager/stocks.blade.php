@@ -21,16 +21,16 @@ use Illuminate\Support\Facades\Session
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 pt-1 pb-5 container-lg">
+            <div id="content" class="px-2 pt-1 pb-5 container-fluid">
                 <h2>ITEMS</h2>
-                <div class="container-lg p-0 mt-1 d-flex justify-content-between" style="flex-wrap: wrap;">
+                <div class="container-fluid p-0 mt-1 d-flex justify-content-between" style="flex-wrap: wrap;">
                     <div class="container-sm p-0 m-0" style="display: flex;flex-wrap:wrap">
                         <a href="{{ route('manager.new-item') }}" class="btn btn-success m-1">New Item</a>
                         <a href="{{ route('manager.AllStocks') }}" class="btn btn-secondary m-1">All Stocks</a>
                     </div>
                 </div>
 
-                <div class="container-sm d-flex p-0 mt-2" style="flex-wrap:wrap">
+                <div class="container-fluid d-flex p-0 mt-2" style="flex-wrap:wrap">
                     <form action="" method="get" class="d-flex mx-1 my-1 m-0">
                         <div class="input-group flex-nowrap m-0 p-0" style="width: 300px;z-index:0;">
                             <input type="text" class="form-control bg-white" placeholder="Search name..." aria-label="search" aria-describedby="addon-wrapping" name="search" id="search" value="{{ $search == true ? $search : ''}}">
@@ -54,7 +54,7 @@ use Illuminate\Support\Facades\Session
                     </form>
                 </div>
 
-                <div class="container-sm p-0 mt-2 d-flex">
+                <div class="container-fluid p-0 mt-2 d-flex">
 
                     <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
                         <div class="container-sm d-flex p-0" style="align-items: center;">
@@ -84,6 +84,7 @@ use Illuminate\Support\Facades\Session
                     <div class="container-sm d-flex m-0 p-0" style="width:100%;max-width:200px;flex-direction:column-reverse">
                         <form class="m-0" action="{{ route('manager.export-items') }}" method="post">
                             @csrf
+                            <input type="hidden" name="filter" value="{{ request('filter') }}">
                             <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                         </form>
                     </div>
@@ -101,9 +102,9 @@ use Illuminate\Support\Facades\Session
                 </div>
                 @endif
 
-                <div class="container-lg mt-2 p-0 rounded shadow" style="height: 400px;overflow:auto;">
+                <div class="mt-2 p-0 border">
                     <table class="table" id="items_table">
-                        <thead class="bg-success text-white" style="position: sticky;top: 0;">
+                        <thead class="bg-success text-white" style="position: sticky;top: 55;">
                             <tr>
                                 <th scope="col">Item ID</th>
                                 <th scope="col">Item Name</th>
@@ -120,7 +121,7 @@ use Illuminate\Support\Facades\Session
                             <tr style="border-bottom: 1px black solid;{{ $item->hasExpiredStocks || $item->isExpiringSoon ? 'background-color:#fcd772' : '' }}">
                                 <th>{{ $item->id }}</th>
                                 <td class="text-capitalize">{{ $item->name }}</td>
-                                <td class="text-capitalize">{{ $item->safeLevel }}</td>
+                                <td class="text-capitalize">{{ $item->description }}</td>
                                 <td class="text-capitalize">{{ $item->category }}</td>
                                 <td>{{ $item->unit }}</td>
                                 <td>{{ is_null($item->price) ? "-" : $item->price}}</td>

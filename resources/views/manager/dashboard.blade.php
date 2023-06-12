@@ -7,9 +7,9 @@
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="container-lg mt-2">
+            <div id="content" class="container-fluid mt-2">
                 <h2>Dashboard</h2>
-                <div class="container-lg p-2 d-flex" style="flex-wrap:wrap;">
+                <div class="container-fluid p-2 d-flex" style="flex-wrap:wrap;">
                     <div class="m-2 p-2" style="width: 200px;height: 120px;background-color:	#005073;color:white">
                         Total Items
                         <hr>
@@ -32,7 +32,7 @@
                     </div>
                 </div>
 
-                <div class="container-lg">
+                <div class="container-fluid">
                     <iframe src="{{ route('manager.show-pending') }}" frameborder="0" class="border shadow" style="height:250px;width:30%;"></iframe>
                 </div>
             </div>

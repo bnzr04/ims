@@ -42,11 +42,16 @@ class UserController extends Controller
             ->where('status', 'completed')
             ->count('user_id');
 
+        $canceled = ModelsRequest::where('user_id', $user_id)
+            ->where('status', 'canceled')
+            ->count('user_id');
+
         return response()->json([
             'pending' => $pending,
             'accepted' => $accepted,
             'delivered' => $delivered,
             'completed' => $completed,
+            'canceled' => $canceled,
         ]);
     }
 

@@ -79,5 +79,5 @@
     }
 
     pendingUpdate();
-    setInterval(pendingUpdate, 10000);
+    setInterval(pendingUpdate, 30000);
 </script>

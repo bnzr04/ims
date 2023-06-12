@@ -223,7 +223,7 @@
 
         <div class="other-details">
             <p>WARD/ROOM:<span>{{ $request->office }}</span></p>
-            <p>DATE & TIME:<span id="todayDateAndTime"></span></p>
+            <p>DATE & TIME:<span id="todayDateAndTime">{{ $request->format_created_at }}</span></p>
         </div>
 
         <table class="sign-table">
@@ -277,44 +277,6 @@
             window.print();
             window.close();
         }
-
-        function dateAndTime() {
-            const todayDateAndTimeOutput = document.getElementById('todayDateAndTime');
-
-            // create a new Date object
-            const today = new Date();
-
-            // get the month name and convert it to uppercase
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-            ];
-            const month = monthNames[today.getMonth()].toUpperCase();
-
-            // get the day and add a leading zero if necessary
-            const day = ("0" + today.getDate()).slice(-2);
-
-            // get the year
-            const year = today.getFullYear();
-
-            // get the hours in 12-hour format
-            let hours = today.getHours();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours %= 12;
-            hours = hours ? hours : 12;
-
-            // get the minutes and add a leading zero if necessary
-            const minutes = ("0" + today.getMinutes()).slice(-2);
-
-            // combine the date and time components into a string
-            const formattedDateTime = `${month} ${day}, ${year} ${hours}:${minutes} ${ampm}`;
-
-            // output the formatted date and time
-            todayDateAndTimeOutput.innerHTML = formattedDateTime;
-        }
-
-        setInterval(function() {
-            dateAndTime();
-        }, 1000);
     </script>
 </body>
 
