@@ -95,7 +95,7 @@ use Illuminate\Support\Facades\Session
                 </div>
                 <div class="container-fluid p-0 border border-dark shadow p-3 mt-3 mb-2 bg-body rounded" style="height: auto">
                     <h4>Requested Items</h4>
-                    <div class=" container-fluid p-0 mb-2 border" style="height:230px;overflow-y: auto;">
+                    <div class=" container-fluid p-0 mb-2 border" style="height:250px;overflow-y: scroll;">
                         <table class="table">
                             <thead class="text-white bg-secondary" style="position: sticky;top: 0;z-index: 0;">
                                 <tr>

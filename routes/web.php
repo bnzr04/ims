@@ -30,14 +30,34 @@ use App\Http\Controllers\UserController;
 |
 */
 
+
+///////////////////
+/////DEV NOTE////// FOR VSCODE IDE, ex. [HomeController::class, 'login'] you can ctrl + click the function 'login' to redirect on the function you want to go. 
+///////////////////
+
 Auth::routes();
 
+/*------------------------------------------
+--------------------------------------------
+All Guest Routes List
+--------------------------------------------
+--------------------------------------------*/
 Route::middleware('guest')->group(function () {
-    Route::get('/', [HomeController::class, 'login'])->name('home');
-    Route::get('/login', [HomeController::class, 'login'])->name('login');
-    Route::get('/info', [HomeController::class, 'showInfo'])->name('info');
-    Route::get('/add-to-stocks/{id}', [HomeController::class, 'addToStocks'])->name('add-to-stocks');
-    Route::get('/dashboard-display', [HomeController::class, 'dashboardDisplay'])->name('dashboard-display');
+    Route::get('/', [HomeController::class, 'login'])->name('home'); //will redirect to login if they access "/"
+    Route::get('/login', [HomeController::class, 'login'])->name('login'); //will redirect to login if they access "/login";
+
+    /////guest view access (info)/////
+    Route::get('/info', [HomeController::class, 'showInfo'])->name('info'); //guest info
+    Route::get('/add-to-stocks/{id}', [HomeController::class, 'addToStocks'])->name('add-to-stocks'); //will view stock batches
+
+    Route::get('/dispense', [HomeController::class, 'dispenseView'])->name('dispense'); //guest will view dispensed items
+    Route::get('/filter-dispense', [HomeController::class, 'dispenseFilter'])->name('filter-dispense'); //will filter the dispense from today, yesterday, this-month
+    Route::get('/fetch-record/{id}', [HomeController::class, 'fetchRecord'])->name('fetch-record'); //will fetch the dispensed record
+    Route::get('/view-request/{id}', [HomeController::class, 'viewRequest'])->name('view-request'); //will view the selected record
+
+    Route::get('/transaction', [HomeController::class, 'transaction'])->name('transaction');
+    Route::get('/filter-all-transaction', [HomeController::class, 'filterAllTransaction'])->name('filter-all-transaction');
+    Route::get('/search-transaction', [HomeController::class, 'searchRequestCodeOrPatientName'])->name('search-transaction');
 });
 
 
@@ -48,26 +68,25 @@ All Normal Users Routes List
 --------------------------------------------*/
 Route::prefix('user')->middleware(['auth', 'user-access:user'])->group(function () {
 
-    Route::get('/home', [UserController::class, 'userHome'])->name('user.home');
-    Route::get('/dashboard-data', [UserController::class, 'dashboardData'])->name('user.dashboard-data');
+    Route::get('/home', [UserController::class, 'userHome'])->name('user.home'); // will show the user dashboard
+    Route::get('/dashboard-data', [UserController::class, 'dashboardData'])->name('user.dashboard-data'); // will show the dashboard data count
 
     ////////Request routes////////
-    Route::get('/request', [RequestController::class, 'request'])->name('user.request');
-    Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');
-    Route::get('/request-items/{id}', [RequestController::class, 'itemRequest'])->name('user.request-items');
-    Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
-    Route::get('/remove-item/{sid}/{id}', [RequestController::class, 'removeItem'])->name('user.remove-item');
-    Route::post('/submit-request', [RequestController::class, 'submitRequest'])->name('user.submit-request');
-    Route::post('/cancel-request/{rid}', [RequestController::class, 'cancelRequest'])->name('user.cancel-request');
-    Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request');
+    Route::get('/request', [RequestController::class, 'request'])->name('user.request'); // will show the request module where user can order item/s and fetch the items available in stocks
+    // Route::get('/delete-request/{id}', [RequestController::class, 'deleteRequest'])->name('user.delete-request');
+    Route::get('/request-items/{id}', [RequestController::class, 'itemRequest'])->name('user.request-items'); // will view the selected request
+    // Route::get('/search-item', [UserController::class, 'searchItem'])->name('user.search-item');
+    // Route::get('/remove-item/{sid}/{id}', [RequestController::class, 'removeItem'])->name('user.remove-item');
+    Route::post('/submit-request', [RequestController::class, 'submitRequest'])->name('user.submit-request'); // will submit the order request
+    Route::post('/cancel-request/{rid}', [RequestController::class, 'cancelRequest'])->name('user.cancel-request'); // will cancel the pending request
+    Route::post('/receive-request/{rid}', [RequestController::class, 'receiveRequest'])->name('user.receive-request'); // will receive the delivered request
 
-    Route::get('/show-pending-requests', [RequestController::class, 'showPendingRequest'])->name('user.show-pending-requests');
-    Route::get('/show-accepted-requests', [RequestController::class, 'showAcceptedRequest'])->name('user.show-accepted-requests');
-    Route::get('/show-delivered-requests', [RequestController::class, 'showDeliveredRequest'])->name('user.show-delivered-requests');
-    Route::get('/show-completed-requests', [RequestController::class, 'showCompletedRequest'])->name('user.show-completed-requests');
+    // Route::get('/show-pending-requests', [RequestController::class, 'showPendingRequest'])->name('user.show-pending-requests');
+    // Route::get('/show-accepted-requests', [RequestController::class, 'showAcceptedRequest'])->name('user.show-accepted-requests');
+    // Route::get('/show-delivered-requests', [RequestController::class, 'showDeliveredRequest'])->name('user.show-delivered-requests');
+    // Route::get('/show-completed-requests', [RequestController::class, 'showCompletedRequest'])->name('user.show-completed-requests');
 
-
-    Route::get('/view-request/{request}/{filter}', [RequestController::class, 'viewRequest'])->name('user.viewRequest');
+    Route::get('/view-request/{request}/{filter}', [RequestController::class, 'viewRequest'])->name('user.viewRequest'); // will show the request depending on its status and data filter
 });
 
 /*------------------------------------------

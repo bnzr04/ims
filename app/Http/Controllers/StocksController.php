@@ -229,6 +229,12 @@ class StocksController extends Controller
         //find item by id set to request
         $item = Item::find($id);
 
+        $totalStocks = DB::table('item_stocks')
+            ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))
+            ->where('item_stocks.item_id', $id)
+            ->get();
+
         $stocks = DB::table('item_stocks')
             ->join('items', 'item_stocks.item_id', '=', 'items.id')
             ->select(
@@ -277,10 +283,10 @@ class StocksController extends Controller
         if ($user_type === 'manager') {
 
             //get total stocks by item id
-            $totalStocks = DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
-                ->get();
+            // $totalStocks = DB::table('item_stocks')
+            //     ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            //     ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)
+            //     ->get();
 
             if ($stocks) {
                 return view('manager.sub-page.stocks.add-to-stock')->with([
@@ -296,13 +302,7 @@ class StocksController extends Controller
         //else the user is admin
         else {
 
-            $totalStocks = DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))
-                ->where('item_stocks.item_id', $id)
-                ->get();
-
-            if ($stocks->isNotEmpty()) {
+            if ($stocks) {
                 return view('admin.sub-page.stocks.add-to-stock')->with([
                     'item' => $item,
                     'stocks' => $stocks,

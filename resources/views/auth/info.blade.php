@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('content')
 <style>
     .level {
         text-decoration: none;
@@ -11,12 +12,14 @@
     }
 </style>
 <div id="content" class="px-2 py-1">
-    <div class="container-lg p-2 pt-0 d-flex" style="flex-wrap:wrap;justify-content:center">
-        <div class="container-lg p-0 m-1">
+    <div class="container-fluid p-2 pt-0 d-flex" style="flex-wrap:wrap;justify-content:center">
+        <div class="container-fluid p-0 m-1">
             <a href="{{ route('login') }}" class="btn btn-secondary">Login</a>
+            <a href="{{ route('dispense') }}" class="btn btn-secondary">Dispense</a>
+            <a href="{{ route('transaction') }}" class="btn btn-secondary">Transactions</a>
         </div>
-        <div class="container-lg mt-2">
-            <div class="container-sm p-0 px- d-flex">
+        <div class="container-fluid mt-2">
+            <div class="container-fluid p-0 px- d-flex">
                 <form action="" method="get">
                     <div class="input-group" style="width: 100%;max-width: 400px">
                         <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search" value="{{ $search }}">
@@ -25,7 +28,7 @@
                 </form>
 
                 <form action="" method="get" class="mx-2">
-                    <div class="container-sm p-0 d-flex input-group" style="width: 100%;max-width: 400px">
+                    <div class="container-fluid p-0 d-flex input-group" style="width: 100%;max-width: 400px">
                         <select name="category" class="form-select text-capitalize" id="category">
                             @if($category !== null)
                             <option value="{{ $category }}" class="text-capitalize">{{ $category }}</option>
@@ -43,38 +46,37 @@
 
             </div>
 
-            <div class="container-sm p-0 mt-2 d-flex">
+            <div class="container-fluid p-0 mt-2 d-flex">
 
-                <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
-                    <div class="container-sm d-flex p-0" style="align-items: center;">
+                <div class="container-fluid m-0 p-0" style="width:100%;max-width:200px;">
+                    <div class="container-fluid d-flex p-0" style="align-items: center;">
                         <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#00CDCD">&nbsp;</div>
                         <p class="m-0"><a href="{{ route('info') }}?filter=max" class="level">Over Max Limit</a></p>
                     </div>
-                    <div class="container-sm d-flex p-0" style="align-items: center;">
+                    <div class="container-fluid d-flex p-0" style="align-items: center;">
                         <div class="m-1" style="width:40px;height:100%;background-color:#1ea200">&nbsp;</div>
                         <p class="m-0"><a href="{{ route('info') }}?filter=safe" class="level">Safe Level</a></p>
                     </div>
-                    <div class="container-sm d-flex p-0" style="align-items: center;">
+                    <div class="container-fluid d-flex p-0" style="align-items: center;">
                         <div class="m-1" style="width:40px;height:100%;background-color:#d67b00">&nbsp;</div>
                         <p class="m-0"><a href="{{ route('info') }}?filter=warning" class="level">Warning Level</a></p>
                     </div>
-                    <div class="container-sm d-flex p-0" style="align-items: center;">
+                    <div class="container-fluid d-flex p-0" style="align-items: center;">
                         <div class="m-1" style="width:40px;height:100%;background-color:#dc0f00">&nbsp;</div>
                         <p class="m-0"><a href="{{ route('info') }}?filter=no-stocks" class="level">No Stocks</a></p>
                     </div>
                 </div>
-                <div class="container-sm m-0 p-0" style="width:100%;max-width:300px;">
-                    <div class="container-sm d-flex p-0" style="align-items: center;">
+                <div class="container-fluid m-0 p-0" style="width:100%;max-width:300px;">
+                    <div class="container-fluid d-flex p-0" style="align-items: center;">
                         <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcd772">&nbsp;</div>
                         <p class="m-0">Has Expired/Expiring Stocks</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="container-lg px-2 pb-4 mb-4 rounded shadow bg-white">
+        <div class="container-fluid px-2 pb-4 mb-4 rounded shadow bg-white">
 
-
-            <div class=" container-lg p-0 border" style="height: 350px;overflow:auto;">
+            <div class=" container-fluid p-0 border" style="overflow:auto;">
                 <table class="table">
                     <thead class="bg-success text-white" style="position: sticky;top: 0;">
                         <tr>
@@ -155,3 +157,4 @@
 
     threshold();
 </script>
+@endsection

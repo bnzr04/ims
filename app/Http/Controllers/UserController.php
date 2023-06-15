@@ -55,18 +55,18 @@ class UserController extends Controller
         ]);
     }
 
-    public function searchItem(Request $request)
-    {
+    // public function searchItem(Request $request)
+    // {
 
-        $searchItem = $request->search_item;
-
-
-        if ($searchItem) {
-            $search = Item::where('name', 'like', '%' . $searchItem . '%')->get();
-        }
+    //     $searchItem = $request->search_item;
 
 
+    //     if ($searchItem) {
+    //         $search = Item::where('name', 'like', '%' . $searchItem . '%')->get();
+    //     }
 
-        return back()->with('items', $search);
-    }
+
+
+    //     return back()->with('items', $search);
+    // }
 }

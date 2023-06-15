@@ -123,17 +123,10 @@ class TransactionController extends Controller
     //filter all the transaction
     public function filterAllTransaction(Request $request)
     {
-        $user = Auth::user();
-        $user_type = $user->type;
-        $user_id = $user->id;
-
         $thisDay = $request->input('this-day');
         $thisWeek = $request->input('this-week');
         $thisMonth = $request->input('this-month');
         $filter = $request->input('filter');
-
-        $searchReqCode = $request->input('req-code');
-        $searchPatient = $request->input('patient');
 
         if ($thisDay) {
             $from = Carbon::now()->startOfDay();
@@ -157,10 +150,6 @@ class TransactionController extends Controller
             ->whereBetween('created_at', [$from, $to])
             ->orderBy('created_at', 'asc');
 
-        // if ($user_type === 'manager') {
-        //     $query->where('accepted_by_user_id', $user_id);
-        // }
-
         $data = $query->get();
 
         // Loop through the data and format the created_at timestamp
@@ -173,10 +162,6 @@ class TransactionController extends Controller
 
     public function searchRequestCodeOrPatientName(Request $request)
     {
-        $user = Auth::user();
-        $user_type = $user->type;
-        $user_id = $user->id;
-
         $searchReqCode = $request->input('req-code');
 
         $query = ModelsRequest::where('status', '!=', 'pending')
@@ -185,10 +170,6 @@ class TransactionController extends Controller
         if ($searchReqCode) {
             $query->where('id', 'like', $searchReqCode);
         }
-
-        // if ($user_type === 'manager') {
-        //     $query->where('accepted_by_user_id', $user_id);
-        // }
 
         $data = $query->get();
 

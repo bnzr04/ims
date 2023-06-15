@@ -94,8 +94,20 @@ use Carbon\Carbon
                 </div>
 
                 <div class="container-fluid p-0 pb-3 pt-2 px-2 shadow-lg rounded">
-                    <div class="container-fluid p-0 border overflow-auto" style="max-height: 300px;">
+                    <div class="container-fluid m-0 p-0" style="display: flex;align-items:center;letter-spacing:2px;">
+                        @if(request()->input('petty-cash') == 1)
+                        <h4>Mode Of Acquisition: Petty Cash</h4>
+                        @endif
 
+                        @if(request()->input('donation') == 1)
+                        <h4>Mode Of Acquisition: Donation</h4>
+                        @endif
+
+                        @if(request()->input('lgu') == 1)
+                        <h4>Mode Of Acquisition: LGU</h4>
+                        @endif
+                    </div>
+                    <div class="container-fluid p-0 border overflow-auto" style="max-height: 300px;">
                         <table class="table">
 
                             @if($stocks->isEmpty())

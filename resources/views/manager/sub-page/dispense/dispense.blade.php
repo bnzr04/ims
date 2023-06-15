@@ -140,9 +140,6 @@
     document.getElementById("date_from").setAttribute("max", tomorrowString);
     document.getElementById("date_to").setAttribute("max", tomorrowString);
 
-    document.getElementById("date_from1").setAttribute("max", tomorrowString);
-    document.getElementById("date_to1").setAttribute("max", tomorrowString);
-
     const modalTitle = document.getElementById('modal_title');
     const modalDispenseCount = document.getElementById('dispense_count');
     const modalTableBody = document.getElementById('modal_table_body');
@@ -156,29 +153,68 @@
         return date.toLocaleDateString('en-US', options);
     }
 
+    function todayTitle() {
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        const today = new Date().toLocaleDateString('en-US', options);
+        table_title.innerHTML = 'TODAY - ' + today;
+    };
+
+    function yesterdayTitle() {
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        table_title.innerHTML = 'YESTERDAY - ' + yesterday.toLocaleDateString('en-US', options);
+    };
+
+    function thisMonthTitle() {
+        const monthNames = [
+            'January', 'February', 'March', 'April',
+            'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December'
+        ];
+
+        const today = new Date();
+        const currentMonth = today.getMonth();
+
+        table_title.innerHTML = 'THIS MONTH - ' + monthNames[currentMonth];
+    }
+
+    var mainUrl = "{{ route('manager.get-dispense') }}";
+
+    var filterForFetchUrl = "?today=1";
+
+    var table_title = document.querySelector('#table_title');
+
+    todayTitle();
+
     function showDispense() {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', "{{ route('manager.get-dispense') }}", true);
+        xhr.open('GET', mainUrl);
         xhr.onload = function() {
             if (xhr.status === 200) {
-                const options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                const today = new Date().toLocaleDateString('en-US', options);
-
                 var data = JSON.parse(xhr.responseText);
+
                 // Update the table with the new data
                 var dispense_table = document.querySelector('#dispense_table');
-                var table_title = document.querySelector('#table_title');
-                table_title.innerHTML = 'TODAY - ' + today;
+
                 dispense_table.innerHTML = '';
+
+                // console.log(data);
 
                 if (data.length > 0) {
                     data.forEach(function(row) {
                         modalTitle.innerHTML = row.name + " - " + row.category + " - " + row.unit;
-                        var url = window.APP_URL + '/manager/view-dispense/' + row.item_id;
+                        var url = window.APP_URL + '/view-dispense/' + row.item_id;
                         var viewButton = "<button type='button' class='btn btn-secondary' data-bs-toggle='modal' data-bs-target='#viewModal' data-item-id='" + row.item_id + "' data-item-name='" + row.name + "' data-item-category='" + row.category + "' data-item-unit='" + row.unit + "' data-total-dispense='" + row.total_dispense + "'>View</button>";
                         dispense_table.innerHTML += "<tr><td>" + row.item_id + "</td><td>" + row.name + "</td><td>" + row.description + "</td><td>" + row.category + "</td><td>" + row.unit + "</td><td>" + row.total_dispense + "</td><td>" + viewButton + "</td></tr>";
                     });
@@ -197,15 +233,13 @@
                             modalTitle.innerHTML = itemName + " - " + itemCategory + " - " + itemUnit;
                             modalDispenseCount.innerHTML = totalDispense;
 
-
                             //to fetch the records
-                            var fetchUrl = window.APP_URL + "/manager/fetch-record/" + itemId;
+                            var fetchUrl = window.APP_URL + "/manager/fetch-record/" + itemId + filterForFetchUrl;
 
                             modalTableBody.innerHTML = "";
 
                             var req = new XMLHttpRequest();
-                            req.open('GET', fetchUrl, true);
-
+                            req.open('GET', fetchUrl);
                             req.onload = function() {
                                 if (req.status === 200) {
                                     var response = JSON.parse(req.responseText);
@@ -217,10 +251,10 @@
                                             modalTableBody.innerHTML += "<tr class='text-center'><th><a target='_blank' href='" + requestUrl + "'>" + row.request_id + "</a></th><td>" + row.formatDate + "</td><td>" + row.quantity + "</td><td>" + row.stock_id + "</td><td>" + row.status + "</td></tr>";
                                         });
                                     } else {
-                                        modalTableBody.innerHTML += "<tr><td colspan='4'>No dispense record...</td></tr>"
+                                        modalTableBody.innerHTML += "<tr><td colspan='5'>No dispense record...</td></tr>";
                                     }
                                 } else {
-                                    console.error(req.statusText);
+                                    console.error('Error: ' + req.statusText);
                                 }
                             }
 
@@ -228,7 +262,7 @@
                         });
                     });
                 } else {
-                    dispense_table.innerHTML += "<tr><td colspan='6'>No item dispensed...</td></tr>";
+                    dispense_table.innerHTML += "<tr><td colspan='7'>No item dispensed...</td></tr>";
                 }
             } else {
                 console.log('Error: ' + xhr.status);
@@ -236,9 +270,6 @@
         };
         xhr.send();
     }
-
-    showDispense();
-
 
     /////filter buttons///////
 
@@ -248,274 +279,33 @@
     const filterForm = document.querySelector('#filter_form');
 
     /////////Today////////
-    todayForm.addEventListener('submit', (event) => {
+    todayForm.addEventListener('submit', function(event) {
         event.preventDefault();
+        mainUrl = "{{ route('manager.filter-dispense') }}?today=1";
+        todayTitle();
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `{{ route('manager.filter-dispense') }}?today=1`);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                const options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                const today = new Date().toLocaleDateString('en-US', options);
-
-                var data = JSON.parse(xhr.responseText);
-                var dispense_table = document.querySelector('#dispense_table');
-                var table_title = document.querySelector('#table_title');
-                table_title.innerHTML = 'TODAY - ' + today;
-                dispense_table.innerHTML = '';
-                // console.log(data);
-
-                if (data.length > 0) {
-                    data.forEach(function(row) {
-                        modalTitle.innerHTML = row.name + " - " + row.category + " - " + row.unit;
-                        var url = window.APP_URL + '/manager/view-dispense/' + row.item_id;
-                        var viewButton = "<button type='button' class='btn btn-secondary' data-bs-toggle='modal' data-bs-target='#viewModal' data-item-id='" + row.item_id + "' data-item-name='" + row.name + "' data-item-category='" + row.category + "' data-item-unit='" + row.unit + "' data-total-dispense='" + row.total_dispense + "'>View</button>";
-                        dispense_table.innerHTML += "<tr><td>" + row.item_id + "</td><td>" + row.name + "</td><td>" + row.description + "</td><td>" + row.category + "</td><td>" + row.unit + "</td><td>" + row.total_dispense + "</td><td>" + viewButton + "</td></tr>";
-                    });
-
-                    // Add click event listener to all view buttons
-                    var viewButtons = document.querySelectorAll("[data-bs-toggle='modal']");
-                    viewButtons.forEach(function(button) {
-                        button.addEventListener("click", function() {
-                            var itemId = this.getAttribute("data-item-id");
-                            var itemName = this.getAttribute("data-item-name");
-                            var itemCategory = this.getAttribute("data-item-category");
-                            var itemUnit = this.getAttribute("data-item-unit");
-                            var totalDispense = this.getAttribute("data-total-dispense");
-
-                            // Set the values in the modal
-                            modalTitle.innerHTML = itemName + " - " + itemCategory + " - " + itemUnit;
-                            modalDispenseCount.innerHTML = totalDispense;
-
-                            //to fetch the records
-                            var fetchUrl = window.APP_URL + "/manager/fetch-record/" + itemId + "?today=1";
-
-                            modalTableBody.innerHTML = "";
-
-                            var req = new XMLHttpRequest();
-                            req.open('GET', fetchUrl, true);
-
-                            req.onload = function() {
-                                if (req.status === 200) {
-                                    var response = JSON.parse(req.responseText);
-
-                                    // console.log(response);
-                                    if (response.length > 0) {
-                                        response.forEach(function(row) {
-                                            var requestUrl = window.APP_URL + "/manager/view-request/" + row.request_id;
-                                            modalTableBody.innerHTML += "<tr class='text-center'><th><a target='_blank' href='" + requestUrl + "'>" + row.request_id + "</a></th><td>" + row.formatDate + "</td><td>" + row.quantity + "</td><td>" + row.stock_id + "</td><td>" + row.status + "</td></tr>";
-                                        });
-                                    } else {
-                                        modalTableBody.innerHTML += "<tr><td colspan='4'>No dispense record...</td></tr>"
-                                    }
-                                } else {
-                                    console.error(req.statusText);
-                                }
-                            }
-
-                            req.send();
-                        });
-                    });
-                } else {
-                    dispense_table.innerHTML += "<tr><td colspan='6'>No item dispensed...</td></tr>";
-                }
-            } else {
-                var data = JSON.parse(xhr.responseText);
-                console.log(data);
-            }
-        };
-        xhr.onerror = function() {
-            var data = JSON.parse(xhr.responseText);
-            console.log(data);
-        };
-        xhr.send();
+        filterForFetchUrl = "?today=1";
+        showDispense();
     });
 
     /////////Yesterday////////
-    yesterdayForm.addEventListener('submit', (event) => {
+    yesterdayForm.addEventListener('submit', function(event) {
         event.preventDefault();
+        mainUrl = "{{ route('manager.filter-dispense') }}?yesterday=1";
+        yesterdayTitle();
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `{{ route('manager.filter-dispense') }}?yesterday=1`);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                const options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
-
-
-                var data = JSON.parse(xhr.responseText);
-                var dispense_table = document.querySelector('#dispense_table');
-                var table_title = document.querySelector('#table_title');
-                table_title.innerHTML = 'YESTERDAY - ' + yesterday.toLocaleDateString('en-US', options);
-                dispense_table.innerHTML = '';
-                // console.log(data);
-
-                if (data.length > 0) {
-                    data.forEach(function(row) {
-                        modalTitle.innerHTML = row.name + " - " + row.category + " - " + row.unit;
-                        var url = window.APP_URL + '/manager/view-dispense/' + row.item_id;
-                        var viewButton = "<button type='button' class='btn btn-secondary' data-bs-toggle='modal' data-bs-target='#viewModal' data-item-id='" + row.item_id + "' data-item-name='" + row.name + "' data-item-category='" + row.category + "' data-item-unit='" + row.unit + "' data-total-dispense='" + row.total_dispense + "'>View</button>";
-                        dispense_table.innerHTML += "<tr><td>" + row.item_id + "</td><td>" + row.name + "</td><td>" + row.description + "</td><td>" + row.category + "</td><td>" + row.unit + "</td><td>" + row.total_dispense + "</td><td>" + viewButton + "</td></tr>";
-                    });
-
-                    // Add click event listener to all view buttons
-                    var viewButtons = document.querySelectorAll("[data-bs-toggle='modal']");
-                    viewButtons.forEach(function(button) {
-                        button.addEventListener("click", function() {
-                            var itemId = this.getAttribute("data-item-id");
-                            var itemName = this.getAttribute("data-item-name");
-                            var itemCategory = this.getAttribute("data-item-category");
-                            var itemUnit = this.getAttribute("data-item-unit");
-                            var totalDispense = this.getAttribute("data-total-dispense");
-
-                            // Set the values in the modal
-                            modalTitle.innerHTML = itemName + " - " + itemCategory + " - " + itemUnit;
-                            modalDispenseCount.innerHTML = totalDispense;
-
-                            //to fetch the records
-                            var fetchUrl = window.APP_URL + "/manager/fetch-record/" + itemId + "?yesterday=1";
-
-                            modalTableBody.innerHTML = "";
-
-                            var req = new XMLHttpRequest();
-                            req.open('GET', fetchUrl, true);
-
-                            req.onload = function() {
-                                if (req.status === 200) {
-                                    var response = JSON.parse(req.responseText);
-
-                                    // console.log(response);
-                                    if (response.length > 0) {
-                                        response.forEach(function(row) {
-                                            var requestUrl = window.APP_URL + "/manager/view-request/" + row.request_id;
-                                            modalTableBody.innerHTML += "<tr class='text-center'><th><a target='_blank' href='" + requestUrl + "'>" + row.request_id + "</a></th><td>" + row.formatDate + "</td><td>" + row.quantity + "</td><td>" + row.stock_id + "</td><td>" + row.status + "</td></tr>";
-                                        });
-                                    } else {
-                                        modalTableBody.innerHTML += "<tr><td colspan='4'>No dispense record...</td></tr>"
-                                    }
-                                } else {
-                                    console.error(req.statusText);
-                                }
-                            }
-
-                            req.send();
-                        });
-                    });
-                } else {
-                    dispense_table.innerHTML += "<tr><td colspan='6'>No item dispensed...</td></tr>";
-                }
-            } else {
-                var data = JSON.parse(xhr.responseText);
-                console.log(data);
-            }
-        };
-        xhr.onerror = function() {
-            var data = JSON.parse(xhr.responseText);
-            console.log(data);
-        };
-        xhr.send();
+        filterForFetchUrl = "?yesterday=1";
+        showDispense();
     });
 
     /////////This month////////
-    thisMonthForm.addEventListener('submit', (event) => {
+    thisMonthForm.addEventListener('submit', function(event) {
         event.preventDefault();
+        mainUrl = "{{ route('manager.filter-dispense') }}?this-month=1";
+        thisMonthTitle();
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `{{ route('manager.filter-dispense') }}?this-month=1`);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                const monthNames = [
-                    'January', 'February', 'March', 'April',
-                    'May', 'June', 'July', 'August',
-                    'September', 'October', 'November', 'December'
-                ];
-
-                const today = new Date();
-                const currentMonth = today.getMonth();
-
-                var data = JSON.parse(xhr.responseText);
-                var dispense_table = document.querySelector('#dispense_table');
-                var table_title = document.querySelector('#table_title');
-                table_title.innerHTML = 'THIS MONTH - ' + monthNames[currentMonth];
-                dispense_table.innerHTML = '';
-                // console.log(data);
-
-                if (data.length > 0) {
-                    data.forEach(function(row) {
-                        // console.log(row.item_id);
-                        modalTitle.innerHTML = row.name + " - " + row.category + " - " + row.unit;
-                        var url = window.APP_URL + '/manager/view-dispense/' + row.item_id;
-                        var viewButton = "<button type='button' class='btn btn-secondary' data-bs-toggle='modal' data-bs-target='#viewModal' data-item-id='" + row.item_id + "' data-item-name='" + row.name + "' data-item-category='" + row.category + "' data-item-unit='" + row.unit + "' data-total-dispense='" + row.total_dispense + "'>View</button>";
-                        dispense_table.innerHTML += "<tr><td>" + row.item_id + "</td><td>" + row.name + "</td><td>" + row.description + "</td><td>" + row.category + "</td><td>" + row.unit + "</td><td>" + row.total_dispense + "</td><td>" + viewButton + "</td></tr>";
-                    });
-
-                    // Add click event listener to all view buttons
-                    var viewButtons = document.querySelectorAll("[data-bs-toggle='modal']");
-                    viewButtons.forEach(function(button) {
-                        button.addEventListener("click", function() {
-                            var itemId = this.getAttribute("data-item-id");
-                            var itemName = this.getAttribute("data-item-name");
-                            var itemCategory = this.getAttribute("data-item-category");
-                            var itemUnit = this.getAttribute("data-item-unit");
-                            var totalDispense = this.getAttribute("data-total-dispense");
-
-                            // Set the values in the modal
-                            modalTitle.innerHTML = itemName + " - " + itemCategory + " - " + itemUnit;
-                            modalDispenseCount.innerHTML = totalDispense;
-
-                            //to fetch the records
-                            var fetchUrl = window.APP_URL + "/manager/fetch-record/" + itemId + "?this-month=1";
-
-                            modalTableBody.innerHTML = "";
-
-                            var req = new XMLHttpRequest();
-                            req.open('GET', fetchUrl, true);
-
-                            req.onload = function() {
-                                if (req.status === 200) {
-                                    var response = JSON.parse(req.responseText);
-
-                                    // console.log(response);
-                                    if (response.length > 0) {
-                                        response.forEach(function(row) {
-                                            // console.log(row.item_id);
-                                            var requestUrl = window.APP_URL + "/manager/view-request/" + row.request_id;
-                                            modalTableBody.innerHTML += "<tr class='text-center'><th><a target='_blank' href='" + requestUrl + "'>" + row.request_id + "</a></th><td>" + row.formatDate + "</td><td>" + row.quantity + "</td><td>" + row.stock_id + "</td><td>" + row.status + "</td></tr>";
-                                        });
-                                    } else {
-                                        modalTableBody.innerHTML += "<tr><td colspan='4'>No dispense record...</td></tr>"
-                                    }
-                                } else {
-                                    console.error(req.statusText);
-                                }
-                            }
-
-                            req.send();
-                        });
-                    });
-                } else {
-                    dispense_table.innerHTML += "<tr><td colspan='6'>No item dispensed...</td></tr>";
-                }
-            } else {
-                var data = JSON.parse(xhr.responseText);
-                console.log(data);
-            }
-        };
-        xhr.onerror = function() {
-            var data = JSON.parse(xhr.responseText);
-            console.log(data);
-        };
-        xhr.send();
+        filterForFetchUrl = "?this-month=1";
+        showDispense();
     });
 
     /////////Date Filter////////
@@ -527,83 +317,14 @@
         const from = new Date(fromDateInput);
         const to = new Date(toDateInput);
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `{{ route('manager.filter-dispense') }}?date_from=${fromDateInput}&date_to=${toDateInput}`);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                var data = JSON.parse(xhr.responseText);
-                var dispense_table = document.querySelector('#dispense_table');
-                var table_title = document.querySelector('#table_title');
-                table_title.innerHTML = 'Date from: ' + formatDate(from) + ' - ' + formatDate(to);
-                dispense_table.innerHTML = '';
-                // console.log(data);
+        mainUrl = `{{ route('manager.filter-dispense') }}?date_from=${fromDateInput}&date_to=${toDateInput}`;
 
-                if (data.length > 0) {
-                    data.forEach(function(row) {
-                        // console.log(row.item_id);
-                        modalTitle.innerHTML = row.name + " - " + row.category + " - " + row.unit;
-                        var url = window.APP_URL + '/manager/view-dispense/' + row.item_id;
-                        var viewButton = "<button type='button' class='btn btn-secondary' data-bs-toggle='modal' data-bs-target='#viewModal' data-item-id='" + row.item_id + "' data-item-name='" + row.name + "' data-item-category='" + row.category + "' data-item-unit='" + row.unit + "' data-total-dispense='" + row.total_dispense + "'>View</button>";
-                        dispense_table.innerHTML += "<tr><td>" + row.item_id + "</td><td>" + row.name + "</td><td>" + row.description + "</td><td>" + row.category + "</td><td>" + row.unit + "</td><td>" + row.total_dispense + "</td><td>" + viewButton + "</td></tr>";
-                    });
+        table_title.innerHTML = 'Date from: ' + formatDate(from) + ' - ' + formatDate(to);
 
-                    // Add click event listener to all view buttons
-                    var viewButtons = document.querySelectorAll("[data-bs-toggle='modal']");
-                    viewButtons.forEach(function(button) {
-                        button.addEventListener("click", function() {
-                            var itemId = this.getAttribute("data-item-id");
-                            var itemName = this.getAttribute("data-item-name");
-                            var itemCategory = this.getAttribute("data-item-category");
-                            var itemUnit = this.getAttribute("data-item-unit");
-                            var totalDispense = this.getAttribute("data-total-dispense");
-
-                            // Set the values in the modal
-                            modalTitle.innerHTML = itemName + " - " + itemCategory + " - " + itemUnit;
-                            modalDispenseCount.innerHTML = totalDispense;
-
-                            //to fetch the records
-                            var fetchUrl = window.APP_URL + "/manager/fetch-record/" + itemId + "?filter=1&from=" + fromDateInput + "&to=" + toDateInput;
-
-                            modalTableBody.innerHTML = "";
-
-                            var req = new XMLHttpRequest();
-                            req.open('GET', fetchUrl, true);
-
-                            req.onload = function() {
-                                if (req.status === 200) {
-                                    var response = JSON.parse(req.responseText);
-
-                                    // console.log(response);
-                                    if (response.length > 0) {
-                                        response.forEach(function(row) {
-                                            // console.log(row.request_id);
-                                            var requestUrl = window.APP_URL + "/manager/view-request/" + row.request_id;
-                                            modalTableBody.innerHTML += "<tr class='text-center'><th><a target='_blank' href='" + requestUrl + "'>" + row.request_id + "</a></th><td>" + row.formatDate + "</td><td>" + row.quantity + "</td><td>" + row.stock_id + "</td><td>" + row.status + "</td></tr>";
-                                        });
-                                    } else {
-                                        modalTableBody.innerHTML += "<tr><td colspan='4'>No dispense record...</td></tr>"
-                                    }
-                                } else {
-                                    console.error(req.statusText);
-                                }
-                            }
-
-                            req.send();
-                        });
-                    });
-                } else {
-                    dispense_table.innerHTML += "<tr><td colspan='6'>No item dispensed...</td></tr>";
-                }
-            } else {
-                var data = JSON.parse(xhr.responseText);
-                console.log(data);
-            }
-        };
-        xhr.onerror = function() {
-            var data = JSON.parse(xhr.responseText);
-            console.log(data);
-        };
-        xhr.send();
+        filterForFetchUrl = "?filter=1&from=" + fromDateInput + "&to=" + toDateInput;
+        showDispense();
     });
+
+    showDispense();
 </script>
 @endsection

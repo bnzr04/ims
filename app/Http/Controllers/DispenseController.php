@@ -120,9 +120,6 @@ class DispenseController extends Controller
             $from = $request->input('date_from');
             $to = $request->input('date_to');
             $to = date('Y-m-d', strtotime($to . ' +1 day'));
-
-            // $from = "2023-05-08";
-            // $to = "2023-05-10";
         }
 
 
@@ -134,11 +131,6 @@ class DispenseController extends Controller
             ->groupBy('request_items.item_id', 'items.name', 'items.description', 'items.category', 'items.unit')
             ->orderBy('items.name', 'asc')
             ->get();
-
-        // $data = $data->groupBy('request_items.item_id')->map(function ($item) {
-        //     $item['total_dispense'] = $item->sum('total_dispense');
-        //     return $item;
-        // })->values();
 
         return response()->json($data);
     }

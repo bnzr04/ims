@@ -42,117 +42,117 @@ class RequestController extends Controller
         ]);
     }
 
-    public function showPendingRequest()
-    {
-        $user = Auth::user();
-        $user_id = $user->id;
+    // public function showPendingRequest()
+    // {
+    //     $user = Auth::user();
+    //     $user_id = $user->id;
 
-        $pending = ModelsRequest::where('status', 'pending')
-            ->where('user_id', $user_id)
-            ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
+    //     $pending = ModelsRequest::where('status', 'pending')
+    //         ->where('user_id', $user_id)
+    //         ->orderByDesc('updated_at')
+    //         ->get()->each(function ($pending) {
+    //             $pending->formatted_date = Carbon::parse($pending->created_at)
+    //                 ->format('F j, Y, g:i:s a');
+    //         });
 
-        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-        Cache::put('filteredData', $pending, $expiresAt);
+    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+    //     Cache::put('filteredData', $pending, $expiresAt);
 
-        $requestCount = ModelsRequest::where('status', 'pending')
-            ->where('user_id', $user_id)
-            ->count();
+    //     $requestCount = ModelsRequest::where('status', 'pending')
+    //         ->where('user_id', $user_id)
+    //         ->count();
 
-        DB::connection()->commit();
+    //     DB::connection()->commit();
 
-        return response()->json([
-            'pending' => $pending,
-            'pendingCount' => $requestCount,
-        ]);
-    }
+    //     return response()->json([
+    //         'pending' => $pending,
+    //         'pendingCount' => $requestCount,
+    //     ]);
+    // }
 
-    public function showAcceptedRequest()
-    {
-        $user = Auth::user();
-        $user_id = $user->id;
+    // public function showAcceptedRequest()
+    // {
+    //     $user = Auth::user();
+    //     $user_id = $user->id;
 
-        $requests = ModelsRequest::where('status', 'accepted')
-            ->where('user_id', $user_id)
-            ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
+    //     $requests = ModelsRequest::where('status', 'accepted')
+    //         ->where('user_id', $user_id)
+    //         ->orderByDesc('updated_at')
+    //         ->get()->each(function ($pending) {
+    //             $pending->formatted_date = Carbon::parse($pending->created_at)
+    //                 ->format('F j, Y, g:i:s a');
+    //         });
 
-        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-        Cache::put('filteredData', $requests, $expiresAt);
+    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+    //     Cache::put('filteredData', $requests, $expiresAt);
 
-        $requestCount = ModelsRequest::where('status', 'accepted')
-            ->where('user_id', $user_id)
-            ->count();
+    //     $requestCount = ModelsRequest::where('status', 'accepted')
+    //         ->where('user_id', $user_id)
+    //         ->count();
 
-        DB::connection()->commit();
+    //     DB::connection()->commit();
 
-        return response()->json([
-            'accepted' => $requests,
-            'acceptedCount' => $requestCount,
-        ]);
-    }
+    //     return response()->json([
+    //         'accepted' => $requests,
+    //         'acceptedCount' => $requestCount,
+    //     ]);
+    // }
 
-    public function showDeliveredRequest()
-    {
-        $user = Auth::user();
-        $user_id = $user->id;
+    // public function showDeliveredRequest()
+    // {
+    //     $user = Auth::user();
+    //     $user_id = $user->id;
 
-        $requests = ModelsRequest::where('status', 'delivered')
-            ->where('user_id', $user_id)
-            ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
+    //     $requests = ModelsRequest::where('status', 'delivered')
+    //         ->where('user_id', $user_id)
+    //         ->orderByDesc('updated_at')
+    //         ->get()->each(function ($pending) {
+    //             $pending->formatted_date = Carbon::parse($pending->created_at)
+    //                 ->format('F j, Y, g:i:s a');
+    //         });
 
-        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-        Cache::put('filteredData', $requests, $expiresAt);
+    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+    //     Cache::put('filteredData', $requests, $expiresAt);
 
-        $requestCount = ModelsRequest::where('status', 'delivered')
-            ->where('user_id', $user_id)
-            ->count();
+    //     $requestCount = ModelsRequest::where('status', 'delivered')
+    //         ->where('user_id', $user_id)
+    //         ->count();
 
-        DB::connection()->commit();
+    //     DB::connection()->commit();
 
-        return response()->json([
-            'delivered' => $requests,
-            'deliveredCount' => $requestCount,
-        ]);
-    }
+    //     return response()->json([
+    //         'delivered' => $requests,
+    //         'deliveredCount' => $requestCount,
+    //     ]);
+    // }
 
-    public function showCompletedRequest()
-    {
-        $user = Auth::user();
-        $user_id = $user->id;
+    // public function showCompletedRequest()
+    // {
+    //     $user = Auth::user();
+    //     $user_id = $user->id;
 
-        $requests = ModelsRequest::where('status', 'completed')
-            ->where('user_id', $user_id)
-            ->orderByDesc('updated_at')
-            ->get()->each(function ($pending) {
-                $pending->formatted_date = Carbon::parse($pending->created_at)
-                    ->format('F j, Y, g:i:s a');
-            });
+    //     $requests = ModelsRequest::where('status', 'completed')
+    //         ->where('user_id', $user_id)
+    //         ->orderByDesc('updated_at')
+    //         ->get()->each(function ($pending) {
+    //             $pending->formatted_date = Carbon::parse($pending->created_at)
+    //                 ->format('F j, Y, g:i:s a');
+    //         });
 
-        $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-        Cache::put('filteredData', $requests, $expiresAt);
+    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
+    //     Cache::put('filteredData', $requests, $expiresAt);
 
-        $requestCount = ModelsRequest::where('status', 'completed')
-            ->where('user_id', $user_id)
-            ->count();
+    //     $requestCount = ModelsRequest::where('status', 'completed')
+    //         ->where('user_id', $user_id)
+    //         ->count();
 
-        DB::connection()->commit();
+    //     DB::connection()->commit();
 
-        return response()->json([
-            'completed' => $requests,
-            'completedCount' => $requestCount,
-        ]);
-    }
+    //     return response()->json([
+    //         'completed' => $requests,
+    //         'completedCount' => $requestCount,
+    //     ]);
+    // }
 
     public function viewRequests()
     {
@@ -270,24 +270,14 @@ class RequestController extends Controller
         //Get today date
         $today = Carbon::today()->format('Y-m-d');
 
-        if ($requested->request_to === 'pharmacy') {
 
-            $items =
-                DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('items.name', 'item_stocks.*')
-                ->where('item_stocks.exp_date', ">", $today)
-                ->orderBy('items.name', 'asc')
-                ->get();
-        } else {
-            $items =
-                DB::table('item_stocks')
-                ->join('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('items.name', 'item_stocks.*')
-                ->where('item_stocks.exp_date', ">", $today)
-                ->orderBy('items.name', 'asc')
-                ->get();
-        }
+        $items =
+            DB::table('item_stocks')
+            ->join('items', 'item_stocks.item_id', '=', 'items.id')
+            ->select('items.name', 'item_stocks.*')
+            ->where('item_stocks.exp_date', ">", $today)
+            ->orderBy('items.name', 'asc')
+            ->get();
 
         $canceled = Canceled_Request::where('request_id', $id)->first();
 
@@ -310,60 +300,60 @@ class RequestController extends Controller
         }
     }
 
-    public function removeItem($sid, $id)
-    {
-        $items = Request_Item::where('stock_id', $sid)->where('item_id', $id);
+    // public function removeItem($sid, $id)
+    // {
+    //     $items = Request_Item::where('stock_id', $sid)->where('item_id', $id);
 
-        $items->delete();
+    //     $items->delete();
 
-        return back()->with('success', 'Item successfully removed to requested item.');
-    }
-
-
-    public function deleteRequest($id)
-    {
-        $request = ModelsRequest::find($id);
-
-        //Enable Query log
-        DB::enableQueryLog();
-
-        $request->delete();
-
-        //QUERY LOG
-        $user = auth()->user();
-
-        $user_id = $user->id; // Get the ID of the authenticated user
-        $user_type = $user->type; // Get the type of the authenticated user
-        $user_name = $user->name; // Get the name of the authenticated user
+    //     return back()->with('success', 'Item successfully removed to requested item.');
+    // }
 
 
-        // Get the SQL query being executed
-        $sql = DB::getQueryLog();
-        if (is_array($sql) && count($sql) > 0) {
-            $last_query = end($sql)['query'];
-        } else {
-            $last_query = 'No query log found.';
-        }
+    // public function deleteRequest($id)
+    // {
+    //     $request = ModelsRequest::find($id);
 
-        //Log Message
-        $message = "Request (ID: " . $id . ") requested by " . $user_name . " is deleted";
+    //     //Enable Query log
+    //     DB::enableQueryLog();
 
-        // Log the data to the logs table
-        Log::create([
-            'user_id' => $user_id,
-            'user_type' => $user_type,
-            'message' => $message,
-            'query' => $last_query,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+    //     $request->delete();
 
-        if ($request == true) {
-            return back()->with('success', 'Request successfully deleted.');
-        } else {
-            return back()->with('error', 'Request failed to deleted.');
-        }
-    }
+    //     //QUERY LOG
+    //     $user = auth()->user();
+
+    //     $user_id = $user->id; // Get the ID of the authenticated user
+    //     $user_type = $user->type; // Get the type of the authenticated user
+    //     $user_name = $user->name; // Get the name of the authenticated user
+
+
+    //     // Get the SQL query being executed
+    //     $sql = DB::getQueryLog();
+    //     if (is_array($sql) && count($sql) > 0) {
+    //         $last_query = end($sql)['query'];
+    //     } else {
+    //         $last_query = 'No query log found.';
+    //     }
+
+    //     //Log Message
+    //     $message = "Request (ID: " . $id . ") requested by " . $user_name . " is deleted";
+
+    //     // Log the data to the logs table
+    //     Log::create([
+    //         'user_id' => $user_id,
+    //         'user_type' => $user_type,
+    //         'message' => $message,
+    //         'query' => $last_query,
+    //         'created_at' => now(),
+    //         'updated_at' => now()
+    //     ]);
+
+    //     if ($request == true) {
+    //         return back()->with('success', 'Request successfully deleted.');
+    //     } else {
+    //         return back()->with('error', 'Request failed to deleted.');
+    //     }
+    // }
 
     //This will submit the requested items
     public function submitRequest(Request $request)
