@@ -28,6 +28,8 @@
                                 <input type="hidden" id="stock_id" name="stock_id" style="min-width:120px;">
                                 <input type="hidden" id="exp_date" name="exp_date" style="min-width:120px;">
                                 <button type="button" id="add-item-btn" class="btn btn-secondary py-1 px-2">Add</button>
+
+                                <button class="btn btn-secondary mx-4" id="item_list_btn" title="Available items on stock" style="height:30px;letter-spacing:2px" data-bs-toggle="modal" data-bs-target="#availble_items_modal">...</button>
                             </div>
                         </div>
                     </div>
@@ -106,10 +108,40 @@
         </div>
     </div>
 </div>
+<!-- Available Items Modal -->
+<div class="modal fade" id="availble_items_modal" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Available items on stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+                <table class="table table-success table-striped">
+                    <thead>
+                        <tr style="position: sticky;top:0">
+                            <th scope="col" class="border">ITEM</th>
+                            <th scope="col" class="border">CATEGORY</th>
+                            <th scope="col" class="border">UNIT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal_table_body">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer d-flex" style="flex-direction: column;">
+                <div class="container-sm">
+                    <input type="text" name="search" id="search_input_modal" class="form-control">
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     $(document).ready(function() {
         window.APP_URL = "{{ url('') }}";
-
 
         $('#nameSearch').select2({
             placeholder: 'select item',
@@ -309,6 +341,51 @@
                 $btn.prop('disabled', false); // enable button again on alert
             }
         });
+    });
+
+    window.APP_URL = "{{ url('') }}";
+
+    function showList() {
+        var list = new XMLHttpRequest();
+        list.open("GET", window.APP_URL + '/user/available-items');
+        list.onload = function() {
+            if (list.status == 200) {
+                var data = JSON.parse(list.responseText);
+                var searchInputValue = ModalSearchInput.value.toLowerCase(); // Get the search input value in lowercase
+
+                modalTableBody.innerHTML = "";
+                if (data.length > 0) {
+                    var filteredData = data.filter(function(row) {
+                        return row.name.toLowerCase().includes(searchInputValue); // Filter data based on matching item names
+                    });
+
+                    if (filteredData.length > 0) {
+                        filteredData.forEach(function(row) {
+                            modalTableBody.innerHTML += "<tr><td class='border'>" + row.name + "</td><td class='border'>" + row.category + "</td><td class='border'>" + row.unit + "</td></tr>";
+                        });
+                    } else {
+                        modalTableBody.innerHTML = "<tr><td colspan='3'>No Items Found</td></tr>";
+                    }
+                } else {
+                    modalTableBody.innerHTML = "<tr><td colspan='3'>No Items Available</td></tr>";
+                }
+            } else {
+                console.log('Error: ' + list.status);
+            }
+        }
+        list.send();
+    }
+
+    const availableItemListBtn = document.getElementById('item_list_btn');
+    const modalTableBody = document.getElementById('modal_table_body');
+    const ModalSearchInput = document.getElementById('search_input_modal');
+
+    ModalSearchInput.addEventListener('input', function() {
+        showList();
+    });
+
+    availableItemListBtn.addEventListener('click', function() {
+        showList();
     });
 </script>
 @endsection

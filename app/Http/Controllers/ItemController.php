@@ -160,118 +160,80 @@ class ItemController extends Controller
         //This will will get the request from filter input
         $filter = $request->input('filter');
 
+        $modeOfAcq = $request->input('moa');
+
         //Get authenticated user credential
         $user = Auth::user();
+
+        $items = Item::leftJoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price')
+            ->orderBy('items.name');
+
+        if ($category) {
+            $items = $items->where('category', $category)->orderBy('name');
+        } else if ($search) {
+            $items = $items->where('name', 'like', "%" . $search . "%")->orderBy('name');
+        } else if ($filter === 'max') {
+            $items = $items->havingRaw('total_quantity > items.max_limit')->orderBy('items.name');
+        } else if ($filter === 'safe') {
+            $items = $items->havingRaw('total_quantity <= items.max_limit AND total_quantity >= (items.max_limit * (items.warning_level / 100))')->orderBy('items.name');
+        } else if ($filter === 'warning') {
+            $items = $items->havingRaw('total_quantity < items.max_limit * (warning_level / 100)')->orderBy('items.name');
+        } else if ($filter === 'no-stocks') {
+            $items = $items->whereNotIn('items.id', function ($query) {
+                $query->select('item_id')
+                    ->from('item_stocks')
+                    ->groupBy('item_id')
+                    ->havingRaw('SUM(stock_qty) IS NOT NULL');
+            })
+                ->orderBy('items.name');
+        } else if ($modeOfAcq === 'petty-cash') {
+            $items = $items->where('item_stocks.mode_acquisition', 'Petty Cash')->orderBy('items.name');
+        } else if ($modeOfAcq === 'donation') {
+            $items = $items->where('item_stocks.mode_acquisition', 'Donation')->orderBy('items.name');
+        } else if ($modeOfAcq === 'lgu') {
+            $items = $items->where('item_stocks.mode_acquisition', 'LGU')->orderBy('items.name');
+        }
+
+        $items = $items->get();
+
+        foreach ($items as $item) {
+            $hasExpiredStocks = Stock::where('item_id', $item->id)
+                ->where('exp_date', '<', Carbon::now()->format('Y-m-d'))
+                ->exists();
+
+            $isExpiringSoon = Stock::where('item_id', $item->id)
+                ->where('exp_date', '<=', Carbon::now()->addMonth()->format('Y-m-d'))
+                ->exists();
+
+            $item->hasExpiredStocks = $hasExpiredStocks;
+            $item->isExpiringSoon = $isExpiringSoon;
+        }
 
         //Check the user if manager type
         if ($user->type === 'manager') {
 
-            if ($user->dept === 'pharmacy') {
-                $categories = Item::distinct('category')
-                    ->pluck('category');
-
-                $items = Item::leftJoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-                    ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price')
-                    ->orderBy('items.name');
-
-                if ($category) {
-                    $items = $items->where('category', $category)->orderBy('name');
-                } else if ($search) {
-                    $items = $items->where('name', 'like', "%" . $search . "%")->orderBy('name');
-                } else if ($filter === 'max') {
-                    $items = $items->havingRaw('total_quantity > items.max_limit')->orderBy('items.name');
-                } else if ($filter === 'safe') {
-                    $items = $items->havingRaw('total_quantity <= items.max_limit AND total_quantity >= (items.max_limit * (items.warning_level / 100))')->orderBy('items.name');
-                } else if ($filter === 'warning') {
-                    $items = $items->havingRaw('total_quantity < items.max_limit * (warning_level / 100)')->orderBy('items.name');
-                } else if ($filter === 'no-stocks') {
-                    $items = $items->whereNotIn('items.id', function ($query) {
-                        $query->select('item_id')
-                            ->from('item_stocks')
-                            ->groupBy('item_id')
-                            ->havingRaw('SUM(stock_qty) IS NOT NULL');
-                    })
-                        ->orderBy('items.name');
-                }
-
-                $items = $items->get();
-
-                foreach ($items as $item) {
-                    $hasExpiredStocks = Stock::where('item_id', $item->id)
-                        ->where('exp_date', '<', Carbon::now()->format('Y-m-d'))
-                        ->exists();
-
-                    $isExpiringSoon = Stock::where('item_id', $item->id)
-                        ->where('exp_date', '<=', Carbon::now()->addMonth()->format('Y-m-d'))
-                        ->exists();
-
-                    $item->hasExpiredStocks = $hasExpiredStocks;
-                    $item->isExpiringSoon = $isExpiringSoon;
-                }
-
-
-                return view('manager.stocks')->with([
-                    'items' => $items,
-                    'categories' => $categories,
-                    'category' => $category,
-                    'search' => $search,
-                ]);
-            }
+            return view('manager.stocks')->with([
+                'items' => $items,
+                'categories' => $categories,
+                'category' => $category,
+                'search' => $search,
+            ]);
         } else {
 
-            //This will get the all items and will know if there is a stocks or none
-
-            //This portion will execute if the user is admin
-            $items = Item::leftJoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-                ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price')
-                ->orderBy('items.name');
-
-
-            if ($category) {
-                $items = $items->where('category', $category)->orderBy('name');
-            } else if ($search) {
-                $items = $items->where('name', 'like', "%" . $search . "%")->orderBy('name');
-            } else if ($filter === 'max') {
-                $items = $items->havingRaw('total_quantity > items.max_limit')->orderBy('items.name');
-            } else if ($filter === 'safe') {
-                $items = $items->havingRaw('total_quantity <= items.max_limit AND total_quantity >= (items.max_limit * (items.warning_level / 100))')->orderBy('items.name');
-            } else if ($filter === 'warning') {
-                $items = $items->havingRaw('total_quantity < items.max_limit * (warning_level / 100)')->orderBy('items.name');
-            } else if ($filter === 'no-stocks') {
-                $items = $items->whereNotIn('items.id', function ($query) {
-                    $query->select('item_id')
-                        ->from('item_stocks')
-                        ->groupBy('item_id')
-                        ->havingRaw('SUM(stock_qty) IS NOT NULL');
-                })
-                    ->orderBy('items.name');
-            }
-
-            $items = $items->get();
-
-            foreach ($items as $item) {
-                $hasExpiredStocks = Stock::where('item_id', $item->id)
-                    ->where('exp_date', '<', Carbon::now()->format('Y-m-d'))
-                    ->exists();
-
-                $isExpiringSoon = Stock::where('item_id', $item->id)
-                    ->where('exp_date', '<=', Carbon::now()->addMonth()->format('Y-m-d'))
-                    ->exists();
-
-                $item->hasExpiredStocks = $hasExpiredStocks;
-                $item->isExpiringSoon = $isExpiringSoon;
-            }
-
-            return view('admin.items', ['items' => $items, 'category' => $category, 'categories' => $categories, 'search' => $search]);
+            return view('admin.items', [
+                'items' => $items,
+                'category' => $category,
+                'categories' => $categories,
+                'search' => $search
+            ]);
         }
     }
 
     //
     //This will view new item page
     //
-
     public function newItem()
     {
         $user = Auth::user();

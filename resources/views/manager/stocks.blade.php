@@ -80,6 +80,23 @@ use Illuminate\Support\Facades\Session
                             <p class="m-0">Has Expired/Expiring Stocks</p>
                         </div>
                     </div>
+                    <div class="container-sm m-0 p-0" style="width:100%;max-width:300px;">
+                        <div class="container-sm" style="letter-spacing: 2px;">
+                            <h5>Mode of acquisition</h5>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a href="{{ route('manager.stocks') }}" class="level">All</a></p>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a href="{{ route('manager.stocks') }}?moa=petty-cash" class="level">Petty Cash</a></p>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a href="{{ route('manager.stocks') }}?moa=donation" class="level">Donation</a></p>
+                        </div>
+                        <div class="container-sm d-flex p-0" style="align-items: center;">
+                            <p class="m-0"><a href="{{ route('manager.stocks') }}?moa=lgu" class="level">LGU</a></p>
+                        </div>
+                    </div>
 
                     <div class="container-sm d-flex m-0 p-0" style="width:100%;max-width:200px;flex-direction:column-reverse">
                         <form class="m-0" action="{{ route('manager.export-items') }}" method="post">
@@ -99,6 +116,22 @@ use Illuminate\Support\Facades\Session
                 @if(session('error'))
                 <div class="alert alert-danger">
                     {{ session('error') }}
+                </div>
+                @endif
+
+                @if(request()->input('moa'))
+                <div class="container-fluid mt-2 p-1 bg-secondary">
+                    @if(request()->input('moa') == 'petty-cash')
+                    <h5 class="m-0 text-white">ITEMS WITH PETTY CASH STOCK BATCH:</h5>
+                    @endif
+
+                    @if(request()->input('moa') == 'donation')
+                    <h5 class="m-0 text-white">ITEMS WITH DONATION STOCK BATCH:</h5>
+                    @endif
+
+                    @if(request()->input('moa') == 'lgu')
+                    <h5 class="m-0 text-white">ITEMS WITH LGU STOCK BATCH:</h5>
+                    @endif
                 </div>
                 @endif
 
@@ -139,7 +172,7 @@ use Illuminate\Support\Facades\Session
                             @empty
                             <tr>
                                 <td colspan="8">
-                                    No data...
+                                    No items...
                                 </td>
                             </tr>
                             @endforelse

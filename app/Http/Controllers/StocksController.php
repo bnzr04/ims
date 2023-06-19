@@ -9,6 +9,7 @@ use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
 use App\Models\Stock;
+use App\Models\Stock_Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -326,6 +327,14 @@ class StocksController extends Controller
         $save->exp_date = $request->exp_date;
         $save->save();
 
+        $stock_log = new Stock_Log();
+        $stock_log->stock_id = $save->id;
+        $stock_log->item_id = $save->item_id;
+        $stock_log->quantity = $save->stock_qty;
+        $stock_log->mode_acquisition = $save->mode_acquisition;
+        $stock_log->transaction_type = 'addition';
+        $stock_log->save();
+
         //Log Message
         $message = "New stocks batch created for ITEM ID: " . $request->item_id;
 
@@ -394,6 +403,14 @@ class StocksController extends Controller
 
             if ($stock->save()) {
 
+                $stock_log = new Stock_Log();
+                $stock_log->stock_id = $stock->id;
+                $stock_log->item_id = $stock->item_id;
+                $stock_log->quantity = $oldQty < $newQty ? $newQty - $oldQty : $oldQty - $newQty;
+                $stock_log->mode_acquisition = $stock->mode_acquisition;
+                $stock_log->transaction_type = $newQty > $oldQty ? 'addition' : 'deduction';
+                $stock_log->save();
+
                 $message = "Stock batch id " . $stockId . " of Item id " . $itemId . " was updated the quantity from " . $oldQty . " to " . $newQty;
 
                 $this->endLog($user_id, $user_type, $user_dept, $message);
@@ -420,6 +437,7 @@ class StocksController extends Controller
         $operation = $request->operation;
         $currentStockQty = $stock->stock_qty;
         $toStockQty = $request->new_stock;
+
         if ($operation == 'remove') {
             $newStockQty = $currentStockQty - $toStockQty;
         } else {
@@ -431,6 +449,14 @@ class StocksController extends Controller
         list($user_id, $user_type, $user_dept) = $this->startLog();
 
         $stock->save();
+
+        $stock_log = new Stock_Log();
+        $stock_log->stock_id = $stock->id;
+        $stock_log->item_id = $stock->item_id;
+        $stock_log->quantity = $toStockQty;
+        $stock_log->mode_acquisition = $stock->mode_acquisition;
+        $stock_log->transaction_type = $operation == 'remove' ? 'deduction' : 'addition';
+        $stock_log->save();
 
         //Log Message
         if ($operation == "return") {
@@ -446,18 +472,26 @@ class StocksController extends Controller
 
     public function deleteStock($id)
     {
-        $item = Stock::find($id);
+        $stock = Stock::find($id);
 
         list($user_id, $user_type, $user_dept) = $this->startLog();
 
-        $item->delete();
+        $stock->delete();
+
+        $stock_log = new Stock_Log();
+        $stock_log->stock_id = $stock->id;
+        $stock_log->item_id = $stock->item_id;
+        $stock_log->quantity = $stock->stock_qty;
+        $stock_log->mode_acquisition = $stock->mode_acquisition;
+        $stock_log->transaction_type = 'deduction';
+        $stock_log->save();
 
         //Log Message
         $message = "Stock batch dispose (id: " . $id . ")";
 
         $this->endLog($user_id, $user_type, $user_dept, $message);
 
-        if ($item) {
+        if ($stock) {
             return back()->with('success', 'Stock successfully deleted.');
         } else {
             return back()->with('error', 'Stock failed to delete.');

@@ -70,12 +70,6 @@ class AdminController extends Controller
         return view('admin.sub-page.items.edit-item')->with('item', $item);
     }
 
-    public function deployment()
-    {
-        return view('admin.deployment');
-    }
-
-
     public function editUser($id)
     {
         $user = User::find($id);

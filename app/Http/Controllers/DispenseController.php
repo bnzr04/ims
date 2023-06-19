@@ -7,6 +7,8 @@ use App\Models\Item;
 use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
+use App\Models\Stock;
+use App\Models\Stock_Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -102,6 +104,8 @@ class DispenseController extends Controller
         $yesterday = $request->input('yesterday');
         $thisMonth = $request->input('this-month');
 
+        $moaFilter = $request->input('moa');
+
 
         if ($today) {
             // Filter dispensed items that occurred today
@@ -122,15 +126,54 @@ class DispenseController extends Controller
             $to = date('Y-m-d', strtotime($to . ' +1 day'));
         }
 
-
         $data = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
             ->select('request_items.item_id', 'items.name', 'items.description', 'items.category', 'items.unit', DB::raw('SUM(request_items.quantity) as total_dispense'))
             ->distinct()
             ->whereIn('request_id', $completedAndDeliveredId)
             ->whereBetween('request_items.updated_at', [$from, $to])
             ->groupBy('request_items.item_id', 'items.name', 'items.description', 'items.category', 'items.unit')
-            ->orderBy('items.name', 'asc')
-            ->get();
+            ->orderBy('items.name', 'asc');
+
+        if ($moaFilter) {
+
+            if ($moaFilter == 'petty-cash') {
+                $data =  $data->where('request_items.mode_acquisition', 'Petty Cash');
+            } else if ($moaFilter == 'donation') {
+                $data =  $data->where('request_items.mode_acquisition', 'Donation');
+            } else if ($moaFilter == 'lgu') {
+                $data =  $data->where('request_items.mode_acquisition', 'LGU');
+            }
+        }
+
+        $data = $data->get();
+
+        foreach ($data as $stock) {
+            $stockQty = Stock_Log::where('item_id', $stock->item_id);
+
+            $stockQty = $stockQty->where('transaction_type', 'addition')
+                ->whereBetween('created_at', [$from, $to])
+                ->value(DB::raw('SUM(quantity)'));
+
+            $stock->stock_qty = $stockQty;
+
+            if ($moaFilter) {
+                $acquired = Stock_Log::where('item_id', $stock->item_id);
+
+                if ($moaFilter == 'petty-cash') {
+                    $acquired =  $acquired->where('mode_acquisition', 'Petty Cash');
+                } else if ($moaFilter == 'donation') {
+                    $acquired =  $acquired->where('mode_acquisition', 'Donation');
+                } else if ($moaFilter == 'lgu') {
+                    $acquired =  $acquired->where('mode_acquisition', 'LGU');
+                }
+
+                $acquired = $acquired->where('transaction_type', 'addition')
+                    ->whereBetween('created_at', [$from, $to])
+                    ->value(DB::raw('SUM(quantity)'));
+
+                $stock->acquired = $acquired;
+            }
+        }
 
         return response()->json($data);
     }
@@ -161,6 +204,8 @@ class DispenseController extends Controller
         $thisMonth = $request->input('this-month');
         $filter = $request->input('filter');
 
+        $moaFilter = $request->input('moa');
+
         if ($today) {
             $from = Carbon::now()->startOfDay();
             $to = Carbon::now()->endOfDay();
@@ -182,8 +227,21 @@ class DispenseController extends Controller
         $record = Request_Item::join('request', 'request_items.request_id', '=', 'request.id')
             ->whereIn('request.status', ['completed', 'delivered'])
             ->where('request_items.item_id', $id)
-            ->whereBetween('request_items.created_at', [$from, $to])
-            ->get();
+            ->whereBetween('request_items.created_at', [$from, $to]);
+        // ->where('request_items.mode_acquisition', 'Petty Cash');
+
+        if ($moaFilter) {
+
+            if ($moaFilter == 'petty-cash') {
+                $record =  $record->where('request_items.mode_acquisition', 'Petty Cash');
+            } else if ($moaFilter == 'donation') {
+                $record =  $record->where('request_items.mode_acquisition', 'Donation');
+            } else if ($moaFilter == 'lgu') {
+                $record =  $record->where('request_items.mode_acquisition', 'LGU');
+            }
+        }
+
+        $record = $record->get();
 
         foreach ($record as $rec) {
             $rec->formatDate = Carbon::parse($rec->created_at)->format("F d, Y h:i:s A");

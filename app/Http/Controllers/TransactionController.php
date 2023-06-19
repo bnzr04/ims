@@ -160,7 +160,7 @@ class TransactionController extends Controller
         return response()->json($data);
     }
 
-    public function searchRequestCodeOrPatientName(Request $request)
+    public function searchRequestCode(Request $request)
     {
         $searchReqCode = $request->input('req-code');
 

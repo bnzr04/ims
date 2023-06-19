@@ -630,4 +630,25 @@ class RequestController extends Controller
             return redirect()->route('user.viewRequest', ['request' => 'delivered', 'filter' => 'today'])->with('error', "Request doesn't exist.");
         }
     }
+
+
+    //show availble items on stock
+    public function showList()
+    {
+        $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
+            ->select(
+                'items.name',
+                'items.category',
+                'items.unit',
+            )
+            ->groupBy(
+                'items.name',
+                'items.category',
+                'items.unit',
+            )
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($items);
+    }
 }

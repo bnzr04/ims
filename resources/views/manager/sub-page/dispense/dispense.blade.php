@@ -13,7 +13,6 @@
                 </div>
                 <div class="container-fluid mt-1 p-2 rounded shadow">
                     <div class="container-fluid d-flex">
-
                         <form id="today_form" class="m-0">
                             <div class="mx-1">
                                 <input type="hidden" name="today" value="1">
@@ -43,20 +42,34 @@
                             </div>
                         </form>
                     </div>
+                    <div class="container-fluid m-0 mt-1" style="display: flex;">
+                        <form id="petty_cash_form" class="m-0">
+                            <div class="mx-1">
+                                <input type="hidden" name="today" value="1">
+                                <button type="submit" class="btn btn-outline-dark m-0">Petty Cash</button>
+                            </div>
+                        </form>
+                        <form id="donation_form" class="m-0">
+                            <div class="mx-1">
+                                <input type="hidden" name="today" value="1">
+                                <button type="submit" class="btn btn-outline-dark m-0">Donation</button>
+                            </div>
+                        </form>
+                        <form id="lgu_form" class="m-0">
+                            <div class="mx-1">
+                                <input type="hidden" name="today" value="1">
+                                <button type="submit" class="btn btn-outline-dark m-0">LGU</button>
+                            </div>
+                        </form>
+                    </div>
                     <div class="container-fluid mt-3">
                         <h4 id="table_title"></h4>
                     </div>
                     <div class="container-fluid mt-1 overflow-auto border border-white" style="height: 350px;">
                         <table class="table">
                             <thead class=" bg-success text-white" style="position: sticky;top:0;">
-                                <tr>
-                                    <th scope="col">Item ID</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Category</th>
-                                    <th scope="col">Unit</th>
-                                    <th scope="col">Total Dispense</th>
-                                    <th scope="col">Action</th>
+                                <tr id="dispense_table_head">
+
                                 </tr>
                             </thead>
                             <tbody id="dispense_table">
@@ -160,7 +173,7 @@
             day: 'numeric'
         };
         const today = new Date().toLocaleDateString('en-US', options);
-        table_title.innerHTML = 'TODAY - ' + today;
+        currentTableTitle = table_title.innerHTML = 'TODAY - ' + today;
     };
 
     function yesterdayTitle() {
@@ -173,7 +186,7 @@
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
 
-        table_title.innerHTML = 'YESTERDAY - ' + yesterday.toLocaleDateString('en-US', options);
+        currentTableTitle = table_title.innerHTML = 'YESTERDAY - ' + yesterday.toLocaleDateString('en-US', options);
     };
 
     function thisMonthTitle() {
@@ -186,14 +199,16 @@
         const today = new Date();
         const currentMonth = today.getMonth();
 
-        table_title.innerHTML = 'THIS MONTH - ' + monthNames[currentMonth];
+        currentTableTitle = table_title.innerHTML = 'THIS MONTH - ' + monthNames[currentMonth];
     }
 
-    var mainUrl = "{{ route('manager.get-dispense') }}";
+    var mainUrl = "{{ route('manager.filter-dispense') }}?today=1";
 
     var filterForFetchUrl = "?today=1";
 
     var table_title = document.querySelector('#table_title');
+
+    var currentTableTitle;
 
     todayTitle();
 
@@ -205,9 +220,11 @@
                 var data = JSON.parse(xhr.responseText);
 
                 // Update the table with the new data
-                var dispense_table = document.querySelector('#dispense_table');
+                const dispense_table = document.querySelector('#dispense_table');
+                const dispense_table_head = document.querySelector('#dispense_table_head');
 
                 dispense_table.innerHTML = '';
+                dispense_table_head.innerHTML = '';
 
                 // console.log(data);
 
@@ -216,7 +233,19 @@
                         modalTitle.innerHTML = row.name + " - " + row.category + " - " + row.unit;
                         var url = window.APP_URL + '/view-dispense/' + row.item_id;
                         var viewButton = "<button type='button' class='btn btn-secondary' data-bs-toggle='modal' data-bs-target='#viewModal' data-item-id='" + row.item_id + "' data-item-name='" + row.name + "' data-item-category='" + row.category + "' data-item-unit='" + row.unit + "' data-total-dispense='" + row.total_dispense + "'>View</button>";
-                        dispense_table.innerHTML += "<tr><td>" + row.item_id + "</td><td>" + row.name + "</td><td>" + row.description + "</td><td>" + row.category + "</td><td>" + row.unit + "</td><td>" + row.total_dispense + "</td><td>" + viewButton + "</td></tr>";
+
+                        if (row.stock_qty == null || row.stock_qty == undefined) {
+                            row.stock_qty = "-";
+                        }
+
+                        if (row.acquired == null || row.acquired == undefined) {
+                            row.acquired = "-";
+                        }
+
+                        dispense_table_head.innerHTML =
+                            "<th scope='col' class='border'>Item ID</th><th scope='col' class='border'>Name</th><th scope='col' class='border'>Description</th><th scope='col' class='border'>Category</th><th scope='col' class='border'>Unit</th><th scope='col' class='border'>Stock</th><th scope='col' class='border'>Acquired</th><th scope='col' class='border'>Total Dispense</th><th scope='col' class='border'>Action</th>";
+                        dispense_table.innerHTML +=
+                            "<tr><td class='border'>" + row.item_id + "</td><td class='border'>" + row.name + "</td><td class='border'>" + row.description + "</td><td class='border'>" + row.category + "</td><td class='border'>" + row.unit + "</td><td class='border'>" + row.stock_qty + "</td><td class='border'>" + row.acquired + "</td><td class='border'>" + row.total_dispense + "</td><td class='border'>" + viewButton + "</td></tr>";
                     });
 
                     // Add click event listener to all view buttons
@@ -278,6 +307,13 @@
     const thisMonthForm = document.querySelector('#thisMonth_form');
     const filterForm = document.querySelector('#filter_form');
 
+    const pettyCashForm = document.getElementById('petty_cash_form');
+    const donationForm = document.getElementById('donation_form');
+    const lguForm = document.getElementById('lgu_form');
+
+    let currentMainUrl = "{{ route('manager.filter-dispense') }}?today=1";
+    let currentFilterForFetchUrl = "?today=1";
+
     /////////Today////////
     todayForm.addEventListener('submit', function(event) {
         event.preventDefault();
@@ -286,6 +322,8 @@
 
         filterForFetchUrl = "?today=1";
         showDispense();
+        currentMainUrl = mainUrl;
+        currentFilterForFetchUrl = filterForFetchUrl;
     });
 
     /////////Yesterday////////
@@ -296,6 +334,8 @@
 
         filterForFetchUrl = "?yesterday=1";
         showDispense();
+        currentMainUrl = mainUrl;
+        currentFilterForFetchUrl = filterForFetchUrl;
     });
 
     /////////This month////////
@@ -306,6 +346,8 @@
 
         filterForFetchUrl = "?this-month=1";
         showDispense();
+        currentMainUrl = mainUrl;
+        currentFilterForFetchUrl = filterForFetchUrl;
     });
 
     /////////Date Filter////////
@@ -319,10 +361,41 @@
 
         mainUrl = `{{ route('manager.filter-dispense') }}?date_from=${fromDateInput}&date_to=${toDateInput}`;
 
-        table_title.innerHTML = 'Date from: ' + formatDate(from) + ' - ' + formatDate(to);
+        currentTableTitle = table_title.innerHTML = 'Date from: ' + formatDate(from) + ' - ' + formatDate(to);
 
         filterForFetchUrl = "?filter=1&from=" + fromDateInput + "&to=" + toDateInput;
         showDispense();
+        currentMainUrl = mainUrl;
+        currentFilterForFetchUrl = filterForFetchUrl;
+    });
+
+    pettyCashForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        mainUrl = currentMainUrl + "&moa=petty-cash";
+        filterForFetchUrl = currentFilterForFetchUrl + "&moa=petty-cash";
+        showDispense();
+
+        table_title.innerHTML = currentTableTitle + " - Petty Cash";
+    });
+
+    donationForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        mainUrl = currentMainUrl + "&moa=donation";
+        filterForFetchUrl = currentFilterForFetchUrl + "&moa=donation";
+        showDispense();
+        table_title.innerHTML = currentTableTitle + " - Donation";
+    });
+
+    lguForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        mainUrl = currentMainUrl + "&moa=lgu";
+        filterForFetchUrl = currentFilterForFetchUrl + "&moa=lgu";
+        showDispense();
+
+        table_title.innerHTML = currentTableTitle + " - LGU";
     });
 
     showDispense();

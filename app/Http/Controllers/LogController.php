@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class LogController extends Controller
 {
-    public function index(Request $request)
+    public function log(Request $request)
     {
         $requestDate = $request->date;
         $date_from = $request->date_from;
