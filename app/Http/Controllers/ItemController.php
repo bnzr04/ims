@@ -16,21 +16,18 @@ use Carbon\Carbon;
 
 class ItemController extends Controller
 {
-    //Import items data
-    public function import()
+    public function import() //this function will import items data or information using csv file
     {
         //Enable query log
         DB::enableQueryLog();
 
-        $user = Auth::user();
-        $user_id = $user->id;
-        $user_type = $user->type;
+        $user = Auth::user(); //get the authenticated user information
+        $user_id = $user->id; //get the user id
+        $user_type = $user->type; //get the user type
 
-        //will import the file
-        $import =
-            Excel::import(new ItemImport, request()->file('import_item'));
+        $import = Excel::import(new ItemImport, request()->file('import_item')); //import the file from the 'import_item' file input
 
-        //if the import is true
+        //if the import is true 
         if ($import) {
             // Get the SQL query being executed
             $sql = DB::getQueryLog();
@@ -84,30 +81,30 @@ class ItemController extends Controller
         }
     }
 
-    //Export items data
-    public function export(Request $request)
+    public function export(Request $request) //this function will export or generate a xlsx file.
     {
         //Enable query log
         DB::enableQueryLog();
 
-        $filter = $request->input('filter');
-        ItemExport::$filter = $filter;
+        $filter = $request->input('filter'); //get the value of 'filter' input
 
-        $user = Auth::user();
-        $user_id = $user->id;
-        $user_type = $user->type;
+        ItemExport::$filter = $filter; //set the value of $filter in ItemExport 
+
+        $user = Auth::user(); //get the authencticated user information
+        $user_id = $user->id; //get the user id
+        $user_type = $user->type; //get the user type
 
         switch ($filter) {
-            case 'max':
+            case 'max': //if the $filter value is 'max'
                 $firstFilename = "Pharma_Items_Over_Max";
                 break;
-            case 'safe':
+            case 'safe': //if the $filter value is 'safe'
                 $firstFilename = "Pharma_Items_Safe_Level";
                 break;
-            case 'warning':
+            case 'warning': //if the $filter value is 'warning'
                 $firstFilename = "Pharma_Items_Warning_Level";
                 break;
-            case 'no-stocks':
+            case 'no-stocks': //if the $filter value is 'no-stocks'
                 $firstFilename = "Pharma_Items_No_Stocks";
                 break;
             default:
@@ -122,7 +119,7 @@ class ItemController extends Controller
             $last_query = 'No query log found.';
         }
 
-        $filename = $firstFilename . Carbon::now()->format('Ymd-His') . '.xlsx';
+        $filename = $firstFilename . Carbon::now()->format('Ymd-His') . '.xlsx'; //set the filename as the $firstFilename value and the date today, default filename ex. Pharma_Items20231201-125900.xlsx
 
         //Log Message
         $message = "Downloaded a report as " . $filename;
@@ -138,15 +135,12 @@ class ItemController extends Controller
         ]);
 
         return Excel::download(new ItemExport(), $filename, \Maatwebsite\Excel\Excel::XLSX, [
-            'Content-Type' => 'application/vnd.ms-excel',
+            'Content-Type' => 'application/vnd.ms-excel', //generate the excek file
         ]);
     }
 
 
-    //
-    //This will show all the saved items
-    //
-    public function showAllItems(Request $request)
+    public function showAllItems(Request $request) //this function will return items view with the items information and total stocks
     {
         //This will initiate all the categories available
         $categories = Item::distinct('category')->pluck('category');
@@ -160,52 +154,53 @@ class ItemController extends Controller
         //This will will get the request from filter input
         $filter = $request->input('filter');
 
+        //this will get the value of 'moa' input
         $modeOfAcq = $request->input('moa');
 
-        //Get authenticated user credential
+        //Get authenticated user information
         $user = Auth::user();
 
+        //left join the items and item_stocks and get all the items information and the total stocks of the item
         $items = Item::leftJoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price')
-            ->orderBy('items.name');
+            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity')) //sum the stock_qty from item_stocks table
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price') //group all selected items column information
+            ->orderBy('items.name'); //order the items name in ascending
 
-        if ($category) {
-            $items = $items->where('category', $category)->orderBy('name');
-        } else if ($search) {
-            $items = $items->where('name', 'like', "%" . $search . "%")->orderBy('name');
-        } else if ($filter === 'max') {
-            $items = $items->havingRaw('total_quantity > items.max_limit')->orderBy('items.name');
-        } else if ($filter === 'safe') {
-            $items = $items->havingRaw('total_quantity <= items.max_limit AND total_quantity >= (items.max_limit * (items.warning_level / 100))')->orderBy('items.name');
-        } else if ($filter === 'warning') {
-            $items = $items->havingRaw('total_quantity < items.max_limit * (warning_level / 100)')->orderBy('items.name');
-        } else if ($filter === 'no-stocks') {
+        if ($category) { //if the $category is true or filter the category
+            $items = $items->where('category', $category); //retrieve the category by the $category value and order 
+        } else if ($search) { //if the $search is true or $search has a value
+            $items = $items->where('name', 'like', "%" . $search . "%"); //find the matching letter or word of items name
+        } else if ($filter === 'max') { //if the $filter is true and value is equal to 'max'
+            $items = $items->havingRaw('total_quantity > items.max_limit'); //select the total_quantity with greater than value to the max_limit of the item
+        } else if ($filter === 'safe') { //if the $filter is true and value is equal to 'safe'
+            $items = $items->havingRaw('total_quantity <= items.max_limit AND total_quantity >= (items.max_limit * (items.warning_level / 100))'); //select the total_quantity that will not exceeed to the max_limit of the item and its warning level quantity, divide the warning_level value to 100 and multiply to max_limit
+        } else if ($filter === 'warning') { //if the $filter is true and value is equal to 'warning
+            $items = $items->havingRaw('total_quantity < items.max_limit * (warning_level / 100)'); //select the total_quantity less than warning level quantity, divide the warning_level value to 100 and multiply to max_limit
+        } else if ($filter === 'no-stocks') { //if the $filter is true and value is equal to 'no-stocks'
             $items = $items->whereNotIn('items.id', function ($query) {
                 $query->select('item_id')
                     ->from('item_stocks')
                     ->groupBy('item_id')
                     ->havingRaw('SUM(stock_qty) IS NOT NULL');
-            })
-                ->orderBy('items.name');
-        } else if ($modeOfAcq === 'petty-cash') {
-            $items = $items->where('item_stocks.mode_acquisition', 'Petty Cash')->orderBy('items.name');
-        } else if ($modeOfAcq === 'donation') {
-            $items = $items->where('item_stocks.mode_acquisition', 'Donation')->orderBy('items.name');
-        } else if ($modeOfAcq === 'lgu') {
-            $items = $items->where('item_stocks.mode_acquisition', 'LGU')->orderBy('items.name');
+            });
+        } else if ($modeOfAcq === 'petty-cash') { //if $modeOfAcq value is equal to 'petty-cash'
+            $items = $items->where('item_stocks.mode_acquisition', 'Petty Cash'); //select where the item_stocks mode_acquisition column with value 'Petty Cash'
+        } else if ($modeOfAcq === 'donation') { //if $modeOfAcq value is equal to 'donation'
+            $items = $items->where('item_stocks.mode_acquisition', 'Donation'); //select where the item_stocks mode_acquisition column with value 'Donation'
+        } else if ($modeOfAcq === 'lgu') { //if $modeOfAcq value is equal to 'lgu'
+            $items = $items->where('item_stocks.mode_acquisition', 'LGU'); //select where the item_stocks mode_acquisition column with value 'LGU'
         }
 
-        $items = $items->get();
+        $items = $items->get(); //retrieve the data
 
         foreach ($items as $item) {
             $hasExpiredStocks = Stock::where('item_id', $item->id)
                 ->where('exp_date', '<', Carbon::now()->format('Y-m-d'))
-                ->exists();
+                ->exists(); //get the item_stocks with exp_date that has expired stock batch
 
             $isExpiringSoon = Stock::where('item_id', $item->id)
                 ->where('exp_date', '<=', Carbon::now()->addMonth()->format('Y-m-d'))
-                ->exists();
+                ->exists(); //get the item_stocks with exp_date that will expired in the next month
 
             $item->hasExpiredStocks = $hasExpiredStocks;
             $item->isExpiringSoon = $isExpiringSoon;
@@ -214,7 +209,7 @@ class ItemController extends Controller
         //Check the user if manager type
         if ($user->type === 'manager') {
 
-            return view('manager.stocks')->with([
+            return view('manager.items')->with([
                 'items' => $items,
                 'categories' => $categories,
                 'category' => $category,
@@ -231,45 +226,38 @@ class ItemController extends Controller
         }
     }
 
-    //
-    //This will view new item page
-    //
-    public function newItem()
-    {
-        $user = Auth::user();
-        $user_type = $user->type;
 
-        $units = Item::distinct('unit')->pluck('unit');
+    public function newItem() //this function will return the new-item view module with the categories and units of the items
+    {
+        $user = Auth::user(); //get the authenticated user information
+        $user_type = $user->type; //get the user type 
+
+        $units = Item::distinct('unit')->pluck('unit'); //get all the items unit without duplicating its value
+
+        $categories = Item::distinct('category')->pluck('category'); //get all the items category without duplicating its value
 
         if ($user_type === 'manager') {
-            if ($user->dept === 'pharmacy') {
-                $categories = Item::where('category', '!=', 'medical supply')->distinct('category')->pluck('category');
-            } elseif ($user->dept === 'csr') {
-                $categories = Item::where('category', '=', 'medical supply')->distinct('category')->pluck('category');
-            }
             return view("manager.sub-page.items.new-item")->with([
                 'categories' => $categories,
                 'units' => $units
             ]);
+        } else {
+            return view("admin.sub-page.items.new-item")->with([
+                'categories' => $categories,
+                'units' => $units
+            ]);
         }
-
-        $categories = Item::distinct('category')->pluck('category');
-        return view("admin.sub-page.items.new-item")->with([
-            'categories' => $categories,
-            'units' => $units
-        ]);
     }
 
-    //
-    //This will add new item in database
-    //
-    public function saveItem(Request $request)
+
+    public function saveItem(Request $request) //this function will save the new item information to items table in the database
     {
         // Enable query logging
         DB::enableQueryLog();
-        $item = new Item;
 
-        $validator = Validator::make($request->all(), [
+        $item = new Item; //get the items table
+
+        $validator = Validator::make($request->all(), [ //requiring the input fields 
             'name' => 'required',
             'description' => 'required',
             'category' => 'required',
@@ -282,36 +270,33 @@ class ItemController extends Controller
                 ->withInput();
         };
 
-        $item->name = ucwords($request->name);
-        $item->description = ucfirst($request->description);
-        if ($request->category === 'other') {
-            $item->category = ucwords($request->new_category);
+        $item->name = ucwords($request->name); //put the value of the new item name into the name column and make upper case every word preparing to save to items table
+        $item->description = ucfirst($request->description); //put the value of the new item description into the description column and make upper case the first word preparing to save to items table
+        if ($request->category === 'other') { // if the category input value is 'other'
+            $item->category = ucwords($request->new_category); //put the value of the new item new_category into the category column and make upper case every word preparing to save to items table
         } else {
-            $item->category = ucwords($request->category);
+            $item->category = ucwords($request->category); //put the value of the new item category into the category column and make upper case every word preparing to save to items table
         }
 
-        if ($request->unit === 'other') {
-            $item->unit = $request->new_unit;
+        if ($request->unit === 'other') { // if the unit input value is 'other'
+            $item->unit = $request->new_unit; //put the value of the new item new_unit into the unit column preparing to save to items table
         } else {
-            $item->unit = $request->unit;
+            $item->unit = $request->unit; //put the value of the new item unit into the unit column preparing to save to items table
         }
 
-        $item->price = $request->price;
+        $item->price = $request->price; //put the value of the new item price into the price column preparing to save to items table
 
-        if ($request->max_limit !== "") {
-            $item->max_limit = $request->filled('max_limit') ? $request->max_limit : 500;
-        } else if ($request->warning_level !== "") {
-            $item->warning_level = $request->filled('warning_level') ? $request->warning_level : 30;
-        }
+        $item->max_limit = $request->filled('max_limit') ? $request->max_limit : 500; //if the max_limit input has a value, store the value of max_limit to the items max_limit column and if its empty store the value 500 as default
 
-        $item->save();
+        $item->warning_level = $request->filled('warning_level') ? $request->warning_level : 30; //if the warning_level input has a value, store the value of warning_level to the items warning_level column and if its empty store the value 30 as default
 
-        $user = auth()->user();
+        $item->save(); //save all the new item information to database
+
+        $user = auth()->user(); //get the authenticated user information
 
         $user_id = $user->id; // Get the ID of the authenticated user
-        $dept = $user->dept; // Get the department if the user is manager
 
-        $user_type = $user->type;
+        $user_type = $user->type; //get the user type
 
         // Get the SQL query being executed
         $sql = DB::getQueryLog();
@@ -337,31 +322,26 @@ class ItemController extends Controller
         return back()->with('success', 'Item successfully added.');
     }
 
-    //This will show the item depending on id
-    public function showItem($id)
+    public function showItem($id) //this function will return the edit-item view module that will show the information of the item and can be edit its information, the parameter is the item id.
     {
-        $item = Item::find($id);
+        $item = Item::find($id); //find the item by its id
 
-        $units = Item::distinct('unit')->pluck('unit');
-        $user = Auth::user();
-        $user_type = $user->type;
+        $units = Item::distinct('unit')->pluck('unit'); //get all the items unit without duplicating its value
 
-        if ($user_type === 'manager') {
-            $user_dept = $user->dept;
+        $categories = Item::distinct('category')->pluck('category'); //get all the items category without duplicating its value
 
-            if ($user_dept === 'pharmacy') {
-                $categories = Item::where('category', '!=', 'medical supply')->distinct('category')->pluck('category');
-            } elseif ($user_dept === 'csr') {
-                $categories = Item::where('category', 'medical supply')->distinct('category')->pluck('category');
-            }
+        $user = Auth::user(); //get the authenticated user information
+        $user_type = $user->type; //get the user type
+
+        if ($user_type === 'manager') { //if the user type is manager and return to the manager edit-item view
 
             return view("manager.sub-page.items.edit-item")->with([
                 "item" => $item,
                 'categories' => $categories,
                 'units' => $units
             ]);
-        } else {
-            $categories = Item::distinct('category')->pluck('category');
+        } else { //else the user is admin and return to the admin edit-item view
+
             return view("admin.sub-page.items.edit-item")->with([
                 "item" => $item,
                 'categories' => $categories,
@@ -370,34 +350,34 @@ class ItemController extends Controller
         }
     }
 
-    //This will update the details of item
-    public function updateItem(Request $request, $id)
+    public function updateItem(Request $request, $id) //this function will update the item information, the parameter $id is the item id
     {
         // Enable query logging
         DB::enableQueryLog();
 
-        $item = Item::find($id);
-        $item->name = ucwords($request->name);
-        $item->description = ucfirst($request->description);
-        if ($request->category === 'other') {
-            $item->category = ucwords($request->new_category);
+        $item = Item::find($id); //find the item in items table
+
+        $item->name = ucwords($request->name); //store the value of the new item name in the selected item 'name' column
+        $item->description = ucfirst($request->description); //store the value of the new item description in the selected item 'description' column
+        if ($request->category === 'other') { //if the category input value is 'other'
+            $item->category = ucwords($request->new_category); //store the value of the new item category from new_category input in the selected item 'category' column
         } else {
-            $item->category = ucwords($request->category);
+            $item->category = ucwords($request->category); //store the value of the new item category in the selected item 'category' column
         }
 
-        if ($request->unit === 'other') {
-            $item->unit = ucwords($request->new_unit);
+        if ($request->unit === 'other') { //if the unit input value is 'other'
+            $item->unit = ucwords($request->new_unit); //store the value of the new item unit from new_unit input in the selected item 'unit' column
         } else {
-            $item->unit = ucwords($request->unit);
+            $item->unit = ucwords($request->unit); //store the value of the new item unit in the selected item 'unit' column
         }
 
-        $item->price = $request->price;
+        $item->price = $request->price; //store the value of the new item price in the selected item 'price' column
 
-        $item->max_limit = $request->max_limit;
+        $item->max_limit = $request->max_limit; //store the value of the new item max_limit in the selected item 'max_limit' column
 
-        $item->warning_level = $request->warning_level;
+        $item->warning_level = $request->warning_level; //store the value of the new item warning_level in the selected item 'warning_level' column
 
-        $item->save();
+        $item->save(); //save the updated item information
 
         //QUERY LOG
         $user_id = Auth::id(); // Get the ID of the authenticated user

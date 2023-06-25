@@ -25,8 +25,8 @@ use Carbon\Carbon
         </div>
         <div class="col-md-9 col-lg-10 p-0">
             <div class="container-fluid pt-2">
-                <a href="{{ route('manager.stocks') }}" class="btn btn-secondary">Back to Items</a>
-                <a href="{{ route('manager.AllStocks') }}" class="btn btn-secondary">Back to Stocks</a>
+                <a href="{{ route('manager.items') }}" class="btn btn-secondary">Back to Items</a>
+                <a href="{{ route('manager.stocks') }}" class="btn btn-secondary">Back to Stocks</a>
             </div>
 
             <div id="content container-fluid" class="p-3">

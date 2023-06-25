@@ -11,44 +11,33 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-
-    //This will show the homepage as dashboard
-    public function dashboard()
+    public function dashboard() //this function will return the admin dashboard view
     {
-        $totalItems = Item::count("id");
-        $inStocks = Stock::select(DB::raw('COUNT(DISTINCT item_id) as count'))
-            ->get()
-            ->first();
-
-
-        return view('admin.dashboard')->with(
-            [
-                'total_items' => $totalItems,
-                'in_stocks' => $inStocks,
-            ]
-        );
+        return view('admin.dashboard');
     }
 
-    public function dashboardDisplay()
+    public function dashboardDisplay() //this function will get the count of the total items, in stocks count, pending request, today completed request, and the user count of admin, manager and user
     {
-        $totalItems = Item::count("id");
-        $inStocks = Stock::select(DB::raw('COUNT(DISTINCT item_id) as count'))
+        $totalItems = Item::count("id"); //get the total count of all the items 
+
+        $inStocks = Stock::select(DB::raw('COUNT(DISTINCT item_id) as count')) //get the total count of all the items that has stocks 
             ->get()
             ->first();
-        $pendingRequest = Request::where('status', 'pending')->count();
 
-        $from = Carbon::now()->startOfDay();
-        $to = Carbon::now()->endOfDay();
+        $pendingRequest = Request::where('status', 'pending')->count(); //get the count of pending request
+
+        $from = Carbon::now()->startOfDay(); //set the $from value to the start of the day
+        $to = Carbon::now()->endOfDay(); //set the $to value to the end of the day
 
         $todayCompletedReq = Request::where('status', 'completed')
             ->whereBetween('updated_at', [$from, $to])
-            ->count();
+            ->count(); //get the count of all the request with the column status 'completed' and filter the request created_at between $from and $to 
 
-        $admins = User::where('type', 1)->count();
-        $managers = User::where('type', 2)->count();
-        $users = User::where('type', 0)->count();
+        $admins = User::where('type', 1)->count(); //get the count of the admin type
+        $managers = User::where('type', 2)->count(); //get the count of the manager type
+        $users = User::where('type', 0)->count(); //get the count of the user type
 
-        return response()->json([
+        return response()->json([ //return all the counts as json format
             'total_items' => $totalItems,
             'in_stocks' => $inStocks,
             'pending_request' => $pendingRequest,
@@ -57,11 +46,6 @@ class AdminController extends Controller
             'managers' => $managers,
             'users' => $users,
         ]);
-    }
-
-    public function adminHome()
-    {
-        return view('admin.main');
     }
 
     public function editItem($id)

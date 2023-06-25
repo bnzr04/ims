@@ -47,12 +47,16 @@ class User extends Authenticatable
      * @param  string  $value
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
+
+    //create a user type attribute
     protected function type(): Attribute
     {
         return new Attribute(
             get: fn ($value) =>  ["user", "admin", "manager"][$value],
         );
     }
+
+    //create a user department attribute
     protected function dept(): Attribute
     {
         return new Attribute(
@@ -65,6 +69,7 @@ class User extends Authenticatable
         );
     }
 
+    //user has types
     public function hasRole($types)
     {
         return $this->type == $types;

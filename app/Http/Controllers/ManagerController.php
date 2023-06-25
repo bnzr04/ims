@@ -12,23 +12,23 @@ use Illuminate\Support\Facades\DB;
 
 class ManagerController extends Controller
 {
-    public function managerHome()
+    public function managerHome() //this function will return the manager dashboard view
     {
         return view('manager.dashboard');
     }
 
-    public function dashboardDisplay()
+    public function dashboardDisplay() //this function will return the count of total items, items in stocks, pending requests, and today completed request in json format
     {
-        $totalItems = Item::count("id");
-        $inStocks = Stock::select(DB::raw('COUNT(DISTINCT item_id) as count'))
+        $totalItems = Item::count("id"); //get the count of saved items
+        $inStocks = Stock::select(DB::raw('COUNT(DISTINCT item_id) as count')) //get the count of items that has stocks
             ->get()
             ->first();
-        $pendingRequest = ModelsRequest::where('status', 'pending')->count();
+        $pendingRequest = ModelsRequest::where('status', 'pending')->count(); //get the pending request count
 
         $from = Carbon::now()->startOfDay();
         $to = Carbon::now()->endOfDay();
 
-        $todayCompletedReq = ModelsRequest::where('status', 'completed')
+        $todayCompletedReq = ModelsRequest::where('status', 'completed') //get the count of today completed request 
             ->whereBetween('updated_at', [$from, $to])
             ->count();
 
@@ -40,13 +40,8 @@ class ManagerController extends Controller
         ]);
     }
 
-    public function stocks()
+    public function stocks() //return the stocks view 
     {
         return view('manager.stocks');
-    }
-
-    public function deployment()
-    {
-        return view('manager.deployment');
     }
 }

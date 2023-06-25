@@ -11,37 +11,37 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    //this will show the user dashboard
-    public function userHome()
+    public function userHome() //this function will return the home view or the user dashboard
     {
         return view('user.home');
     }
 
-    public function dashboardData()
+    public function dashboardData() //this function will fetch request count of every status 
     {
         //get the user id
-        $user_id = Auth::user()->id;
+        $user_id = Auth::user()->id; //get the authenticated user id
 
-        //this will get the total number of pending
+        //this will get the total number of pending request
         $pending = ModelsRequest::where('user_id', $user_id)
             ->where('status', 'pending')
             ->count('user_id');
 
-        //this will get the total number of accepted
+        //this will get the total number of accepted request
         $accepted = ModelsRequest::where('user_id', $user_id)
             ->where('status', 'accepted')
             ->count('user_id');
 
-        //this will get the total number of delivered
+        //this will get the total number of delivered request
         $delivered = ModelsRequest::where('user_id', $user_id)
             ->where('status', 'delivered')
             ->count('user_id');
 
-        //this will get the total number of completed or received requests
+        //this will get the total number of completed or received request
         $completed = ModelsRequest::where('user_id', $user_id)
             ->where('status', 'completed')
             ->count('user_id');
 
+        //this will get the total number of canceled request
         $canceled = ModelsRequest::where('user_id', $user_id)
             ->where('status', 'canceled')
             ->count('user_id');
@@ -54,19 +54,4 @@ class UserController extends Controller
             'canceled' => $canceled,
         ]);
     }
-
-    // public function searchItem(Request $request)
-    // {
-
-    //     $searchItem = $request->search_item;
-
-
-    //     if ($searchItem) {
-    //         $search = Item::where('name', 'like', '%' . $searchItem . '%')->get();
-    //     }
-
-
-
-    //     return back()->with('items', $search);
-    // }
 }

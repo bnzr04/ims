@@ -29,31 +29,27 @@ class LoginController extends Controller
      *
      * @return void
      */
-    // public function __construct()
-    // {
-    //     $this->middleware('guest')->except('logout');
-    // }
 
+    //this function is for login in the account
     public function login(Request $request)
     {
         // Enable query logging
         DB::enableQueryLog();
 
-        $input = $request->all();
+        $input = $request->all(); //get all the input including username and password input
 
         $this->validate($request, [
             'username' => 'required',
             'password' => 'required',
         ]);
 
-        if (auth()->attempt(array('username' => $input['username'], 'password' => $input['password']))) {
-            //QUERY LOG
+        if (auth()->attempt(array('username' => $input['username'], 'password' => $input['password']))) { //if the username and password is exist
 
-            $user = auth()->user();
+            $user = auth()->user(); //get the authenticated user information
 
             $user_id = $user->id; // Get the ID of the authenticated user
             $userName = $user->name; // Get user name
-            $user_type = $user->type;
+            $user_type = $user->type; // get the user type
 
 
             // Get the SQL query being executed
@@ -65,7 +61,7 @@ class LoginController extends Controller
             }
 
             //Log Message
-            if ($user_type === 'user' || $user_type === 'manager') {
+            if ($user_type === 'user' || $user_type === 'manager') { //if user type is 'user' or 'manager'
                 $message = $user_type . " (" . $userName . ") logged in.";
             } else {
                 $message = $user_type . " logged in.";
@@ -81,14 +77,14 @@ class LoginController extends Controller
                 'updated_at' => now()
             ]);
 
-            if ($user->type == 'admin') {
-                return redirect()->route('admin.dashboard');
-            } else if ($user->type == 'manager') {
-                return redirect()->route('manager.home');
-            } else if ($user->type == 'user') {
-                return redirect()->route('user.request');
+            if ($user->type == 'admin') { //if user type is admin
+                return redirect()->route('admin.dashboard'); //redirect to admin dashboard route
+            } else if ($user->type == 'manager') { //if user type is manager
+                return redirect()->route('manager.home'); //redirect to manager dashboard route
+            } else if ($user->type == 'user') { //if user type is user
+                return redirect()->route('user.request'); //redirect to user request route
             }
-        } else {
+        } else { //if the credetial that enter is not exist
             return redirect()->route('login')
                 ->withErrors([
                     'username' => 'Username or password is incorrect.',
@@ -96,18 +92,17 @@ class LoginController extends Controller
         }
     }
 
+    //this the logout function
     public function logout(Request $request)
     {
-        //QUERY LOG
-
         // Enable query logging
         DB::enableQueryLog();
 
-        $user = auth()->user();
+        $user = auth()->user(); //get the authenticated user information
 
         $user_id = $user->id; // Get the ID of the authenticated user
         $userName = $user->name; // Get user name
-        $user_type = $user->type;
+        $user_type = $user->type; //get the user type
 
 
 
@@ -118,9 +113,6 @@ class LoginController extends Controller
         } else {
             $last_query = "No query log found.";
         }
-
-
-        $userName = $user->name; // Get user name
 
         //Log Message
         if ($user_type === 'user' || $user_type === 'manager') {
@@ -139,12 +131,12 @@ class LoginController extends Controller
             'updated_at' => now()
         ]);
 
-        Auth::logout();
+        Auth::logout(); //logout the authenticated user
 
-        $request->session()->invalidate();
+        $request->session()->invalidate(); //remove all the data stored in the session
 
-        $request->session()->regenerateToken();
+        $request->session()->regenerateToken(); //regenerate token for the next session
 
-        return redirect('/login');
+        return redirect('/login'); //redirect the user to login
     }
 }

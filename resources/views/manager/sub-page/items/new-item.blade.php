@@ -11,7 +11,7 @@
                 <div class="container-md">
 
                     <div class="container-md mt-2 d-inline" style="flex-direction: column;">
-                        <a href="{{ route('manager.stocks') }}" class="btn btn-secondary">Back</a>
+                        <a href="{{ route('manager.items') }}" class="btn btn-secondary">Back</a>
                         <hr>
                         <div class="container-md py-2 mt-3 shadow">
                             <form action="{{ route('manager.insert-items') }}" method="post" enctype="multipart/form-data">

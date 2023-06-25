@@ -16,7 +16,7 @@
                     <div class="container-lg p-0 d-flex" style="flex-direction:column">
                         <div class="container-lg " id="add-item-div">
                             <h5 style="letter-spacing: 3px;">ITEM NAME: </h5>
-                            <div class="container-lg p-0 m-0 d-flex align-items-center" style="width:100%;max-width:500px">
+                            <div class="container-lg p-0 m-0 d-flex align-items-center" style="width:100%;max-width:600px">
                                 <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
                                     <option></option>
                                     @foreach($items as $item)
@@ -158,6 +158,7 @@
         }
 
         $('#nameSearch').on('change', function() {
+            console.log(true);
             var selectedOptionValue = $('#nameSearch option:selected');
             var itemId = selectedOptionValue.data('item-id');
             var stockId = selectedOptionValue.data('stock-id');

@@ -1,6 +1,3 @@
-@php
-use Illuminate\Support\Facades\Session
-@endphp
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
@@ -21,122 +18,81 @@ use Illuminate\Support\Facades\Session
             @include('layouts.sidebar')
         </div>
         <div class="col-md-9 col-lg-10 p-0">
-            <div id="content" class="px-2 pt-1 pb-5 container-fluid">
-                <h2>ITEMS</h2>
-                <div class="container-fluid p-0 mt-1 d-flex justify-content-between" style="flex-wrap: wrap;">
-                    <div class="container-sm p-0 m-0" style="display: flex;flex-wrap:wrap">
-                        <a href="{{ route('manager.new-item') }}" class="btn btn-success m-1">New Item</a>
-                        <a href="{{ route('manager.AllStocks') }}" class="btn btn-secondary m-1">All Stocks</a>
-                    </div>
+            <div id="content" class="px-2 py-1">
+                <div class="container-fluid">
+                    <a href="{{ route('manager.items') }}" class="btn btn-secondary mt-2 mb-1">Back</a>
+                    <hr>
+                    <h2>STOCKS</h2>
                 </div>
-
-                <div class="container-fluid d-flex p-0 mt-2" style="flex-wrap:wrap">
-                    <form action="" method="get" class="d-flex mx-1 my-1 m-0">
-                        <div class="input-group flex-nowrap m-0 p-0" style="width: 300px;z-index:0;">
-                            <input type="text" class="form-control bg-white" placeholder="Search name..." aria-label="search" aria-describedby="addon-wrapping" name="search" id="search" value="{{ $search == true ? $search : ''}}">
-                            <button type="submit" class="btn btn-outline-secondary">Search</button>
-                        </div>
-                    </form>
-
-                    <form action="{{ route('manager.stocks') }}" method="get" style="z-index:0;" class="mx-1 my-1 m-0">
-                        <div class="container-sm p-0 input-group" style="width: 300px;">
-                            <select name="category" class="form-select text-capitalize" id="category">
-                                @if($category)
-                                <option value="{{ $category }}">{{ $category }}</option>
-                                @endif
-                                <option value="">All</option>
-                                @foreach($categories as $category)
-                                <option value="{{ $category }}">{{ $category }}</option>
-                                @endforeach
-                            </select>
-                            <button type="submit" class="btn btn-outline-primary">Filter</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="container-fluid p-0 mt-2 d-flex">
-
-                    <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#00CDCD">&nbsp;</div>
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=max" class="level">Over Max Limit</a></p>
-                        </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="width:40px;height:100%;background-color:#1ea200">&nbsp;</div>
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=safe" class="level">Safe Level</a></p>
-                        </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="width:40px;height:100%;background-color:#d67b00">&nbsp;</div>
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=warning" class="level">Warning Level</a></p>
-                        </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="width:40px;height:100%;background-color:#dc0f00">&nbsp;</div>
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=no-stocks" class="level">No Stocks</a></p>
-                        </div>
-                    </div>
-                    <div class="container-sm m-0 p-0" style="width:100%;max-width:300px;">
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcd772">&nbsp;</div>
-                            <p class="m-0">Has Expired/Expiring Stocks</p>
-                        </div>
-                    </div>
-                    <div class="container-sm m-0 p-0" style="width:100%;max-width:300px;">
-                        <div class="container-sm" style="letter-spacing: 2px;">
-                            <h5>Mode of acquisition</h5>
-                        </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}" class="level">All</a></p>
-                        </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}?moa=petty-cash" class="level">Petty Cash</a></p>
-                        </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}?moa=donation" class="level">Donation</a></p>
-                        </div>
-                        <div class="container-sm d-flex p-0" style="align-items: center;">
-                            <p class="m-0"><a href="{{ route('manager.stocks') }}?moa=lgu" class="level">LGU</a></p>
-                        </div>
-                    </div>
-
-                    <div class="container-sm d-flex m-0 p-0" style="width:100%;max-width:200px;flex-direction:column-reverse">
-                        <form class="m-0" action="{{ route('manager.export-items') }}" method="post">
-                            @csrf
-                            <input type="hidden" name="filter" value="{{ request('filter') }}">
-                            <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
+                <div class="container-fluid">
+                    <div class="container-fluid p-0 px- d-flex">
+                        <form action="" method="get">
+                            <div class="input-group" style="width: 100%;max-width: 400px">
+                                <input type="text" class="form-control bg-white" placeholder="Search item name or id" name="search" id="search" value="{{ $search }}">
+                                <button type="submit" class="input-group-text btn btn-outline-secondary">Search</button>
+                            </div>
                         </form>
+
+                        <form action="" method="get" class="mx-2">
+                            <div class="container-sm p-0 d-flex input-group" style="width: 100%;max-width: 400px">
+                                <select name="category" class="form-select text-capitalize" id="category">
+                                    @if($category !== null)
+                                    <option value="{{ $category }}" class="text-capitalize">{{ $category }}</option>
+                                    <option value="">All</option>
+                                    @else
+                                    <option value="">All</option>
+                                    @endif
+                                    @foreach($categories as $category)
+                                    <option value="{{ $category }}">{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary">Filter</button>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <div class="container-fluid p-0 mt-2 d-flex">
+
+                        <div class="container-sm m-0 p-0" style="width:100%;max-width:200px;">
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#00CDCD">&nbsp;</div>
+                                <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=max" class="level">Over Max Limit</a></p>
+                            </div>
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="width:40px;height:100%;background-color:#1ea200">&nbsp;</div>
+                                <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=safe" class="level">Safe Level</a></p>
+                            </div>
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="width:40px;height:100%;background-color:#d67b00">&nbsp;</div>
+                                <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=warning" class="level">Warning Level</a></p>
+                            </div>
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="width:40px;height:100%;background-color:#dc0f00">&nbsp;</div>
+                                <p class="m-0"><a href="{{ route('manager.stocks') }}?filter=no-stocks" class="level">No Stocks</a></p>
+                            </div>
+                        </div>
+                        <div class="container-sm m-0 p-0" style="width:100%;max-width:300px;">
+                            <div class="container-sm d-flex p-0" style="align-items: center;">
+                                <div class="m-1" style="min-width:40px;width:40px;height:100%;background-color:#fcd772">&nbsp;</div>
+                                <p class="m-0">Has Expired/Expiring Stocks</p>
+                            </div>
+                        </div>
+
+                        <div class="container-lg p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:300px;flex-direction:column-reverse">
+                            <div class="container-sm d-flex m-0 p-1">
+                                <form action="{{ route('manager.export-stocks') }}" method="post" class="m-0 d-flex">
+                                    @csrf
+                                    <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-                @endif
 
-                @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-                @endif
-
-                @if(request()->input('moa'))
-                <div class="container-fluid mt-2 p-1 bg-secondary">
-                    @if(request()->input('moa') == 'petty-cash')
-                    <h5 class="m-0 text-white">ITEMS WITH PETTY CASH STOCK BATCH:</h5>
-                    @endif
-
-                    @if(request()->input('moa') == 'donation')
-                    <h5 class="m-0 text-white">ITEMS WITH DONATION STOCK BATCH:</h5>
-                    @endif
-
-                    @if(request()->input('moa') == 'lgu')
-                    <h5 class="m-0 text-white">ITEMS WITH LGU STOCK BATCH:</h5>
-                    @endif
-                </div>
-                @endif
-
-                <div class="mt-2 p-0 border">
-                    <table class="table" id="items_table">
+                <div class=" container-fluid p-0 border">
+                    <table class="table">
                         <thead class="bg-success text-white" style="position: sticky;top: 55;">
                             <tr>
                                 <th scope="col">Item ID</th>
@@ -144,39 +100,34 @@ use Illuminate\Support\Facades\Session
                                 <th scope="col">Description</th>
                                 <th scope="col">Category</th>
                                 <th scope="col">Unit</th>
-                                <th scope="col">Price</th>
-                                <th scope="col">Current Stock</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">Batches</th>
+                                <th scope="col">Total Stocks</th>
+                                <th scope="col">Latest Date Stocked</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($items as $item)
-                            <tr style="border-bottom: 1px black solid;{{ $item->hasExpiredStocks || $item->isExpiringSoon ? 'background-color:#fcd772' : '' }}">
-                                <th>{{ $item->id }}</th>
-                                <td class="text-capitalize">{{ $item->name }}</td>
-                                <td class="text-capitalize">{{ $item->description }}</td>
-                                <td class="text-capitalize">{{ $item->category }}</td>
-                                <td>{{ $item->unit }}</td>
-                                <td>{{ is_null($item->price) ? "-" : $item->price}}</td>
-                                @if($item->total_quantity !== null)
-                                <th class="total_quantity" data-warning-level="{{ $item->warning_level }}" data-max-limit="{{ $item->max_limit }}">{{ $item->total_quantity }}</th>
-                                @else
-                                <th class="text-danger">No stocks</th>
-                                @endif
-
-                                <td class="d-flex border-0" style="flex-direction:column;">
-                                    <a href="{{route('manager.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary m-1" title="Add stocks">Stocks</a>
-                                    <a href="{{route('manager.show-item', ['id' => $item->id])}}" class="btn btn-success m-1">Edit</a>
+                            @forelse( $stocks as $stock )
+                            <tr style="border-bottom: 1px black solid;{{ $stock->hasExpiredStocks || $stock->isExpiringSoon ? 'background-color:#fcd772' : ''}}">
+                                <th scope="row">{{ $stock->id }}</th>
+                                <th>{{ $stock->name }}</th>
+                                <td>{{ $stock->description }}</td>
+                                <td>{{ $stock->category }}</td>
+                                <td>{{ $stock->unit }}</td>
+                                <td>{{ $stock->stocks_batch}}</td>
+                                <th class="total_quantity" data-warning-level="{{ $stock->warning_level }}" data-max-limit="{{ $stock->max_limit }}">{{ $stock->total_quantity }}</th>
+                                <th>{{ $stock->latest_stock }}</th>
+                                <td>
+                                    <a href="{{ route('manager.add-to-stocks', ['id' => $stock->id]) }}" class="btn btn-outline-secondary">View Batches</a>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8">
-                                    No items...
+                                <td colspan="7">
+                                    No Item stock...
                                 </td>
                             </tr>
                             @endforelse
-
                         </tbody>
                     </table>
                 </div>
@@ -185,12 +136,6 @@ use Illuminate\Support\Facades\Session
     </div>
 </div>
 <script>
-    function deleteUser() {
-        if (!confirm("Are you sure you want to delete this item?\nThis item will be deleted even in the stocks if it's added.")) {
-            event.preventDefault();
-        };
-    }
-
     function threshold() {
         const totalQuantity = document.getElementsByClassName("total_quantity");
 
@@ -203,6 +148,8 @@ use Illuminate\Support\Facades\Session
             var warningLevel = warningLevel / 100;
 
             var warningQty = maxLimit * warningLevel;
+
+            console.log(maxLimit);
 
             if (totalQuantityValue <= warningQty) {
                 totalQuantity[i].style.color = "#d67b00";
@@ -217,8 +164,5 @@ use Illuminate\Support\Facades\Session
     }
 
     threshold();
-
-    // const warningLevel = totalQuantity.getAttribute('data-warning-level');
-    // const totalQuantityValue = totalQuantity.innerHTML;
 </script>
 @endsection

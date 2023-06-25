@@ -18,23 +18,23 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize, WithMapping, WithColumnFormatting
 {
 
-    public static $filter;
+    public static $filter; //get the value of $filter
 
     public function fileName(): string
     {
         return $this->filename();
     }
 
-    public function headings(): array
+    public function headings(): array //this will generate the headings of the excel file 
     {
         return [
             [
                 'As of: ',
-                date('h:i A, F d, Y'),
+                date('h:i A, F d, Y'), //will generate current date
             ],
             [],
             [
-                'Item name', 'Description', 'Category', 'Unit', 'Total Stocks'
+                'Item name', 'Description', 'Category', 'Unit', 'Total Stocks' //data header or the table head
             ]
         ];
     }
@@ -45,30 +45,31 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
     //data collection
     public function collection()
     {
+        //join the item_stocks and items table to get every items and its total quantity in stocks
         $query = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level')
-            ->orderBy('items.name');
+            ->orderBy('items.name'); //order the names by ascending
 
         $items = $query->get();
 
         foreach ($items as $item) {
-            $item->warning_level = $item->warning_level / 100;
+            $item->warning_level = $item->warning_level / 100; //divide the value of warning_level to 100
         }
 
         if (self::$filter) {
             switch (self::$filter) {
-                case 'max':
+                case 'max': //if the $filter value is 'max'
                     $query->havingRaw('total_quantity > max_limit');
                     break;
-                case 'safe':
+                case 'safe': //if the $filter value is 'safe'
                     $query->havingRaw('total_quantity > max_limit * (warning_level / 100)')
                         ->havingRaw('total_quantity <= max_limit');
                     break;
-                case 'warning':
+                case 'warning': //if the $filter value is 'warning'
                     $query->havingRaw('total_quantity <= (warning_level / 100) * max_limit ');
                     break;
-                case 'no-stocks':
+                case 'no-stocks': //if the $filter value is 'no-stocks'
                     $query->whereNotExists(function ($query) {
                         $query->select(DB::raw(1))
                             ->from('item_stocks')
@@ -105,7 +106,7 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
                 $row->description,
                 $row->category,
                 $row->unit,
-                ($row->total_quantity !== null) ? $row->total_quantity : 'out of stock',
+                ($row->total_quantity !== null) ? $row->total_quantity : 'out of stock', //if the total_quantity is not null, show the value of total_quantity else return 'out of stock'
             ]
         ];
     }

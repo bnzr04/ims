@@ -24,220 +24,95 @@ class RequestController extends Controller
         $today = Carbon::today()->format('Y-m-d');
 
 
-        $items =
+        $items = //this $items will show to the select tag where the user can choose the items they want to request
             DB::table('item_stocks')
-            ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            ->select('items.id', 'items.name', 'items.category', 'items.unit', 'item_stocks.id as item_stock_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition')
-            ->where('item_stocks.exp_date', ">", $today)
+            ->join('items', 'item_stocks.item_id', '=', 'items.id') //join the item_stocks and items table
+            ->select('items.id', 'items.name', 'items.category', 'items.unit', 'item_stocks.id as item_stock_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition') //select this items and item_stocks columns
+            ->where('item_stocks.exp_date', ">", $today) //select the item stock with the exp_date that not expired
             ->orderBy('items.name', 'asc')
             ->get();
 
         foreach ($items as $item) {
             $exp_date = Carbon::createFromFormat('Y-m-d', $item->exp_date);
-            $item->formatted_exp_date = $exp_date->format('m-d-Y');
+            $item->formatted_exp_date = $exp_date->format('m-d-Y'); //format the exp_date to 'm-d-Y'
         }
 
-        return view('user.request')->with([
+        return view('user.request')->with([ //return tp request module with the $items data
             'items' => $items,
         ]);
     }
-
-    // public function showPendingRequest()
-    // {
-    //     $user = Auth::user();
-    //     $user_id = $user->id;
-
-    //     $pending = ModelsRequest::where('status', 'pending')
-    //         ->where('user_id', $user_id)
-    //         ->orderByDesc('updated_at')
-    //         ->get()->each(function ($pending) {
-    //             $pending->formatted_date = Carbon::parse($pending->created_at)
-    //                 ->format('F j, Y, g:i:s a');
-    //         });
-
-    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-    //     Cache::put('filteredData', $pending, $expiresAt);
-
-    //     $requestCount = ModelsRequest::where('status', 'pending')
-    //         ->where('user_id', $user_id)
-    //         ->count();
-
-    //     DB::connection()->commit();
-
-    //     return response()->json([
-    //         'pending' => $pending,
-    //         'pendingCount' => $requestCount,
-    //     ]);
-    // }
-
-    // public function showAcceptedRequest()
-    // {
-    //     $user = Auth::user();
-    //     $user_id = $user->id;
-
-    //     $requests = ModelsRequest::where('status', 'accepted')
-    //         ->where('user_id', $user_id)
-    //         ->orderByDesc('updated_at')
-    //         ->get()->each(function ($pending) {
-    //             $pending->formatted_date = Carbon::parse($pending->created_at)
-    //                 ->format('F j, Y, g:i:s a');
-    //         });
-
-    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-    //     Cache::put('filteredData', $requests, $expiresAt);
-
-    //     $requestCount = ModelsRequest::where('status', 'accepted')
-    //         ->where('user_id', $user_id)
-    //         ->count();
-
-    //     DB::connection()->commit();
-
-    //     return response()->json([
-    //         'accepted' => $requests,
-    //         'acceptedCount' => $requestCount,
-    //     ]);
-    // }
-
-    // public function showDeliveredRequest()
-    // {
-    //     $user = Auth::user();
-    //     $user_id = $user->id;
-
-    //     $requests = ModelsRequest::where('status', 'delivered')
-    //         ->where('user_id', $user_id)
-    //         ->orderByDesc('updated_at')
-    //         ->get()->each(function ($pending) {
-    //             $pending->formatted_date = Carbon::parse($pending->created_at)
-    //                 ->format('F j, Y, g:i:s a');
-    //         });
-
-    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-    //     Cache::put('filteredData', $requests, $expiresAt);
-
-    //     $requestCount = ModelsRequest::where('status', 'delivered')
-    //         ->where('user_id', $user_id)
-    //         ->count();
-
-    //     DB::connection()->commit();
-
-    //     return response()->json([
-    //         'delivered' => $requests,
-    //         'deliveredCount' => $requestCount,
-    //     ]);
-    // }
-
-    // public function showCompletedRequest()
-    // {
-    //     $user = Auth::user();
-    //     $user_id = $user->id;
-
-    //     $requests = ModelsRequest::where('status', 'completed')
-    //         ->where('user_id', $user_id)
-    //         ->orderByDesc('updated_at')
-    //         ->get()->each(function ($pending) {
-    //             $pending->formatted_date = Carbon::parse($pending->created_at)
-    //                 ->format('F j, Y, g:i:s a');
-    //         });
-
-    //     $expiresAt = now()->addMinutes(10); // cache will expire after 10 minutes
-    //     Cache::put('filteredData', $requests, $expiresAt);
-
-    //     $requestCount = ModelsRequest::where('status', 'completed')
-    //         ->where('user_id', $user_id)
-    //         ->count();
-
-    //     DB::connection()->commit();
-
-    //     return response()->json([
-    //         'completed' => $requests,
-    //         'completedCount' => $requestCount,
-    //     ]);
-    // }
 
     public function viewRequests()
     {
         return view('user.sub-page.view-request');
     }
 
-    public function viewRequest(Request $requests, $request, $filter)
+    public function viewRequest(Request $requests, $request, $filter) //this function will retrieve the requests, parameter $request = the request status what to retrieve, parameter $filter = the selected date period
     {
-        $user_id = Auth::user()->id;
+        $user_id = Auth::user()->id; //get the id of authenticated user
 
-        $date_from = $requests->input("date_from");
-        $date_to = $requests->input("date_to");
+        $date_from = $requests->input("date_from"); //get the value of date_from input
+        $date_to = $requests->input("date_to"); //get the value of date_to input
 
-        if ($filter === "today") {
+        $requests = ModelsRequest::where('user_id', $user_id) //query a request with column user_id equal to the user id of authenticated user 
+            ->orderBy('created_at', 'desc'); //order the request created_at as descending
+
+        if ($filter === "today") { //if the $filter parameter is equal to 'today'
             $from = Carbon::now()->startOfDay();
             $to = Carbon::now()->endOfDay();
-        } else if ($filter === "this-week") {
+        } else if ($filter === "this-week") { //if the $filter parameter is equal to 'this-week'
             $from = Carbon::now()->startOfWeek();
             $to = Carbon::now()->endOfWeek();
-        } else if ($filter === "this-month") {
+        } else if ($filter === "this-month") { //if the $filter parameter is equal to 'this-month'
             $from = Carbon::now()->startOfMonth();
             $to = Carbon::now()->endOfMonth();
-        } else if ($date_from && $date_to) {
+        } else if ($date_from && $date_to) { //if the $date_from and $date_to is true or has a value passed
 
-            $from = date('Y-m-d', strtotime($date_from));
-            $to = date('Y-m-d', strtotime($date_to . '+1day'));
+            $from = date('Y-m-d', strtotime($date_from)); //format the value of $date_from to 'Year-Month-Day'
+            $to = date('Y-m-d', strtotime($date_to . '+1day')); //format the value of $date_to to 'Year-Month-Day' and add 1 day
 
-            $dateFrom = Carbon::parse($from)->format('F j, Y');
-            $dateTo = Carbon::parse(strtotime($date_to . '+1day'))->format('F j, Y');
+            $dateFrom = Carbon::parse($from)->format('F j, Y'); //format the $from value to readable format ex. 'January 10, 2023'
+            $dateTo = Carbon::parse(strtotime($date_to . '+1day'))->format('F j, Y'); //format the $to value to readable format ex. 'January 10, 2023' and add 1 day
         }
 
-        if ($request === 'pending') {
+        if ($request === 'pending') { //if the $request value is equal to 'pending'
 
-            $items = ModelsRequest::where('user_id', $user_id)
-                ->whereBetween('created_at', [$from, $to])
-                ->where('status', 'pending')
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $requests = $requests->where('status', 'pending'); //add to $requests query that will retrieve the request where status with the value of 'pending'
 
-            $title = "pending";
-        } else if ($request === 'accepted') {
+            $title = "pending"; //set the $title value to 'pending'
+        } else if ($request === 'accepted') { //if the $request value is equal to 'accepted'
 
-            $items = ModelsRequest::where('user_id', $user_id)
-                ->whereBetween('created_at', [$from, $to])
-                ->where('status', 'accepted')
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $requests = $requests->where('status', 'accepted'); //add to $requests query that will retrieve the request where status with the value of 'accepted'
 
-            $title = "accepted";
-        } else if ($request === 'delivered') {
+            $title = "accepted"; //set the $title value to 'accepted'
+        } else if ($request === 'delivered') { //if the $request value is equal to 'delivered'
 
-            $items = ModelsRequest::where('user_id', $user_id)
-                ->whereBetween('created_at', [$from, $to])
-                ->where('status', 'delivered')
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $requests = $requests->where('status', 'delivered'); //add to $requests query that will retrieve the request where status with the value of 'delivered'
 
-            $title = "delivered";
-        } else if ($request === 'completed') {
+            $title = "delivered"; //set the $title value to 'delivered'
+        } else if ($request === 'completed') { //if the $request value is equal to 'completed'
 
-            $items = ModelsRequest::where('user_id', $user_id)
-                ->whereBetween('created_at', [$from, $to])
-                ->where('status', 'completed')
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $requests = $requests->where('status', 'completed'); //add to $requests query that will retrieve the request where status with the value of 'completed'
 
-            $title = "completed";
-        } else if ($request === 'canceled') {
+            $title = "completed"; //set the $title value to 'completed'
+        } else if ($request === 'canceled') { //if the $request value is equal to 'canceled'
 
-            $items = ModelsRequest::where('user_id', $user_id)
-                ->whereBetween('created_at', [$from, $to])
-                ->where('status', 'canceled')
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $requests = $requests->where('status', 'canceled'); //add to $requests query that will retrieve the request where status with the value of 'canceled'
 
-            $title = "canceled";
+            $title = "canceled"; //set the $title value to 'canceled'
         }
 
-        foreach ($items as $item) {
-            $item->formatted_date = Carbon::parse($item->created_at)->format('F j, Y, g:i:s a');
+        $requests = $requests->whereBetween('created_at', [$from, $to]) //filter the request created_at between the value of $from and $to
+            ->orderBy('created_at', 'desc') //order the request created_at as descending 
+            ->get(); //get the query
+
+        foreach ($requests as $item) {
+            $item->formatted_date = Carbon::parse($item->created_at)->format('F j, Y, g:i:s a'); //format the created_at to a readble format and store the value to 'formatted_date'
         }
 
         if ($date_from && $date_to) {
             return view('user.sub-page.view-request')->with([
-                'items' => $items,
+                'requests' => $requests,
                 'title' => $title,
                 'filter' => $filter,
                 'request' => $request,
@@ -246,7 +121,7 @@ class RequestController extends Controller
             ]);
         } else {
             return view('user.sub-page.view-request')->with([
-                'items' => $items,
+                'requests' => $requests,
                 'title' => $title,
                 'filter' => $filter,
                 'request' => $request
@@ -254,45 +129,42 @@ class RequestController extends Controller
         }
     }
 
-    public function itemRequest(Request $request, $id)
+    public function itemRequest(Request $request, $id) //this function will return the view-request view
     {
-        $requested = ModelsRequest::where('id', $id)->first();
+        $requested = ModelsRequest::where('id', $id)->first(); //get the information of the request using the request id = $id
 
-        //Formatted date
-        $requested->formatted_date = Carbon::parse($requested->created_at)->format('F j, Y, g:i:s a');
+        $requested->formatted_date = Carbon::parse($requested->created_at)->format('F j, Y, g:i:s a'); //format the created_at to a readable format
 
-        $requestItems = Request_Item::join('items', 'request_items.item_id', '=', 'items.id')
-            ->select('request_items.*', 'items.*')
-            ->where('request_items.request_id', $id)
-            ->orderBy('request_items.created_at', 'asc')
+        $requestItems = Request_Item::join('items', 'request_items.item_id', '=', 'items.id') //join the request_items and items table
+            ->select('request_items.*', 'items.*') //select all the column of the request_items and items table
+            ->where('request_items.request_id', $id) //select all the data where the request_id is equal to $id
+            ->orderBy('request_items.created_at', 'asc') //fetch the request_items created_at to ascending order
             ->get();
 
-        //Get today date
-        $today = Carbon::today()->format('Y-m-d');
-
+        $today = Carbon::today()->format('Y-m-d'); //format the todays date to 'Year-Month-Day'
 
         $items =
             DB::table('item_stocks')
-            ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            ->select('items.name', 'item_stocks.*')
-            ->where('item_stocks.exp_date', ">", $today)
+            ->join('items', 'item_stocks.item_id', '=', 'items.id') //join the item_stocks and items table
+            ->select('items.name', 'item_stocks.*') //select the name column to items table and all the columns to item_stocks
+            ->where('item_stocks.exp_date', ">", $today) //fetch all the item_stocks row with the exp_date that has exp_date that is not expired
             ->orderBy('items.name', 'asc')
             ->get();
 
-        $canceled = Canceled_Request::where('request_id', $id)->first();
+        $canceled = Canceled_Request::where('request_id', $id)->first(); //find the $id that match to request_id in canceled_requests table
 
-        if ($canceled) {
+        if ($canceled) { //if the the request_id is exist in canceled_requests table
 
-            $canceled->format_date = Carbon::parse($canceled->created_at)->format('F j, Y, g:i:s a');
+            $canceled->format_date = Carbon::parse($canceled->created_at)->format('F j, Y, g:i:s a'); //format the created_at to a readable format
 
-            return view('user.sub-page.view-items')->with([
+            return view('user.sub-page.view-items')->with([ //return the requested items, request, items and canceled data to view-items view
                 'requestItems' => $requestItems,
                 'request' => $requested,
                 'items' => $items,
                 'canceled' => $canceled,
             ]);
         } else {
-            return view('user.sub-page.view-items')->with([
+            return view('user.sub-page.view-items')->with([ //return the requested items, request and items data to view-items view
                 'requestItems' => $requestItems,
                 'request' => $requested,
                 'items' => $items,
@@ -300,97 +172,39 @@ class RequestController extends Controller
         }
     }
 
-    // public function removeItem($sid, $id)
-    // {
-    //     $items = Request_Item::where('stock_id', $sid)->where('item_id', $id);
-
-    //     $items->delete();
-
-    //     return back()->with('success', 'Item successfully removed to requested item.');
-    // }
-
-
-    // public function deleteRequest($id)
-    // {
-    //     $request = ModelsRequest::find($id);
-
-    //     //Enable Query log
-    //     DB::enableQueryLog();
-
-    //     $request->delete();
-
-    //     //QUERY LOG
-    //     $user = auth()->user();
-
-    //     $user_id = $user->id; // Get the ID of the authenticated user
-    //     $user_type = $user->type; // Get the type of the authenticated user
-    //     $user_name = $user->name; // Get the name of the authenticated user
-
-
-    //     // Get the SQL query being executed
-    //     $sql = DB::getQueryLog();
-    //     if (is_array($sql) && count($sql) > 0) {
-    //         $last_query = end($sql)['query'];
-    //     } else {
-    //         $last_query = 'No query log found.';
-    //     }
-
-    //     //Log Message
-    //     $message = "Request (ID: " . $id . ") requested by " . $user_name . " is deleted";
-
-    //     // Log the data to the logs table
-    //     Log::create([
-    //         'user_id' => $user_id,
-    //         'user_type' => $user_type,
-    //         'message' => $message,
-    //         'query' => $last_query,
-    //         'created_at' => now(),
-    //         'updated_at' => now()
-    //     ]);
-
-    //     if ($request == true) {
-    //         return back()->with('success', 'Request successfully deleted.');
-    //     } else {
-    //         return back()->with('error', 'Request failed to deleted.');
-    //     }
-    // }
-
     //This will submit the requested items
     public function submitRequest(Request $request)
     {
-        $requested = $request->input('requestedItems');
-        $request_by = $request->input('requestBy');
-        $patient_name = $request->input('patientName');
-        $patient_age = $request->input('patientAge');
-        $patient_gender = $request->input('patientGender');
-        $doctor_name = $request->input('doctorName');
-        $requestedItems = json_decode($requested);
+        $requested = $request->input('requestedItems'); //get the requestedItems input value
+        $request_by = $request->input('requestBy'); //get the requestBy input value
+        $patient_name = $request->input('patientName'); //get the patientName input value
+        $patient_age = $request->input('patientAge'); //get the patientAge input value
+        $patient_gender = $request->input('patientGender'); //get the patientGender input value
+        $doctor_name = $request->input('doctorName'); //get the doctorName input value
+        $requestedItems = json_decode($requested); //decode the $requested from json format
 
         //Enable Query Log
         DB::enableQueryLog();
 
         //get user details
         $user = Auth::user();
-        //user id
-        $userId = $user->id;
-        //user type
-        $userType = $user->type;
-        //we use user name as office name
-        $office = $user->name;
 
-        $requestModel = new ModelsRequest();
-        $requestModel->user_id = $userId;
-        $requestModel->office = $office;
-        //we always send the request to pharmacy
-        $requestModel->request_to = 'pharmacy';
-        $requestModel->request_by = ucfirst($request_by);
-        $requestModel->patient_name = ucfirst($patient_name);
-        $requestModel->age = filled($patient_age) ? $patient_age : 0;
-        $requestModel->gender = filled($patient_gender) ? $patient_gender : "-";
-        $requestModel->doctor_name = ucfirst($doctor_name);
-        $requestModel->save();
+        $userId = $user->id; //user id
+        $userType = $user->type; //user type
+        $office = $user->name; //we use user name as office name
 
-        $requestID = $requestModel->id;
+        $requestModel = new ModelsRequest(); //set the $requestModel to ModelsRequest or request table
+        $requestModel->user_id = $userId; //set the request.user_id to the $userId
+        $requestModel->office = $office; //set the request.office to the $office
+        $requestModel->request_to = 'pharmacy'; //set the request.request_to value to 'pharmacy'
+        $requestModel->request_by = ucwords($request_by); //set the request.request_by to the $request_by and upper case the value every word
+        $requestModel->patient_name = ucwords($patient_name); //set the request.patient_name to the $patient_name and upper case the value every word
+        $requestModel->age = filled($patient_age) ? $patient_age : 0; //if the patient_age has a value, pass the value to request age else pass the value as '0'
+        $requestModel->gender = filled($patient_gender) ? $patient_gender : "-"; //if the patient_gender has a value, pass the value to request gender else pass the value as '-'
+        $requestModel->doctor_name = ucwords($doctor_name); //set the request.doctor_name to the $doctor_name and upper case the value every word
+        $requestModel->save(); //save the data to the table
+
+        $requestID = $requestModel->id; //set the $requestID to the new request id
 
         // Get the SQL query being executed
         $sql = DB::getQueryLog();
@@ -414,15 +228,16 @@ class RequestController extends Controller
         ]);
 
         //add the item in request_items
-        foreach ($requestedItems as $item) {
-            $model = new Request_Item();
-            $model->request_id = $requestModel->id;
-            $model->item_id = $item->item_id;
-            $model->stock_id = $item->stock_id;
-            $model->mode_acquisition = $item->mode_acquisition;
-            $model->exp_date = $item->exp_date;
-            $model->quantity = intval($item->quantity);
-            $model->save();
+        foreach ($requestedItems as $item) { //every requested items
+
+            $model = new Request_Item(); //set the model to request_items table
+            $model->request_id = $requestModel->id; //set the request_item.request_id to new request ID
+            $model->item_id = $item->item_id; //set the request_item.item_id from the passed or requested item id
+            $model->stock_id = $item->stock_id; //set the request_item.stock_id from the passed or requested item stock_id
+            $model->mode_acquisition = $item->mode_acquisition; //set the request_item.mode_acquisition from the passed or requested item mode_acquisition
+            $model->exp_date = $item->exp_date; //set the request_item.exp_date from the passed or requested item exp_date
+            $model->quantity = intval($item->quantity); //set the request_item.quantity from the passed or requested item quantity
+            $model->save(); //save the setted data to request_items table
 
 
             // Get the SQL query being executed
@@ -445,20 +260,19 @@ class RequestController extends Controller
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
-            // var_dump($model->exp_date);
 
-            //Stock reserving
-            $requestedQty = $model->quantity;
+            /////Stock reserving/////
 
-            $itemStock = Stock::find($model->stock_id);
+            $requestedQty = $model->quantity; //set the requested quantity of items to $requestedQty
 
-            //minus the requested quantity to current stocks
-            $newStock = $itemStock->stock_qty - $requestedQty;
-            $itemStock->stock_qty = $newStock;
-            $itemStock->save();
+            $itemStock = Stock::find($model->stock_id); //find the requested item stock_id that exist in Stock or items_stocks table
 
-            if ($itemStock->stock_qty === 0) {
-                $itemStock->delete();
+            $newStock = $itemStock->stock_qty - $requestedQty; //deduct the requested quantity to the stock quantity and set the value to $newStock
+            $itemStock->stock_qty = $newStock; //set the stock quantity to new stock value
+            $itemStock->save(); //save the data to item stock
+
+            if ($itemStock->stock_qty === 0) { //if the stock quantity is 0 value
+                $itemStock->delete(); //delete the item stock or stock batch
             }
 
             // Get the SQL query being executed
@@ -491,8 +305,8 @@ class RequestController extends Controller
         ]);
     }
 
-    //cancel request
-    public function cancelRequest(Request $request, $rid)
+
+    public function cancelRequest(Request $request, $rid) //this function will cancel the request
     {
         //Enable Query Log
         DB::enableQueryLog();
@@ -502,12 +316,13 @@ class RequestController extends Controller
         $userId = $user->id;
         $userType = $user->type;
 
-        $requestItems = Request_Item::where("request_id", $rid)->get();
+        $requestItems = Request_Item::where("request_id", $rid)->get(); //find all the requested items of the request using the request id = $rid
 
         //get the reason of cancelation
         $cancelReason = $request->input("canceled_reason");
 
         foreach ($requestItems as $item) {
+
             //get the requested items details
             $stockId = $item->stock_id;
             $itemId =  $item->item_id;
@@ -515,11 +330,9 @@ class RequestController extends Controller
 
             //get the current stock details
             $stock = Stock::where("id", $stockId)->first();
-            $stockQty = Stock::select("stock_qty")->where("id", $stockId)->first();
 
-            //item quantity to return
-            $stock->stock_qty += $quantity;
-            $stock->save();
+            $stock->stock_qty += $quantity; //return the requested item quantity to stock quantity
+            $stock->save(); //save the data to item_stock table
 
             // Get the SQL query being executed
             $sql = DB::getQueryLog();
@@ -543,14 +356,14 @@ class RequestController extends Controller
             ]);
         }
 
-        $canceledModel =  new Canceled_Request();
-        $canceledModel->request_id = $rid;
-        $canceledModel->reason = $cancelReason;
-        $canceledModel->save();
+        $canceledModel =  new Canceled_Request(); //set the canceled_requests table to $canceledModel
+        $canceledModel->request_id = $rid; //set the canceled_request request_id to $rid  
+        $canceledModel->reason = $cancelReason; //set the canceled_request reason to $cancelReason value
+        $canceledModel->save(); //save the data to canceled_request
 
-        $theRequest = ModelsRequest::where("id", $rid)->first();
-        $theRequest->status = "canceled";
-        $theRequest->save();
+        $theRequest = ModelsRequest::where("id", $rid)->first(); //get the request data of the canceled request
+        $theRequest->status = "canceled"; //set the request status value to 'canceled'
+        $theRequest->save(); //save the data
 
         // Get the SQL query being executed
         $sql = DB::getQueryLog();
@@ -583,25 +396,25 @@ class RequestController extends Controller
     }
 
 
-    //this will mark status as received
-    public function receiveRequest(Request $request, $rid)
+    public function receiveRequest(Request $request, $rid) //this function will mark the request status to 'completed'
     {
         //Enable Query Log
         DB::enableQueryLog();
 
-        $user = Auth::user();
+        $user = Auth::user(); //get the authenticated user details
+        $user_id = $user->id; //get the user id
+        $user_type = $user->type; //get the user type
+        $user_name = $user->name; //get the user name
 
-        $user_id = $user->id;
-        $user_type = $user->type;
-        $user_name = $user->name;
+        $receiverName = $request->receiver_name; //get the receiver name from receiver_name input
 
-        $receiverName = $request->receiver_name;
+        $request = ModelsRequest::find($rid); //find the request by requested_id = $rid
 
-        $request = ModelsRequest::find($rid);
-        if ($request) {
-            $request->receiver = $receiverName;
-            $request->status = 'completed';
-            $request->save();
+        if ($request) { //if $request is true
+
+            $request->receiver = $receiverName; //set the request receiver to $receiverName value
+            $request->status = 'completed'; //set the request status to 'completed'
+            $request->save(); //save the updated data
 
             //Get Query
             $sql = DB::getQueryLog();
@@ -632,23 +445,22 @@ class RequestController extends Controller
     }
 
 
-    //show availble items on stock
-    public function showList()
+    public function showList() //this function will show all the availble items on stock
     {
-        $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
-            ->select(
+        $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id') //join the item_stocks and items table
+            ->select( //select the name,category and unit column to items table
                 'items.name',
                 'items.category',
                 'items.unit',
             )
-            ->groupBy(
+            ->groupBy( //group the name,category and unit column
                 'items.name',
                 'items.category',
                 'items.unit',
             )
-            ->orderBy('name')
+            ->orderBy('name') //order the items name as ascending
             ->get();
 
-        return response()->json($items);
+        return response()->json($items); //return the $items value in json format
     }
 }

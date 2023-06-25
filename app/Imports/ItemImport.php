@@ -15,7 +15,7 @@ class ItemImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-        return new Item([
+        return new Item([ //insert every item $row from the imported item file
             'name' => $row['name'],
             'description' => $row['description'],
             'category' => $row['category'],

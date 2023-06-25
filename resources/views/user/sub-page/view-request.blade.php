@@ -75,19 +75,19 @@ use Illuminate\Support\Facades\Session
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($items as $item)
+                                @forelse($requests as $request)
                                 <tr>
-                                    <td>{{$item->id}}</td>
-                                    <td>{{$item->formatted_date}}</td>
-                                    <td>{{$item->office}}</td>
-                                    <td>{{$item->patient_name}}</td>
-                                    <td>{{$item->doctor_name}}</td>
-                                    <td>{{$item->request_by}}</td>
-                                    <td>{{$item->request_to}}</td>
-                                    <td>{{is_null($item->accepted_by_user_name) ? "-" : $item->accepted_by_user_name}}</td>
-                                    <td>{{$item->status}}</td>
+                                    <td>{{$request->id}}</td>
+                                    <td>{{$request->formatted_date}}</td>
+                                    <td>{{$request->office}}</td>
+                                    <td>{{$request->patient_name}}</td>
+                                    <td>{{$request->doctor_name}}</td>
+                                    <td>{{$request->request_by}}</td>
+                                    <td>{{$request->request_to}}</td>
+                                    <td>{{is_null($request->accepted_by_user_name) ? "-" : $request->accepted_by_user_name}}</td>
+                                    <td>{{$request->status}}</td>
                                     <td>
-                                        <a href="{{ route('user.request-items',['id' => $item->id]) }}" class="btn btn-secondary">View</a>
+                                        <a href="{{ route('user.request-items',['id' => $request->id]) }}" class="btn btn-secondary">View</a>
                                     </td>
                                 </tr>
                                 @empty

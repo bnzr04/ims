@@ -26,10 +26,10 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
     //style of excel file
     public function styles(Worksheet $sheet)
     {
-        $style = $sheet->getStyle('A1:I1')->getFont()->setBold(true);
+        $style = $sheet->getStyle('A1:I1')->getFont()->setBold(true); //set the first row to bold text from A1 to I1
 
         // Apply bold font to the header row
-        $sheet->getStyle('A4:I4')->applyFromArray([
+        $sheet->getStyle('A4:I4')->applyFromArray([ //set the A4 - I4 row to bold text
             'font' => [
                 'bold' => true,
             ],
@@ -68,41 +68,17 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
      */
     public function collection()
     {
-        $user = Auth::user();
-        $user_type = $user->type;
+        $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
+            ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.price', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.created_at', 'item_stocks.updated_at',)
+            ->orderBy('items.name')->get();
 
-        if ($user_type === 'manager') {
-            $user_dept = $user->dept;
-
-            if ($user_dept === 'pharmacy') {
-                $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
-                    ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                    ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.price', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.exp_date', 'item_stocks.created_at', 'item_stocks.updated_at',)
-                    // ->where('items.category', '!=', 'medical supply')
-                    ->orderBy('items.name')->get();
-
-                foreach ($items as $item) {
-                    $item_id = $item->item_id;
-
-                    $item->total_quantity = Stock::select(DB::raw('SUM(stock_qty) as total_quantity'))->groupBy('item_id')->where('item_id', $item_id)->get();
-                }
-
-
-                return $items;
-            }
-        } else {
-            $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
-                ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-                ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.price', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.created_at', 'item_stocks.updated_at',)
-                ->orderBy('items.name')->get();
-
-            foreach ($items as $item) {
-                $item_id = $item->item_id;
-                $item->total_quantity = Stock::select(DB::raw('SUM(stock_qty) as total_quantity'))->groupBy('item_id')->where('item_id', $item_id)->get();
-            }
-
-            return $items;
+        foreach ($items as $item) {
+            $item_id = $item->item_id;
+            $item->total_quantity = Stock::select(DB::raw('SUM(stock_qty) as total_quantity'))->groupBy('item_id')->where('item_id', $item_id)->get();
         }
+
+        return $items;
     }
 
     public function map($row): array

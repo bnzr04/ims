@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Session
         <div class="col-md-9 col-lg-10 p-0">
             <div id="content" class="px-2 py-1">
                 <div class="container-lg">
-                    <a href="{{ route('manager.stocks') }}" class="btn btn-secondary">Back</a>
+                    <a href="{{ route('manager.items') }}" class="btn btn-secondary">Back</a>
                     <hr>
                 </div>
 
