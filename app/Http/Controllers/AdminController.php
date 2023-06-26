@@ -47,21 +47,4 @@ class AdminController extends Controller
             'users' => $users,
         ]);
     }
-
-    public function editItem($id)
-    {
-        $item = Item::find($id);
-        return view('admin.sub-page.items.edit-item')->with('item', $item);
-    }
-
-    public function editUser($id)
-    {
-        $user = User::find($id);
-        return print($user);
-    }
-
-    public function log()
-    {
-        return view('admin.log');
-    }
 }
