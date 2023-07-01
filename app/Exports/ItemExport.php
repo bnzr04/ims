@@ -50,6 +50,9 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
             case 'warning':
                 $filterTitle = 'Warning Level';
                 break;
+            case 'no-stocks':
+                $filterTitle = 'No Stocks';
+                break;
             default:
                 $filterTitle = '';
                 break;
