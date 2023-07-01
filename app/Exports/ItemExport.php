@@ -111,7 +111,9 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
 
         if (self::$date) {
             $date = self::$date;
-            $query = $query->where('item_stocks.created_at', '<=', $date . ' 23:59:59');
+
+            $formattedDate = Carbon::parse($date)->endOfDay()->toDateTimeString();
+            $query = $query->where('item_stocks.created_at', '<=', $formattedDate);
         }
 
         $items = $query->get();
@@ -124,6 +126,12 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
     {
         // Apply bold font to the header row
         $sheet->getStyle('A3:F3')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+        $sheet->getStyle('B1:C1')->applyFromArray([
             'font' => [
                 'bold' => true,
             ],
