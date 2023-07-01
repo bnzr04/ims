@@ -30,18 +30,34 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
     public function headings(): array //this will generate the headings of the excel file 
     {
 
-        $date = self::$date;
+        $date = self::$date; //store the value of public static $date
+        $filter = self::$filter; //store the value of public static $filter
 
-        if ($date) {
+
+        if ($date) { //if date is true means $date has value
             $formatted_date = Carbon::parse($date)->format('F d, Y');
         } else {
             $formatted_date = Carbon::now()->format('F d, Y');
         }
 
+        switch ($filter) {
+            case 'max':
+                $filterTitle = 'Over Max Level';
+                break;
+            case 'safe':
+                $filterTitle = 'Safe Level';
+                break;
+            case 'warning':
+                $filterTitle = 'Warning Level';
+                break;
+            default:
+                $filterTitle = '';
+                break;
+        }
+
         return [
             [
-                'As of: ',
-                $formatted_date, //will generate current date
+                'As of: ', $formatted_date, $filterTitle //will generate current date
             ],
             [],
             [
@@ -57,15 +73,10 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
     public function collection()
     {
         //join the item_stocks and items table to get every items and its total quantity in stocks
-        $query = Item::leftjoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+        $query = Item::join('item_stocks', 'items.id', '=', 'item_stocks.item_id')
             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level')
             ->orderBy('items.name'); //order the names by ascending
-
-        if (self::$date) {
-            $date = self::$date;
-            $query = $query->where('item_stocks.created_at', '<=', $date . ' 23:59:59');
-        }
 
         $items = $query->get();
 
@@ -93,6 +104,11 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
                     });
                     break;
             }
+        }
+
+        if (self::$date) {
+            $date = self::$date;
+            $query = $query->where('item_stocks.created_at', '<=', $date . ' 23:59:59');
         }
 
         $items = $query->get();

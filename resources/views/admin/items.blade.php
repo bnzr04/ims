@@ -97,9 +97,11 @@ use Illuminate\Support\Facades\Session
                         </div>
                     </div>
 
-                    <div class=" d-flex m-0 p-0" style="width:100%;max-width:200px;flex-direction:column-reverse">
-                        <form class="m-0" action="{{ route('admin.export-items') }}" method="post">
+                    <div class="container-fluid d-flex m-0 p-0" style="width:100%;flex-direction:row;align-items:center">
+                        <form class="m-0" action="{{ route('admin.export-items') }}" method="post" style="display: flex;align-items:center">
                             @csrf
+                            <label class="m-0" for="as_of_date">As of:</label>
+                            <input type="date" name="date" id="as_of_date" class="form-control mx-1">
                             <input type="hidden" name="filter" value="{{ request('filter') }}">
                             <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                         </form>
