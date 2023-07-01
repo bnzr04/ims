@@ -113,6 +113,12 @@ class ItemController extends Controller
                 $firstFilename = "Pharma_Items";
         }
 
+        if ($date) {
+            $formatted_date = Carbon::parse($date)->endOfDay()->format('Ymd-His');
+        } else {
+            $formatted_date =  Carbon::now()->format('Ymd-His');
+        }
+
         // Get the SQL query being executed
         $sql = DB::getQueryLog();
         if (is_array($sql) && count($sql) > 0) {
@@ -121,7 +127,7 @@ class ItemController extends Controller
             $last_query = 'No query log found.';
         }
 
-        $filename = $firstFilename . Carbon::now()->format('Ymd-His') . '.xlsx'; //set the filename as the $firstFilename value and the date today, default filename ex. Pharma_Items20231201-125900.xlsx
+        $filename = $firstFilename . $formatted_date . '.xlsx'; //set the filename as the $firstFilename value and the date today, default filename ex. Pharma_Items20231201-125900.xlsx
 
         //Log Message
         $message = "Downloaded a report as " . $filename;
