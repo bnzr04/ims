@@ -87,8 +87,10 @@ class ItemController extends Controller
         DB::enableQueryLog();
 
         $filter = $request->input('filter'); //get the value of 'filter' input
+        $date = $request->input('date'); //get the value of 'date' input
 
         ItemExport::$filter = $filter; //set the value of $filter in ItemExport 
+        ItemExport::$date = $date; //set the value of $filter in ItemExport 
 
         $user = Auth::user(); //get the authencticated user information
         $user_id = $user->id; //get the user id

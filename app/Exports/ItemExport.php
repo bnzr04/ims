@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Item;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,7 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
 {
 
     public static $filter; //get the value of $filter
+    public static $date; //get the value of $filter
 
     public function fileName(): string
     {
@@ -27,10 +29,19 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
 
     public function headings(): array //this will generate the headings of the excel file 
     {
+
+        $date = self::$date;
+
+        if ($date) {
+            $formatted_date = Carbon::parse($date)->format('F d, Y');
+        } else {
+            $formatted_date = Carbon::now()->format('F d, Y');
+        }
+
         return [
             [
                 'As of: ',
-                date('h:i A, F d, Y'), //will generate current date
+                $formatted_date, //will generate current date
             ],
             [],
             [
@@ -50,6 +61,11 @@ class ItemExport implements FromCollection, WithHeadings, WithStyles, ShouldAuto
             ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level')
             ->orderBy('items.name'); //order the names by ascending
+
+        if (self::$date) {
+            $date = self::$date;
+            $query = $query->where('item_stocks.created_at', '<=', $date . ' 23:59:59');
+        }
 
         $items = $query->get();
 

@@ -159,12 +159,12 @@ use Illuminate\Support\Facades\Session
                         <form action="{{ route('user.receive-request',['rid' => $request->id]) }}" method="post" class="m-0">
                             @csrf
                             <div class="container-fluid d-flex m-0 p-0" style="flex-direction:column;">
-                                <div class="container-md p-0">
+                                <div class="container-fluid p-0">
                                     <label for="receiver_name" class="px-1" style="letter-spacing: 3px;"><strong>RECEIVER NAME</strong></label>
                                 </div>
 
                                 <div class="container-fluid p-0 mt-2">
-                                    <div class="container-md">
+                                    <div class="container-fluid">
                                         <label for="requester">Requester</label>
                                         <input type="radio" name="receiver_name" id="requester" onchange="getRequesterValue()" value="{{ $request->request_by }}" checked>
                                     </div>
