@@ -324,11 +324,11 @@ class RequestController extends Controller
             $itemId =  $item->item_id;
             $quantity = $item->quantity;
 
-            //get the current stock details
-            $stock = Stock::where("id", $stockId)->first();
-
             $oldStockQuantity = Stock::where('item_id', $itemId)
                 ->sum('stock_qty'); //store the sum of the old stock quantity if the item
+
+            //get the current stock details
+            $stock = Stock::where("id", $stockId)->first();
 
             $stock->stock_qty += $quantity; //return the requested item quantity to stock quantity
             $stock->save(); //save the data to item_stock table
@@ -425,6 +425,25 @@ class RequestController extends Controller
         $request = ModelsRequest::find($rid); //find the request by requested_id = $rid
 
         if ($request) { //if $request is true
+
+            $requestedItems = Request_Item::where('request_id', $rid)->get();
+
+            // return dd($requestedItems);
+
+            foreach ($requestedItems as $item) {
+                $stock_id =  $item->stock_id;
+
+                $stock = Stock::where('id', $stock_id)->first();
+
+                $stockQuantity = $stock->stock_qty;
+
+                // return dd($stockQuantity);
+
+                //check if the stock batch is 0 value
+                if ($stockQuantity <= 0) {
+                    $stock->delete();
+                }
+            }
 
             $request->receiver = $receiverName; //set the request receiver to $receiverName value
             $request->status = 'completed'; //set the request status to 'completed'

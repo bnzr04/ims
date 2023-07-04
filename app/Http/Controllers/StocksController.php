@@ -200,6 +200,7 @@ class StocksController extends Controller
                 DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at")
             )
             ->where('item_stocks.item_id', $id)
+            ->where('item_stocks.stock_qty', '>', 0)
             ->groupBy(
                 'item_stocks.id',
                 'item_stocks.item_id',
