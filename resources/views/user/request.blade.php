@@ -325,6 +325,7 @@
                             // console.log(response);
                         },
                         error: function(xhr, status, error) {
+                            // console.log(response);
                             console.log(xhr.responseText);
                             $btn.prop('disabled', false); // enable button again on error
                         }

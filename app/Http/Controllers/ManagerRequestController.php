@@ -7,13 +7,16 @@ use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
 use App\Models\Stock;
+use App\Models\Stock_Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class ManagerRequestController extends Controller
 {
+
     //show requests
     public function managerRequest() //this function will return the manager request view
     {
@@ -172,10 +175,50 @@ class ManagerRequestController extends Controller
         $user_type = $user->type; //get the user type
         $user_name = $user->name; //get the user name
 
+
         if ($request) { //if the $request is true or exist
             $request->accepted_by_user_id = $user_id; //add a value of the user id who accept the request
             $request->accepted_by_user_name = $user_name; //add a value of the user name who accept the request
-            $request->status = 'accepted'; //update the request status to 'accepted'
+            $requestStatus = $request->status; //store request status value
+
+            $requestedItems = Request_Item::where('request_id', $rid)
+                ->get();
+
+            foreach ($requestedItems as $item) {
+                $item_id = $item->item_id;
+                $quantity = $item->quantity;
+                $stock_id = $item->stock_id;
+                $mode_acquisition = $item->mode_acquisition;
+
+                //Log the deduction to stock_logs table 
+                $stockLog = new Stock_Log(); //get the stock_log table
+                $stockLog->stock_id = $stock_id; //store the $stock_id value to 'stock_id' in the stock_log table
+                $stockLog->item_id = $item_id; //store the $item_id value to 'item_id' in the stock_log table
+                $stockLog->quantity = $quantity; //store the $quantity value to 'quantity' in the stock_log table
+                $stockLog->mode_acquisition = $mode_acquisition; //store the $mode_acquisition value to 'mode_acquisition' in the stock_log table
+                $stockLog->transaction_type = 'deduction'; //store the 'deduction' to 'transaction_type' in the stock_log table
+
+                $currentStockQuantity = Stock::where('item_id', $item_id)
+                    ->sum('stock_qty'); //store the sum of the current stock quantity if the item
+
+                $oldStockQuantity = Request_Item::where('request_id', $item->request_id)
+                    ->where('item_id', $item_id)
+                    ->sum('quantity'); //store the sum of the item requested quantity
+
+                $oldStockQuantity = $currentStockQuantity + $oldStockQuantity; //sum the requested item quantity as $oldStockQuantity to $currentStockQuantity
+
+                $stockLog->current_quantity = $currentStockQuantity; //store the $currentStockQuantity value to 'current_quantity' in the stock_log table
+                $stockLog->prev_quantity = $oldStockQuantity; //store the $oldStockQuantity value to 'prev_quantity' in the stock_log table
+                $stockLog->save();
+            }
+
+
+            if ($requestStatus == 'canceled') { //if request status marked as 'canceled'
+                return back()->with('error', 'Request is already canceled by the requester.'); //return to current view with error message
+            } else {
+                $request->status = 'accepted'; //update the request status to 'accepted'
+            }
+
             $request->save(); //save or update the request information
 
             //Get Query
@@ -269,7 +312,15 @@ class ManagerRequestController extends Controller
 
 
         if ($request) { //if the $request is true or exist
-            $request->status = 'delivered'; //update the request status to 'delivered'
+
+            $requestStatus = $request->status; //store request status value
+
+            if ($requestStatus == 'canceled') { //if request status marked as 'canceled'
+                return back()->with('error', 'Request is already canceled by the requester.'); //return to current view with error message
+            } else {
+                $request->status = 'delivered'; //update the request status to 'delivered'
+            }
+
             $request->save(); //save or update the request information
 
             //Get Query

@@ -13,8 +13,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Borders;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageMargins;
 
 class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
 {
@@ -51,13 +55,10 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
             ],
             [],
             [
-                'Stock ID',
                 'Expiration Date (YYYY-MM-DD)',
                 'Mode of Acquisition',
                 'Quantity',
-                'Item ID',
                 'Name',
-                'Descrption',
                 'Category',
                 'Unit',
             ]
@@ -86,16 +87,12 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
         $today = Carbon::now()->format('Y-m-d');
 
         return [
-            $row->id,
             $row->exp_date,
             $row->mode_acquisition,
             $row->stock_qty,
-            $row->item_id,
             $row->name,
-            $row->description,
             $row->category,
             $row->unit,
-
         ];
     }
 
@@ -124,40 +121,24 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
                             ->getStartColor()->setARGB('FFFF0000');
                         $sheet->getStyle("A$row:I$row")->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
                     }
-
-                    // $itemId = $sheet->getCell("D$row")->getValue();
-                    // $totalQuantity = $sheet->getCell("I$row")->getValue();
-
-                    // // If the current row has the same item_id as the previous row, merge the cells in column I
-                    // if (isset($mergedCells[$itemId]) && $totalQuantity) {
-                    //     $prevRow = $mergedCells[$itemId]['row'];
-                    //     $last = $row;
-                    //     $lastRowWithItemId[$itemId] = $last;
-
-                    //     // return dd($last);
-
-                    //     // $sheet->mergeCells("I$prevRow:I$last");
-                    //     // $sheet->setCellValue("I$prevRow", $totalQuantity);
-                    //     // $sheet->getStyle("I$prevRow:I$last")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                    //     // $sheet->getStyle("I$prevRow:I$last")->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-                    // } else {
-                    //     $mergedCells[$itemId] = ['row' => $row];
-                    // }
-
-                    // // Fill in any remaining cells that were not merged
-                    // foreach ($lastRowWithItemId as $itemId => $lastRow) {
-                    //     if (isset($mergedCells[$itemId]) && $totalQuantity) {
-                    //         $mergedRow = $mergedCells[$itemId]['row'];
-                    //         $sheet->mergeCells("I$mergedRow:I$lastRow");
-                    //         $sheet->setCellValue("I$mergedRow", $totalQuantity);
-                    //         $sheet->getStyle("I$mergedRow:I$lastRow")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                    //         $sheet->getStyle("I$mergedRow:I$lastRow")->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-                    //     }
-                    // }
                 }
-                // return dd($totalQuantity);
 
-                // return dd($mergedCells[$itemId]['row'],  $lastRowWithItemId[$itemId]);
+                $event->sheet->getDelegate()->setPrintGridlines(true);
+
+                $event->sheet->getPageSetup()
+                    ->setPaperSize(PageSetup::PAPERSIZE_A4)
+                    ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
+                    ->setFitToPage(true)
+                    ->setFitToWidth(1)
+                    ->setFitToHeight(0)
+                    ->setHorizontalCentered(true)
+                    ->setVerticalCentered(true);
+
+                $event->sheet->getPageMargins()
+                    ->setTop(0)
+                    ->setRight(0)
+                    ->setBottom(0)
+                    ->setLeft(0);
             },
         ];
     }

@@ -8,11 +8,13 @@ use App\Models\Log;
 use App\Models\Request as ModelsRequest;
 use App\Models\Request_Item;
 use App\Models\Stock;
+use App\Models\Stock_Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class RequestController extends Controller
 {
@@ -239,7 +241,6 @@ class RequestController extends Controller
             $model->quantity = intval($item->quantity); //set the request_item.quantity from the passed or requested item quantity
             $model->save(); //save the setted data to request_items table
 
-
             // Get the SQL query being executed
             $sql = DB::getQueryLog();
             if (is_array($sql) && count($sql) > 0) {
@@ -266,14 +267,9 @@ class RequestController extends Controller
             $requestedQty = $model->quantity; //set the requested quantity of items to $requestedQty
 
             $itemStock = Stock::find($model->stock_id); //find the requested item stock_id that exist in Stock or items_stocks table
-
             $newStock = $itemStock->stock_qty - $requestedQty; //deduct the requested quantity to the stock quantity and set the value to $newStock
             $itemStock->stock_qty = $newStock; //set the stock quantity to new stock value
             $itemStock->save(); //save the data to item stock
-
-            if ($itemStock->stock_qty === 0) { //if the stock quantity is 0 value
-                $itemStock->delete(); //delete the item stock or stock batch
-            }
 
             // Get the SQL query being executed
             $sql = DB::getQueryLog();
@@ -331,8 +327,26 @@ class RequestController extends Controller
             //get the current stock details
             $stock = Stock::where("id", $stockId)->first();
 
+            $oldStockQuantity = Stock::where('item_id', $itemId)
+                ->sum('stock_qty'); //store the sum of the old stock quantity if the item
+
             $stock->stock_qty += $quantity; //return the requested item quantity to stock quantity
             $stock->save(); //save the data to item_stock table
+
+            //Log the deduction to stock_logs table 
+            $stockLog = new Stock_Log(); //get the stock_log table
+            $stockLog->stock_id = $stockId;  //store the $stockId value to 'stock_id' in the stock_log table
+            $stockLog->item_id = $itemId;  //store the $itemId value to 'item_id' in the stock_log table
+            $stockLog->quantity = $quantity;  //store the $quantity value to 'quantity' in the stock_log table
+            $stockLog->mode_acquisition = $item->mode_acquisition;  //store the $item->mode_acquisition value to 'mode_acquisition' in the stock_log table
+            $stockLog->transaction_type = 'addition';  //store the 'addition' to 'transaction_type' in the stock_log table
+
+            $currentStockQuantity = Stock::where('item_id', $item->item_id)
+                ->sum('stock_qty'); //store the sum of the current stock quantity if each item
+
+            $stockLog->current_quantity = $currentStockQuantity;  //store the $currentStockQuantity value to 'current_quantity' in the stock_log table
+            $stockLog->prev_quantity = $oldStockQuantity;  //store the $oldStockQuantity value to 'prev_quantity' in the stock_log table
+            $stockLog->save();
 
             // Get the SQL query being executed
             $sql = DB::getQueryLog();
