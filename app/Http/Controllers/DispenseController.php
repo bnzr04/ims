@@ -148,12 +148,14 @@ class DispenseController extends Controller
         $data = $data->get(); //pass the query and get the $data
 
         foreach ($data as $stock) {
-            $stockQty = Stock_Log::where('item_id', $stock->item_id); //retrieve all the stock_log table information by the item_id
+            $stockQty = Stock_Log::select('current_quantity')
+                ->where('item_id', $stock->item_id)
+                ->where('created_at', '<=', $to)
+                ->latest('created_at')
+                ->first(); //retrieve all the stock_log table information by the item_id
 
             //add the query to $stockQty where the transaction_type column is 'addition' between the date period and sum all the quantity of every row
-            $stockQty = $stockQty->where('transaction_type', 'addition')
-                ->whereBetween('created_at', [$from, $to])
-                ->value(DB::raw('SUM(quantity)'));
+            $stockQty = $stockQty;
 
             $stock->stock_qty = $stockQty; //store the $stockQty to stock_qty of data as stock
 

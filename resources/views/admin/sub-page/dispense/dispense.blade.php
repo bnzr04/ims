@@ -246,7 +246,7 @@
                         dispense_table_head.innerHTML =
                             "<th scope='col' class='border'>Item ID</th><th scope='col' class='border'>Name</th><th scope='col' class='border'>Description</th><th scope='col' class='border'>Category</th><th scope='col' class='border'>Unit</th><th scope='col' class='border'>Stock</th><th scope='col' class='border'>Acquired</th><th scope='col' class='border'>Total Dispense</th><th scope='col' class='border'>Action</th>";
                         dispense_table.innerHTML +=
-                            "<tr><td class='border'>" + row.item_id + "</td><td class='border'>" + row.name + "</td><td class='border'>" + row.description + "</td><td class='border'>" + row.category + "</td><td class='border'>" + row.unit + "</td><td class='border'>" + row.stock_qty + "</td><td class='border'>" + row.acquired + "</td><td class='border'>" + row.total_dispense + "</td><td class='border'>" + viewButton + "</td></tr>";
+                            "<tr><td class='border'>" + row.item_id + "</td><td class='border'>" + row.name + "</td><td class='border'>" + row.description + "</td><td class='border'>" + row.category + "</td><td class='border'>" + row.unit + "</td><td class='border'>" + row.stock_qty.current_quantity + "</td><td class='border'>" + row.acquired + "</td><td class='border'>" + row.total_dispense + "</td><td class='border'>" + viewButton + "</td></tr>";
                     });
 
                     // Add click event listener to all view buttons

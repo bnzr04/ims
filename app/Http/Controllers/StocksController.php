@@ -113,6 +113,7 @@ class StocksController extends Controller
                 DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
                 DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
             )
+            ->where('item_stocks.stock_qty', '>', 0)
             ->groupBy(
                 'items.id',
                 'items.name',

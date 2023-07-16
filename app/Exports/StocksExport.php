@@ -71,6 +71,7 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
     {
         $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
             ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
+            ->where('item_stocks.stock_qty', '>', 0)
             ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.price', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.created_at', 'item_stocks.updated_at',)
             ->orderBy('items.name')->get();
 

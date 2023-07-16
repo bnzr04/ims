@@ -31,6 +31,7 @@ class RequestController extends Controller
             ->join('items', 'item_stocks.item_id', '=', 'items.id') //join the item_stocks and items table
             ->select('items.id', 'items.name', 'items.category', 'items.unit', 'item_stocks.id as item_stock_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition') //select this items and item_stocks columns
             ->where('item_stocks.exp_date', ">", $today) //select the item stock with the exp_date that not expired
+            ->where('item_stocks.stock_qty', '>', 0)
             ->orderBy('items.name', 'asc')
             ->get();
 
@@ -486,6 +487,7 @@ class RequestController extends Controller
                 'items.category',
                 'items.unit',
             )
+            ->where('item_stocks.stock_qty', '>', 0)
             ->groupBy( //group the name,category and unit column
                 'items.name',
                 'items.category',
