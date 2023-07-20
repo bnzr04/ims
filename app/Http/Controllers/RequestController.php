@@ -436,13 +436,16 @@ class RequestController extends Controller
 
                 $stock = Stock::where('id', $stock_id)->first();
 
-                $stockQuantity = $stock->stock_qty;
+                if ($stock) { // if stock batch is exist
 
-                // return dd($stockQuantity);
+                    $stockQuantity = $stock->stock_qty;
 
-                //check if the stock batch is 0 value
-                if ($stockQuantity <= 0) {
-                    $stock->delete();
+                    // return dd($stockQuantity);
+
+                    //check if the stock batch is 0 value
+                    if ($stockQuantity <= 0) {
+                        $stock->delete();
+                    }
                 }
             }
 
