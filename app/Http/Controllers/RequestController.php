@@ -29,9 +29,20 @@ class RequestController extends Controller
         $items = //this $items will show to the select tag where the user can choose the items they want to request
             DB::table('item_stocks')
             ->join('items', 'item_stocks.item_id', '=', 'items.id') //join the item_stocks and items table
-            ->select('items.id', 'items.name', 'items.category', 'items.unit', 'item_stocks.id as item_stock_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition') //select this items and item_stocks columns
+            ->select(
+                'items.id',
+                'items.name',
+                'items.category',
+                'items.unit',
+                'item_stocks.id as item_stock_id',
+                'item_stocks.stock_qty',
+                'item_stocks.exp_date',
+                'item_stocks.mode_acquisition',
+                'item_stocks.created_at'
+            ) //select this items and item_stocks columns
             ->where('item_stocks.exp_date', ">", $today) //select the item stock with the exp_date that not expired
-            ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.stock_qty', '>', 0) //show the stocks where stock_qty is greater than 0
+            ->where('item_stocks.status', 'active') //show the stocks where stock status is equal to 'active'
             ->orderBy('items.name', 'asc')
             ->get();
 
@@ -263,6 +274,10 @@ class RequestController extends Controller
                 'updated_at' => now()
             ]);
 
+            $oldStockQuantity = Stock::where('item_id', $item->item_id)
+                ->where('status', 'active')
+                ->sum('stock_qty'); //store the sum of the old stock quantity if the item
+
             /////Stock reserving/////
 
             $requestedQty = $model->quantity; //set the requested quantity of items to $requestedQty
@@ -292,6 +307,22 @@ class RequestController extends Controller
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
+
+            //Log the deduction to stock_logs table 
+            $stockLog = new Stock_Log(); //get the stock_log table
+            $stockLog->stock_id = $item->stock_id;  //store the $stockId value to 'stock_id' in the stock_log table
+            $stockLog->item_id = $item->item_id;  //store the $itemId value to 'item_id' in the stock_log table
+            $stockLog->quantity = $item->quantity;  //store the $quantity value to 'quantity' in the stock_log table
+            $stockLog->mode_acquisition = $item->mode_acquisition;  //store the $item->mode_acquisition value to 'mode_acquisition' in the stock_log table
+            $stockLog->transaction_type = 'reserve';  //store the 'reserve' to 'transaction_type' in the stock_log table
+
+            $currentStockQuantity = Stock::where('item_id', $item->item_id)
+                ->where('status', 'active')
+                ->sum('stock_qty'); //store the sum of the current stock quantity if each item
+
+            $stockLog->current_quantity = $currentStockQuantity;  //store the $currentStockQuantity value to 'current_quantity' in the stock_log table
+            $stockLog->prev_quantity = $oldStockQuantity;  //store the $oldStockQuantity value to 'prev_quantity' in the stock_log table
+            $stockLog->save();
         }
 
         return response()->json([
@@ -318,6 +349,20 @@ class RequestController extends Controller
         //get the reason of cancelation
         $cancelReason = $request->input("canceled_reason");
 
+        $theRequest = ModelsRequest::where("id", $rid)->first(); //get the request data of the canceled request
+
+        $canceledModel =  new Canceled_Request(); //set the canceled_requests table to $canceledModel
+        $canceledModel->request_id = $rid; //set the canceled_request request_id to $rid  
+        $canceledModel->reason = $cancelReason; //set the canceled_request reason to $cancelReason value
+        $canceledModel->save(); //save the data to canceled_request
+
+        if ($theRequest->status == "pending") { //if the request status is equal to 'pending'
+            $theRequest->status = "canceled"; //set the request status value to 'canceled'
+            $theRequest->save(); //save the updated data
+        } else {
+            return back()->with("error", "The request is failed to cancel because the request is either already accepted or delivered."); //show alert, saying that the request is either accepted or delivered.
+        }
+
         foreach ($requestItems as $item) {
 
             //get the requested items details
@@ -326,13 +371,25 @@ class RequestController extends Controller
             $quantity = $item->quantity;
 
             $oldStockQuantity = Stock::where('item_id', $itemId)
+                ->where('status', 'active')
                 ->sum('stock_qty'); //store the sum of the old stock quantity if the item
 
             //get the current stock details
             $stock = Stock::where("id", $stockId)->first();
 
-            $stock->stock_qty += $quantity; //return the requested item quantity to stock quantity
-            $stock->save(); //save the data to item_stock table
+            if ($stock) {
+                $stock->stock_qty += $quantity; //return the requested item quantity to stock quantity
+                $stock->save(); //save the data to item_stock table
+            } else {
+                $createStock = new Stock();
+                $createStock->id = $stockId;
+                $createStock->item_id = $itemId;
+                $createStock->stock_qty = $quantity;
+                $createStock->exp_date = Carbon::createFromFormat('m-d-Y', $item->exp_date)->format('Y-m-d');
+                $createStock->mode_acquisition = $item->mode_acquisition;
+                $createStock->save();
+            }
+
 
             //Log the deduction to stock_logs table 
             $stockLog = new Stock_Log(); //get the stock_log table
@@ -340,9 +397,10 @@ class RequestController extends Controller
             $stockLog->item_id = $itemId;  //store the $itemId value to 'item_id' in the stock_log table
             $stockLog->quantity = $quantity;  //store the $quantity value to 'quantity' in the stock_log table
             $stockLog->mode_acquisition = $item->mode_acquisition;  //store the $item->mode_acquisition value to 'mode_acquisition' in the stock_log table
-            $stockLog->transaction_type = 'addition';  //store the 'addition' to 'transaction_type' in the stock_log table
+            $stockLog->transaction_type = 'return';  //store the 'return' to 'transaction_type' in the stock_log table
 
             $currentStockQuantity = Stock::where('item_id', $item->item_id)
+                ->where('status', 'active')
                 ->sum('stock_qty'); //store the sum of the current stock quantity if each item
 
             $stockLog->current_quantity = $currentStockQuantity;  //store the $currentStockQuantity value to 'current_quantity' in the stock_log table
@@ -371,15 +429,6 @@ class RequestController extends Controller
             ]);
         }
 
-        $canceledModel =  new Canceled_Request(); //set the canceled_requests table to $canceledModel
-        $canceledModel->request_id = $rid; //set the canceled_request request_id to $rid  
-        $canceledModel->reason = $cancelReason; //set the canceled_request reason to $cancelReason value
-        $canceledModel->save(); //save the data to canceled_request
-
-        $theRequest = ModelsRequest::where("id", $rid)->first(); //get the request data of the canceled request
-        $theRequest->status = "canceled"; //set the request status value to 'canceled'
-        $theRequest->save(); //save the data
-
         // Get the SQL query being executed
         $sql = DB::getQueryLog();
         if (is_array($sql) && count($sql) > 0) {
@@ -403,7 +452,7 @@ class RequestController extends Controller
             ]);
         }
 
-        if ($stock) {
+        if ($stock || $createStock->save()) {
             return back()->with("success", "The request is successfully canceled.");
         } else {
             return back()->with("error", "The request is failed to canceled.");
@@ -491,6 +540,7 @@ class RequestController extends Controller
                 'items.unit',
             )
             ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.status', 'active')
             ->groupBy( //group the name,category and unit column
                 'items.name',
                 'items.category',

@@ -81,8 +81,29 @@ class ItemExport implements FromCollection, WithHeadings, WithEvents, WithStyles
     {
         //join the item_stocks and items table to get every items and its total quantity in stocks
         $query = Item::join('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level')
+            ->select(
+                'items.id',
+                'items.name',
+                'items.description',
+                'items.category',
+                'items.unit',
+                'items.max_limit',
+                'items.warning_level',
+                DB::raw('SUM(item_stocks.stock_qty) as total_quantity'),
+                'item_stocks.status',
+            )
+            ->groupBy(
+                'items.id',
+                'items.name',
+                'items.description',
+                'items.category',
+                'items.unit',
+                'items.max_limit',
+                'items.warning_level',
+                'item_stocks.status'
+            )
+            ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.status', 'active')
             ->orderBy('items.name');
 
         $items = $query->get();

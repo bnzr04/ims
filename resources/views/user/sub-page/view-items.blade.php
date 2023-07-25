@@ -93,6 +93,19 @@ use Illuminate\Support\Facades\Session
                         </table>
                     </div>
                 </div>
+
+                @if(session('success'))
+                <div class="alert alert-success" id="alert">
+                    {{ session('success') }}
+                </div>
+                @endif
+
+                @if(session('error'))
+                <div class="alert alert-danger" id="alert">
+                    {{ session('error') }}
+                </div>
+                @endif
+
                 <div class="container-fluid p-0 border border-dark shadow p-3 mt-3 mb-2 bg-body rounded" style="height: auto">
                     <h4>Requested Items</h4>
                     <div class=" container-fluid p-0 mb-2 border" style="height:250px;overflow-y: scroll;">
@@ -133,18 +146,6 @@ use Illuminate\Support\Facades\Session
                             </tbody>
                         </table>
                     </div>
-
-                    @if(session('success'))
-                    <div class="alert alert-success" id="alert">
-                        {{ session('success') }}
-                    </div>
-                    @endif
-
-                    @if(session('error'))
-                    <div class="alert alert-danger" id="alert">
-                        {{ session('error') }}
-                    </div>
-                    @endif
 
                     <div class="container-fluid p-0 m-0">
                         @if($request->status == 'pending')
@@ -191,7 +192,7 @@ use Illuminate\Support\Facades\Session
 <script>
     setTimeout(function() {
         document.getElementById("alert").style.display = "none";
-    }, 3000);
+    }, 5000);
 
     const requesterRadio = document.getElementById("requester");
     const otherRadio = document.getElementById("other");

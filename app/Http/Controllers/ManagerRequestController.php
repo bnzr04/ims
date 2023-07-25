@@ -196,13 +196,15 @@ class ManagerRequestController extends Controller
                 $stockLog->item_id = $item_id; //store the $item_id value to 'item_id' in the stock_log table
                 $stockLog->quantity = $quantity; //store the $quantity value to 'quantity' in the stock_log table
                 $stockLog->mode_acquisition = $mode_acquisition; //store the $mode_acquisition value to 'mode_acquisition' in the stock_log table
-                $stockLog->transaction_type = 'deduction'; //store the 'deduction' to 'transaction_type' in the stock_log table
+                $stockLog->transaction_type = 'accepted'; //store the 'accepted' to 'transaction_type' in the stock_log table
 
                 $currentStockQuantity = Stock::where('item_id', $item_id)
+                    ->where('status', 'active')
                     ->sum('stock_qty'); //store the sum of the current stock quantity if the item
 
                 $oldStockQuantity = Request_Item::where('request_id', $item->request_id)
                     ->where('item_id', $item_id)
+                    // ->where('status', 'active')
                     ->sum('quantity'); //store the sum of the item requested quantity
 
                 $oldStockQuantity = $currentStockQuantity + $oldStockQuantity; //sum the requested item quantity as $oldStockQuantity to $currentStockQuantity

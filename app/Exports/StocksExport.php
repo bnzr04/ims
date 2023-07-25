@@ -55,12 +55,12 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
             ],
             [],
             [
-                'Expiration Date (YYYY-MM-DD)',
-                'Mode of Acquisition',
-                'Quantity',
                 'Name',
                 'Category',
                 'Unit',
+                'Mode of Acquisition',
+                'Expiration Date (YYYY-MM-DD)',
+                'Quantity',
             ]
         ];
     }
@@ -71,7 +71,8 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
     {
         $items = Stock::leftjoin('items', 'item_stocks.item_id', '=', 'items.id')
             ->select('items.*', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', DB::raw('SUM(item_stocks.stock_qty) as total_quantity'))
-            ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.stock_qty', '>', 0) //show the stock batch where stock_qty is greater than 0
+            ->where('item_stocks.status', 'active') //show the stock batch where stock status is equal to 'active'
             ->groupBy('item_stocks.item_id', 'items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.price', 'items.created_at', 'items.updated_at', 'item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'items.max_limit', 'items.warning_level', 'item_stocks.created_at', 'item_stocks.updated_at',)
             ->orderBy('items.name')->get();
 
@@ -88,12 +89,12 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
         $today = Carbon::now()->format('Y-m-d');
 
         return [
-            $row->exp_date,
-            $row->mode_acquisition,
-            $row->stock_qty,
             $row->name,
             $row->category,
             $row->unit,
+            $row->mode_acquisition,
+            $row->exp_date,
+            $row->stock_qty,
         ];
     }
 
@@ -110,17 +111,15 @@ class StocksExport implements FromCollection, WithEvents, WithHeadings, WithMapp
 
                 // Apply conditional formatting to rows based on expiration date
                 for ($row = 5; $row <= $lastRow; $row++) {
-                    $expirationDate = $sheet->getCell("B$row")->getValue();
+                    $expirationDate = $sheet->getCell("E$row")->getValue();
                     $today = now()->format('Y-m-d');
-
-
 
                     if ($expirationDate < $today) {
                         // Set background color to red and font color to white
-                        $sheet->getStyle("A$row:I$row")->getFill()
+                        $sheet->getStyle("A$row:F$row")->getFill()
                             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                             ->getStartColor()->setARGB('FFFF0000');
-                        $sheet->getStyle("A$row:I$row")->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+                        $sheet->getStyle("A$row:F$row")->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
                     }
                 }
 

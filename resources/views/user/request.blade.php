@@ -20,7 +20,7 @@
                                 <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
                                     <option></option>
                                     @foreach($items as $item)
-                                    <option data-item-id="{{ $item->id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-item-category="{{ $item->category }}" data-item-unit="{{ $item->unit }}" data-stock-id="{{ $item->item_stock_id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}">{{ $item->name }} - {{ $item->category }} {{ $item->unit === "-" ? "" : "- " . $item->unit }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
+                                    <option data-item-id="{{ $item->id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-item-category="{{ $item->category }}" data-item-unit="{{ $item->unit }}" data-stock-id="{{ $item->item_stock_id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}" data-stock-created-date="{{ $item->created_at }}">{{ $item->name }} - {{ $item->category }} {{ $item->unit === "-" ? "" : "- " . $item->unit }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
                                     @endforeach
                                 </select>
 
@@ -158,13 +158,14 @@
         }
 
         $('#nameSearch').on('change', function() {
-            console.log(true);
+            // console.log(true);
             var selectedOptionValue = $('#nameSearch option:selected');
             var itemId = selectedOptionValue.data('item-id');
             var stockId = selectedOptionValue.data('stock-id');
             var modeOfAcq = selectedOptionValue.data('mode-acq');
             var stockExpDate = selectedOptionValue.data('stock-exp');
             var quantity = selectedOptionValue.data('stock-qty');
+            var stockDate = selectedOptionValue.data('stock-created-date');
             $('#stock_id').val(stockId);
             $('#exp_date').val(stockExpDate);
             $('#quantity').attr('max', quantity);
@@ -185,6 +186,7 @@
             var stockExpDate = selectedOptionValue.data('stock-exp');
             var stockQty = selectedOptionValue.data('stock-qty');
             var quantity = $('#quantity').val();
+            var stockDate = selectedOptionValue.data('stock-created-date');
 
             //check the inputs if not empty
             if (selectedOptionValue !== '' && itemId !== '' && itemName !== '' && stockId !== '' && modeOfAcq !== '' && stockExpDate !== '' && quantity !== '') {
@@ -218,6 +220,7 @@
                             mode_acquisition: modeOfAcq,
                             quantity: quantity,
                             exp_date: stockExpDate,
+                            stock_date: stockDate,
                         });
                         var row = '<tr><td class="align-items-center">' + itemId + '</td><td>' + itemName + '</td><td>' + itemCategory + '</td><td>' + itemUnit + '</td><td>' + stockId + '</td><td>' + modeOfAcq + '</td><td>' + stockExpDate + '</td><td>' + quantity + '</td><td><button id="remove-item-btn" class="btn btn-danger" data-stock-id="' + stockId + '">✘</button></td></tr>';
 

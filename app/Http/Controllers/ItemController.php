@@ -170,10 +170,22 @@ class ItemController extends Controller
 
         //left join the items and item_stocks and get all the items information and the total stocks of the item
         $items = Item::leftJoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
-            ->select('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', DB::raw('SUM(item_stocks.stock_qty) as total_quantity')) //sum the stock_qty from item_stocks table
+            ->select(
+                'items.id',
+                'items.name',
+                'items.description',
+                'items.category',
+                'items.unit',
+                'items.max_limit',
+                'items.warning_level',
+                'items.price',
+                DB::raw('SUM(item_stocks.stock_qty) as total_quantity')
+            ) //sum the stock_qty from item_stocks table
             // ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.status', 'active')
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price') //group all selected items column information
             ->orderBy('items.name'); //order the items name in ascending
+
 
         if ($category) { //if the $category is true or filter the category
             $items = $items->where('category', $category); //retrieve the category by the $category value and order 

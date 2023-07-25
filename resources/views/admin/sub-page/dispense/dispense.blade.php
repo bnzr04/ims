@@ -1,6 +1,17 @@
 @extends('layouts.app')
 @include('layouts.header')
 @section('content')
+<style>
+    #item-name-link {
+        text-decoration: none;
+        color: black;
+    }
+
+    #item-name-link:hover {
+        text-decoration: underline;
+        color: blue;
+    }
+</style>
 <div class="container-fluid">
     <div class="row min-vh-100">
         <div class="col-md-3 col-lg-2 sidebar p-0 bg-dark ">
@@ -244,9 +255,12 @@
                         }
 
                         dispense_table_head.innerHTML =
-                            "<th scope='col' class='border'>Item ID</th><th scope='col' class='border'>Name</th><th scope='col' class='border'>Description</th><th scope='col' class='border'>Category</th><th scope='col' class='border'>Unit</th><th scope='col' class='border'>Stock</th><th scope='col' class='border'>Acquired</th><th scope='col' class='border'>Total Dispense</th><th scope='col' class='border'>Action</th>";
+                            "<th scope='col' class='border'>Item ID</th><th scope='col' class='border'>Name</th><th scope='col' class='border'>Description</th><th scope='col' class='border'>Category</th><th scope='col' class='border'>Unit</th><th scope='col' class='border'>Current Stock</th><th scope='col' class='border'>Input Stock</th><th scope='col' class='border'>Acquired</th><th scope='col' class='border'>Total Dispense</th><th scope='col' class='border'></th>";
+
+                        var stock_batch = window.APP_URL + "/admin/add-to-stocks/" + row.item_id;
+
                         dispense_table.innerHTML +=
-                            "<tr><td class='border'>" + row.item_id + "</td><td class='border'>" + row.name + "</td><td class='border'>" + row.description + "</td><td class='border'>" + row.category + "</td><td class='border'>" + row.unit + "</td><td class='border'>" + row.stock_qty.current_quantity + "</td><td class='border'>" + row.acquired + "</td><td class='border'>" + row.total_dispense + "</td><td class='border'>" + viewButton + "</td></tr>";
+                            "<tr><td class='border'>" + row.item_id + "</td><td class='border'><a id='item-name-link' target='_blank' href='" + stock_batch + "'>" + row.name + "</a></td><td class='border'>" + row.description + "</td><td class='border'>" + row.category + "</td><td class='border'>" + row.unit + "</td><td class='border'>" + row.stock_qty.current_quantity + "</td><td class='border'>" + row.inputStock + "</td><td class='border'>" + row.acquired + "</td><td class='border'>" + row.total_dispense + "</td><td class='border'>" + viewButton + "</td></tr>";
                     });
 
                     // Add click event listener to all view buttons

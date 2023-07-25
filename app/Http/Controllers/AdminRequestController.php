@@ -197,9 +197,10 @@ class AdminRequestController extends Controller
                 $stockLog->item_id = $item_id; //store the $item_id value to 'item_id' in the stock_log table
                 $stockLog->quantity = $quantity; //store the $quantity value to 'quantity' in the stock_log table
                 $stockLog->mode_acquisition = $mode_acquisition; //store the $mode_acquisition value to 'mode_acquisition' in the stock_log table
-                $stockLog->transaction_type = 'deduction'; //store the 'deduction' to 'transaction_type' in the stock_log table
+                $stockLog->transaction_type = 'accepted'; //store the 'accepted' to 'transaction_type' in the stock_log table
 
                 $currentStockQuantity = Stock::where('item_id', $item_id)
+                    ->where('status', 'active')
                     ->sum('stock_qty'); //store the sum of the current stock quantity if the item
 
                 $oldStockQuantity = Request_Item::where('request_id', $item->request_id)
@@ -303,51 +304,4 @@ class AdminRequestController extends Controller
             return back()->with('error', 'Request failed to mark as delivered'); //return current view with error message
         }
     }
-
-    //this will change the status of request to accepted
-    // public function completeRequest($rid)
-    // {
-    //     //Enable Query Log
-    //     DB::enableQueryLog();
-
-    //     $request = ModelsRequest::find($rid);
-
-    //     $user = Auth::user();
-
-    //     $user_id = $user->id;
-    //     $user_type = $user->type;
-    //     $user_name = $user->name;
-
-
-    //     if ($request) {
-    //         $request->status = 'completed';
-    //         $request->save();
-
-    //         //Get Query
-    //         $sql = DB::getQueryLog();
-
-    //         if (is_array($sql) && count($sql) > 0) {
-    //             $last_query = end($sql)['query'];
-    //         } else {
-    //             $last_query = 'No query log found.';
-    //         }
-
-    //         //Log Message
-    //         $message = "Request ID: " . $rid . ", request is delivered and mark as completed.";
-
-    //         // Log the data to the logs table
-    //         Log::create([
-    //             'user_id' => $user_id,
-    //             'user_type' => $user_type,
-    //             'message' => $message,
-    //             'query' => $last_query,
-    //             'created_at' => now(),
-    //             'updated_at' => now()
-    //         ]);
-
-    //         return redirect()->route('admin.requests')->with('success', 'Request Completed');
-    //     } else {
-    //         return back()->with('error', 'Request failed to mark as complete');
-    //     }
-    // }
 }

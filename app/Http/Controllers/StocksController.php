@@ -114,6 +114,7 @@ class StocksController extends Controller
                 DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
             )
             ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.status', 'active')
             ->groupBy(
                 'items.id',
                 'items.name',
@@ -189,6 +190,8 @@ class StocksController extends Controller
             ->join('items', 'item_stocks.item_id', '=', 'items.id')
             ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))
             ->where('item_stocks.item_id', $id)
+            ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.status', 'active')
             ->get();
 
         //join the item_stocks and items table to get the stocks of the item
@@ -202,12 +205,14 @@ class StocksController extends Controller
             )
             ->where('item_stocks.item_id', $id)
             ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.status', 'active')
             ->groupBy(
                 'item_stocks.id',
                 'item_stocks.item_id',
                 'item_stocks.stock_qty',
                 'item_stocks.exp_date',
                 'item_stocks.mode_acquisition',
+                'item_stocks.status',
                 'item_stocks.created_at',
                 'item_stocks.updated_at',
                 'items.id',
@@ -271,6 +276,7 @@ class StocksController extends Controller
         list($user_id, $user_type, $user_dept) = $this->startLog(); //the first part of the log
 
         $oldStockQuantity = Stock::where('item_id', $request->item_id)
+            ->where('status', 'active') // select the stock batch with status 'active'
             ->sum('stock_qty'); //store the sum of the previous stock quantity if the item
 
         $stock = new Stock; //get the stock table
@@ -280,7 +286,13 @@ class StocksController extends Controller
         $stock->exp_date = $request->exp_date; //store the exp_date to the item_stock exp_date column
         $stock->save(); //save the new stock batch 
 
+        //Log Message
+        $message = "New stocks batch created for ITEM ID: " . $request->item_id;
+
+        $this->endLog($user_id, $user_type, $user_dept, $message); //end of log
+
         $currentStockQuantity = Stock::where('item_id', $request->item_id)
+            ->where('status', 'active') // select the stock batch with status 'active'
             ->sum('stock_qty'); //store the sum of the previous stock quantity if the item
 
         $stock_log = new Stock_Log(); //get the stock_logs table
@@ -288,15 +300,11 @@ class StocksController extends Controller
         $stock_log->item_id = $stock->item_id; //store the item_id to stock_logs item_id column
         $stock_log->quantity = $stock->stock_qty; //store the stock_qty to stock_logs quantity column
         $stock_log->mode_acquisition = $stock->mode_acquisition; //store the mode_acquisition to stock_logs mode_acquisition column
-        $stock_log->transaction_type = 'addition'; //store the 'addition' to stock_logs transaction_type column
+        $stock_log->transaction_type = 'new-stock'; //store the 'new-stock' to stock_logs transaction_type column
         $stock_log->current_quantity = $currentStockQuantity;
         $stock_log->prev_quantity = $oldStockQuantity;
         $stock_log->save(); //save the stock log
 
-        //Log Message
-        $message = "New stocks batch created for ITEM ID: " . $request->item_id;
-
-        $this->endLog($user_id, $user_type, $user_dept, $message); //end of log
 
         return back()->with('success', 'Item is successfully added to stocks.');
     }
@@ -314,7 +322,7 @@ class StocksController extends Controller
         return view('admin.sub-page.stocks.edit-stock')->with(['stock' => $stock, 'item' => $items]);
     }
 
-    public function addStock($id) //return the add-stock view that can return and remove a quantity to a stock batch, the parameter $id is the stock id
+    public function addStock($id) //return the add-stock view 
     {
         $stock = Stock::find($id); //find the id of the stock batch to 'item_stocks' table
 
@@ -352,7 +360,8 @@ class StocksController extends Controller
         $oldQty = $stock->stock_qty; //store the value of stock_qty
 
         $oldStockQty = Stock::where('item_id', $itemId)
-            ->sum('stock_qty');
+            ->where('status', 'active') // select the stock batch with status 'active'
+            ->sum('stock_qty'); //sum the stock_qty
 
         if ($stock) { //if the stock is true
             $newQty = $stockQty; //store the value of $stockQty
@@ -363,14 +372,15 @@ class StocksController extends Controller
             if ($stock->save()) { //if the stock is saved
 
                 $currentStockQty = Stock::where('item_id', $itemId)
-                    ->sum('stock_qty');
+                    ->where('status', 'active') // select the stock batch with status 'active'
+                    ->sum('stock_qty'); //sum the stock_qty
 
                 $stock_log = new Stock_Log(); //get the stock_log
                 $stock_log->stock_id = $stock->id; //store the stock id to stock_log stock_id column
                 $stock_log->item_id = $stock->item_id; //store the stock item_id to stock_log item_id column
                 $stock_log->quantity = $oldQty < $newQty ? $newQty - $oldQty : $oldQty - $newQty; //if the $oldQty is less than $newQty subtract the $oldQty to $newQty else subtract the $newQty to $oldQty
                 $stock_log->mode_acquisition = $stock->mode_acquisition; //store the stock mode_acquisition to stock_log mode_acquisition column
-                $stock_log->transaction_type = $newQty > $oldQty ? 'addition' : 'deduction'; //if the $newQty is greater than $oldQty, store 'addition' to stock_log transaction_type else store 'deduction'
+                $stock_log->transaction_type = $newQty > $oldQty ? 'add-stock' : 'deduct-stock'; //if the $newQty is greater than $oldQty, store 'addition' to stock_log transaction_type else store 'deduction'
                 $stock_log->current_quantity = $currentStockQty;
                 $stock_log->prev_quantity = $oldStockQty;
 
@@ -404,6 +414,7 @@ class StocksController extends Controller
         $toStockQty = $request->new_stock; //store the value of new_stock input
 
         $oldStockQuantity = Stock::where('item_id', $stock->item_id)
+            ->where('status', 'active') // select the stock batch with status 'active'
             ->sum('stock_qty'); //store the sum of the previous stock quantity if the item
 
         if ($operation == 'remove') { //if the operation value is 'remove'
@@ -418,9 +429,6 @@ class StocksController extends Controller
 
         $stock->save(); //save the stock quantity changes
 
-        $currentStockQuantity = Stock::where('item_id', $stock->item_id)
-            ->sum('stock_qty'); //store the sum of the current stock quantity if the item
-
         //Log Message
         if ($operation == "return") {
             $message = "Stock ID: " . $id . ",  returned: " . $toStockQty . ", prev quantity: " . $oldStockQty . ", current quantity: " . $newStockQty;
@@ -430,12 +438,16 @@ class StocksController extends Controller
 
         $this->endLog($user_id, $user_type, $user_dept, $message); //end part of the log that will save the message
 
+        $currentStockQuantity = Stock::where('item_id', $stock->item_id)
+            ->where('status', 'active')
+            ->sum('stock_qty'); //store the sum of the current stock quantity if the item
+
         $stock_log = new Stock_Log(); //get the stock_log table
         $stock_log->stock_id = $stock->id; //store the stock id to stock_log stock_id column
         $stock_log->item_id = $stock->item_id; //store the stock item_id to stock_log item_id column
         $stock_log->quantity = $toStockQty; //store the $toStockQty value to stock_log quantity column
         $stock_log->mode_acquisition = $stock->mode_acquisition; //store the $toStockQty value to stock_log quantity column
-        $stock_log->transaction_type = $operation == 'remove' ? 'deduction' : 'addition'; //if the $operation value is 'remove' store the value as 'deduction' else if the operation value is 'return' store the value as 'addition'
+        $stock_log->transaction_type = $operation == 'remove' ? 'deduct-stock' : 'add-stock'; //if the $operation value is 'remove' store the value as 'deduction' else if the operation value is 'return' store the value as 'addition'
         $stock_log->current_quantity = $currentStockQuantity;
         $stock_log->prev_quantity = $oldStockQuantity;
         $stock_log->save(); //save to stock_logs
@@ -450,24 +462,29 @@ class StocksController extends Controller
         $stock = Stock::find($id); //find the stock batch by stock id
 
         $oldStockQuantity = Stock::where('item_id', $stock->item_id)
+            ->where('status', 'active') // select the stock batch with status 'active'
             ->sum('stock_qty'); //store the sum of the previous stock quantity if the item
 
-        $stock->delete(); //delete the selected stock
-
-        $currentStockQuantity = Stock::where('item_id', $stock->item_id)
-            ->sum('stock_qty'); //store the sum of the current stock quantity if the item
+        $stock->status = 'disposed'; //delete the selected stock
+        $stock->save(); //update the stock_batch status
 
         //Log Message
         $message = "Stock batch dispose (id: " . $id . ")";
 
         $this->endLog($user_id, $user_type, $user_dept, $message); //end of log
 
+        $currentStockQuantity = Stock::where('item_id', $stock->item_id)
+            ->where('status', 'active') // select the stock batch with status 'active'
+            ->sum('stock_qty'); //store the sum of the current stock quantity if the item
+
+
+
         $stock_log = new Stock_Log(); //get the stock_log table
         $stock_log->stock_id = $stock->id; //store the stock id to stock_log stock_id column
         $stock_log->item_id = $stock->item_id; //store the stock item_id to stock_log item_id column
         $stock_log->quantity = $stock->stock_qty; //store the stock stock_qty to stock_log quantity column
         $stock_log->mode_acquisition = $stock->mode_acquisition; //store the $toStockQty value to stock_log quantity column
-        $stock_log->transaction_type = 'deduction'; //store 'deduction' to stock_log transaction_type column
+        $stock_log->transaction_type = 'dispose'; //store 'deduction' to stock_log transaction_type column
         $stock_log->current_quantity = $currentStockQuantity;
         $stock_log->prev_quantity = $oldStockQuantity;
         $stock_log->save(); //save the data to stock_log table

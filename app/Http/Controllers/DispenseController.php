@@ -148,11 +148,11 @@ class DispenseController extends Controller
         $data = $data->get(); //pass the query and get the $data
 
         foreach ($data as $stock) {
-            $stockQty = Stock_Log::select('current_quantity')
-                ->where('item_id', $stock->item_id)
-                ->where('created_at', '<=', $to)
-                ->latest('created_at')
-                ->first(); //retrieve all the stock_log table information by the item_id
+            $stockQty = Stock_Log::select('current_quantity') //select only the current_quantity value from 'stock_logs' table
+                ->where('item_id', $stock->item_id) //select where the item_id is equal to the $item_id of $data as $stock
+                ->where('created_at', '<=', $to) //select the created_at until the $to value 
+                ->latest('created_at') //select the latest inserted data by 'created_at'
+                ->first(); //get the first data retrieved
 
             //add the query to $stockQty where the transaction_type column is 'addition' between the date period and sum all the quantity of every row
             $stockQty = $stockQty;
@@ -160,7 +160,8 @@ class DispenseController extends Controller
             $stock->stock_qty = $stockQty; //store the $stockQty to stock_qty of data as stock
 
             if ($moaFilter) { //if $moaFilter is true
-                $acquired = Stock_Log::where('item_id', $stock->item_id); //retrieve all the stock_log table information by the item_id
+                $acquired = Stock_Log::where('item_id', $stock->item_id) //retrieve all the stock_log table information by the item_id
+                    ->where('transaction_type', 'new-stock'); //select where the transaction_type value is 'addition'
 
                 if ($moaFilter == 'petty-cash') { //if $moaFilter value is "petty-cash"
                     $acquired =  $acquired->where('mode_acquisition', 'Petty Cash'); //add a query to $acquired where the request_items mode_acquisition column is 'Petty Cash' 
@@ -171,12 +172,19 @@ class DispenseController extends Controller
                 }
 
                 //add the query to $acquired where the transaction_type column is 'addition' between the date period and sum all the quantity of every row
-                $acquired = $acquired->where('transaction_type', 'addition')
-                    ->whereBetween('created_at', [$from, $to])
-                    ->value(DB::raw('SUM(quantity)'));
+                $acquired = $acquired->whereBetween('created_at', [$from, $to]) //select where date starts with the $from value until the $to value
+                    ->value(DB::raw('SUM(quantity)')); //$acquired will return the sum of all the quantity 
 
-                $stock->acquired = $acquired;
+                $stock->acquired = $acquired; //store the $acquired
             }
+
+            $inputStock = Stock_Log::where('item_id', $stock->item_id) //select all the stock where it match in the item_id
+                ->where('transaction_type', 'new-stock'); //select where the transaction_type is 'new-stock'
+
+            $inputStock = $inputStock->whereBetween('created_at', [$from, $to]) //select the date between $from and $to by 'created_at'
+                ->value(DB::raw('SUM(quantity)')); //sum all the quantity and store the value to $inputStock
+
+            $stock->inputStock = $inputStock ?? 0; //if $inputStock is null, store 0 value;
         }
 
         return response()->json($data); //return the $data as json format
