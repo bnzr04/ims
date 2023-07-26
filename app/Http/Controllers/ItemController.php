@@ -182,7 +182,7 @@ class ItemController extends Controller
                 DB::raw('SUM(item_stocks.stock_qty) as total_quantity')
             ) //sum the stock_qty from item_stocks table
             // ->where('item_stocks.stock_qty', '>', 0)
-            ->where('item_stocks.status', 'active')
+            // ->where('item_stocks.status', 'active')
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price') //group all selected items column information
             ->orderBy('items.name'); //order the items name in ascending
 
