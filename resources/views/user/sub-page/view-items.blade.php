@@ -120,6 +120,8 @@ use Illuminate\Support\Facades\Session
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Stock ID</th>
                                     <th scope="col">Mode Of ACQ</th>
+                                    <th scope="col">Lot #</th>
+                                    <th scope="col">Block #</th>
                                     <th scope="col">Expiration</th>
                                 </tr>
                             </thead>
@@ -134,6 +136,8 @@ use Illuminate\Support\Facades\Session
                                     <td scope="col" class="text-capitalize">{{ $item->quantity }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->stock_id }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->mode_acquisition }}</td>
+                                    <td scope="col" class="text-capitalize">{{ $item->lot_number ?? '-' }}</td>
+                                    <td scope="col" class="text-capitalize">{{ $item->block_number ?? '-' }}</td>
                                     <td scope="col" class="text-capitalize">{{ $item->exp_date }}</td>
                                 </tr>
                                 @empty

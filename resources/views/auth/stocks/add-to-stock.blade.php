@@ -115,6 +115,8 @@ use Carbon\Carbon
                             <th scope="col">Update Date</th>
                             <th scope="col">Quantity</th>
                             <th scope="col">MOA</th>
+                            <th scope="col">Lot #</th>
+                            <th scope="col">Block #</th>
                             <th scope="col">Exp Date</th>
                         </tr>
                     </thead>
@@ -127,6 +129,8 @@ use Carbon\Carbon
                             <td>{{ $stock->updated_at }}</td>
                             <td>{{ $stock->stock_qty }}</td>
                             <td>{{ $stock->mode_acquisition }}</td>
+                            <td>{{ $stock->lot_number ?? '-' }}</td>
+                            <td>{{ $stock->block_number ?? '-' }}</td>
                             <td id="exp-date">{{ Carbon::parse($stock->exp_date)->format('m-d-Y') }}</td>
                         </tr>
                         @endforeach

@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Session
                                 <th scope="col">Update Date</th>
                                 <th scope="col">Quantity</th>
                                 <th scope="col">MOA</th>
+                                <th scope="col">Lot #</th>
+                                <th scope="col">Block #</th>
                                 <th scope="col">Exp Date</th>
                             </tr>
 
@@ -33,26 +35,20 @@ use Illuminate\Support\Facades\Session
                                 <th>{{ $stock->id }}</th>
                                 <td>{{ $stock->formated_created_at }}</td>
                                 <td>{{ $stock->formated_updated_at }}</td>
-                                <td>{{ $stock->stock_qty }}</td>
+                                <td id="stock_quantity">{{ $stock->stock_qty }}</td>
                                 <td>{{ $stock->mode_acquisition }}</td>
+                                <td>{{ $stock->lot_number ?? '-' }}</td>
+                                <td>{{ $stock->block_number ?? '-' }}</td>
                                 <td>{{ $stock->exp_date }}</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    @if(session('success'))
-                    <div class="alert alert-success" id="alert">
+                    <div class="alert alert-success" id="alert" style="display: none;">
                         {{ session('success') }}
                     </div>
-                    @endif
 
-                    @if(session('error'))
-                    <div class="alert alert-danger" id="alert">
-                        {{ session('error') }}
-                    </div>
-                    @endif
-
-                    <form action="{{ route('admin.update-stock', ['id' => $stock->id]) }}" method="post">
+                    <form action="{{ route('admin.update-stock', ['id' => $stock->id]) }}" method="post" id="update_form" data-stock-id="{{ $stock->id }}">
                         @csrf
                         <div class="container-sm mb-3">
                             <label for="operation">Operation</label>
@@ -64,7 +60,7 @@ use Illuminate\Support\Facades\Session
 
                         <div class="container-sm">
                             <label for="new_stock">Quantity:</label>
-                            <input type="number" class="form-control" min="1" name="new_stock" id="new_stock" style="width: 200px;">
+                            <input type="number" class="form-control" min="1" name="quantity" id="quantity" style="width: 200px;">
                         </div>
 
                         <div class="container-sm mt-3">
@@ -72,35 +68,90 @@ use Illuminate\Support\Facades\Session
                             <button class="btn btn-primary">Proceed</button>
                         </div>
                     </form>
+
+                    <div class="alert alert-warning border border-warning" id="warning" style="display: none;">
+                        <b>WARNING:</b> '0' quantity stock batch will not be visible to the stock list.
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-    setTimeout(function() {
-        document.getElementById('alert').style.display = 'none';
-    }, 3000);
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('#alert').css('display', 'none');
+        }, 5000);
 
-    ///////////////////////Mode of acquisition////////////////////////
-    // function modeOfAcquisition(){
-    // const moaEditButton = document.getElementById('moa_edit_btn');
-    // const moaData = document.getElementById('moa_data').innerHTML;
-    // const editBtnImg = document.getElementById('edit_button_img');
+        $("#update_form").submit(function(event) { //this will update the stock batch quantity and lot number
+            event.preventDefault();
+            var stockId = $(this).data("stock-id");
+            var stockQuantity = $("#stock_quantity");
+            var quantityInput = $("#quantity");
 
-    // moaEditButton.addEventListener('click', function() {
-    //     if (editBtnImg.src === "{{ asset('/icons/edit.png') }}") {
-    //         document.getElementById('moa_data').innerHTML = "<input id='moa_input' type='text' class='form-control' style='width:100px' value='" + moaData + "'>";
-    //         editBtnImg.src = "{{ asset('/icons/check.png') }}"
-    //     } else {
-    //         const new_moa = document.getElementById('moa_input').value;
-    //         document.getElementById('moa_data').innerHTML = moaData;
-    //         editBtnImg.src = "{{ asset('/icons/edit.png') }}";
-    //     }
-    //     // alert(moaData);
-    // });
-    // }
+            var lotNumber = $("#lot_number").val();
+            var operation = $("#operation").val();
+            var quantity = $("#quantity").val();
 
-    // modeOfAcquisition();
+            var url = "{{ route('admin.update-stock', ['id' => ':stockId']) }}";
+            url = url.replace(':stockId', stockId);
+
+            if (quantity == '' && quantity < 1) {
+                alert('Quantity must be greater than or equal 1.');
+            } else {
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {
+                        lot_number: lotNumber,
+                        operation: operation,
+                        quantity: quantity,
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function(response) {
+                        // console.log(response);
+                        const warningDiv = $('#warning');
+
+                        quantityInput.val('');
+
+                        stockQuantity.text(response.new_quantity)
+
+                        if (response.new_quantity === 0) {
+                            warningDiv.css('display', 'block');
+                        } else {
+                            warningDiv.css('display', 'none');
+                        }
+
+                        if (response.success) {
+                            $('#alert').removeClass('alert-danger').addClass('alert-success').css('display', 'block').text(response.success);
+                        } else {
+                            $('#alert').removeClass('alert-success').addClass('alert-danger').css('display', 'block').text(response.error);
+                        }
+
+                        setTimeout(function() { //this will hide the alert message after showing
+                            $('#alert').css('display', 'none');
+                        }, 5000);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            }
+
+        });
+
+
+        const stockQuantity = parseInt($("#stock_quantity").text()); // Parse the text content to an integer
+        console.log(typeof(stockQuantity));
+        const warningDiv = $('#warning');
+
+        if (stockQuantity === 0) {
+            warningDiv.css('display', 'block');
+        } else {
+            warningDiv.css('display', 'none');
+        }
+
+    });
 </script>
 @endsection

@@ -20,7 +20,7 @@
                                 <select id="nameSearch" class="text-capitalize m-1" name="nameSearch" style="width: 280px;" required>
                                     <option></option>
                                     @foreach($items as $item)
-                                    <option data-item-id="{{ $item->id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-item-category="{{ $item->category }}" data-item-unit="{{ $item->unit }}" data-stock-id="{{ $item->item_stock_id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}" data-stock-created-date="{{ $item->created_at }}">{{ $item->name }} - {{ $item->category }} {{ $item->unit === "-" ? "" : "- " . $item->unit }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
+                                    <option data-item-id="{{ $item->id }}" class="text-capitalize" data-item-name="{{ $item->name }}" data-item-category="{{ $item->category }}" data-item-unit="{{ $item->unit }}" data-stock-id="{{ $item->item_stock_id }}" data-mode-acq="{{ $item->mode_acquisition }}" data-lot-number="{{ $item->lot_number ?? null }}" data-block-number="{{ $item->block_number ?? null }}" data-stock-exp="{{ $item->formatted_exp_date }}" data-stock-qty="{{ $item->stock_qty }}" data-stock-created-date="{{ $item->created_at }}">{{ $item->name }} - {{ $item->category }} {{ $item->unit === "-" ? "" : "- " . $item->unit }} ({{ $item->formatted_exp_date }}) ({{ $item->mode_acquisition }}) - {{ $item->stock_qty }}</option>
                                     @endforeach
                                 </select>
 
@@ -29,7 +29,7 @@
                                 <input type="hidden" id="exp_date" name="exp_date" style="min-width:120px;">
                                 <button type="button" id="add-item-btn" class="btn btn-secondary py-1 px-2">Add</button>
 
-                                <button class="btn btn-secondary mx-4" id="item_list_btn" title="Available items on stock" style="height:30px;letter-spacing:2px" data-bs-toggle="modal" data-bs-target="#availble_items_modal">...</button>
+                                <button class="btn btn-dark mx-4" id="item_list_btn" title="Available items on stock" data-bs-toggle="modal" data-bs-target="#availble_items_modal">ITEM LIST</button>
                             </div>
                         </div>
                     </div>
@@ -48,6 +48,8 @@
                                         <th scope="col">Unit</th>
                                         <th scope="col">Stock ID</th>
                                         <th scope="col">Mode Of ACQ</th>
+                                        <th scope="col">Lot #</th>
+                                        <th scope="col">Block #</th>
                                         <th scope="col">Expiration Date</th>
                                         <th scope="col">Quantity</th>
                                         <th scope="col" id="action-header">Action</th>
@@ -157,21 +159,7 @@
             const cell = $("<td colspan='6'>").text("No items").appendTo(row);
         }
 
-        $('#nameSearch').on('change', function() {
-            // console.log(true);
-            var selectedOptionValue = $('#nameSearch option:selected');
-            var itemId = selectedOptionValue.data('item-id');
-            var stockId = selectedOptionValue.data('stock-id');
-            var modeOfAcq = selectedOptionValue.data('mode-acq');
-            var stockExpDate = selectedOptionValue.data('stock-exp');
-            var quantity = selectedOptionValue.data('stock-qty');
-            var stockDate = selectedOptionValue.data('stock-created-date');
-            $('#stock_id').val(stockId);
-            $('#exp_date').val(stockExpDate);
-            $('#quantity').attr('max', quantity);
-        });
-
-        //Initiate selected item array
+        //Initiate selectedItem array
         var selectedItem = [];
 
         $('#add-item-btn').on('click', function() {
@@ -183,10 +171,14 @@
             var itemUnit = selectedOptionValue.data('item-unit');
             var stockId = selectedOptionValue.data('stock-id');
             var modeOfAcq = selectedOptionValue.data('mode-acq');
+            var lotNumber = selectedOptionValue.data('lot-number');
+            var blockNumber = selectedOptionValue.data('block-number');
             var stockExpDate = selectedOptionValue.data('stock-exp');
             var stockQty = selectedOptionValue.data('stock-qty');
             var quantity = $('#quantity').val();
             var stockDate = selectedOptionValue.data('stock-created-date');
+
+            // console.log(lotNumber);
 
             //check the inputs if not empty
             if (selectedOptionValue !== '' && itemId !== '' && itemName !== '' && stockId !== '' && modeOfAcq !== '' && stockExpDate !== '' && quantity !== '') {
@@ -211,18 +203,34 @@
                         var quantityExceed = true;
                     }
 
+                    if (quantity < 1) { //if quantity inpur value is less than 1
+                        alert('Quantity must be less than or equal to 1.');
+                        var quantityExceed = true;
+                    }
+
                     //if requested quantity is less than stock quantity
                     if (!quantityExceed == true) {
-                        selectedItem.push({
+                        selectedItem.push({ //push the requested item data to the array
                             item_id: itemId,
                             item_name: itemName,
                             stock_id: stockId,
                             mode_acquisition: modeOfAcq,
+                            lot_number: lotNumber,
+                            block_number: blockNumber,
                             quantity: quantity,
                             exp_date: stockExpDate,
                             stock_date: stockDate,
                         });
-                        var row = '<tr><td class="align-items-center">' + itemId + '</td><td>' + itemName + '</td><td>' + itemCategory + '</td><td>' + itemUnit + '</td><td>' + stockId + '</td><td>' + modeOfAcq + '</td><td>' + stockExpDate + '</td><td>' + quantity + '</td><td><button id="remove-item-btn" class="btn btn-danger" data-stock-id="' + stockId + '">✘</button></td></tr>';
+
+                        if (lotNumber == '') { //if lotNumber has no value, store '-' to lotNumber variable
+                            lotNumber = '-';
+                        }
+
+                        if (blockNumber == '') { //if blockNumber has no value, store '-' to blockNumber variable
+                            blockNumber = '-';
+                        }
+
+                        var row = '<tr><td class="align-items-center">' + itemId + '</td><td>' + itemName + '</td><td>' + itemCategory + '</td><td>' + itemUnit + '</td><td>' + stockId + '</td><td>' + modeOfAcq + '</td><td>' + lotNumber + '</td><td>' + blockNumber + '</td><td>' + stockExpDate + '</td><td>' + quantity + '</td><td><button id="remove-item-btn" class="btn btn-danger" data-stock-id="' + stockId + '">✘</button></td></tr>';
 
                         //this will remove the 'No items' if data is added
                         $("#requested-item-table-body td:contains('No items')").parent().remove();
@@ -325,7 +333,7 @@
                                 $(this).find('#item-row-qty').prop('readonly', true);
                             });
                             $('#request_id_span').text('Request ID: ' + response.request_id);
-                            // console.log(response);
+                            console.log(requestedItems);
                         },
                         error: function(xhr, status, error) {
                             // console.log(response);
@@ -347,8 +355,6 @@
             }
         });
     });
-
-    window.APP_URL = "{{ url('') }}";
 
     function showList() {
         var list = new XMLHttpRequest();

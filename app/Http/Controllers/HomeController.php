@@ -48,6 +48,8 @@ class HomeController extends Controller
                 DB::raw('COUNT(item_stocks.item_id) as stocks_batch'),
                 DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as latest_stock")
             )
+            ->where('item_stocks.status', 'active')
+            ->where('item_stocks.stock_qty', '>', 0)
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price')
             ->orderBy('items.name');
 
@@ -105,7 +107,30 @@ class HomeController extends Controller
         $stocks = DB::table('item_stocks') //get the item details of the selected item using its item_id
             ->join('items', 'item_stocks.item_id', '=', 'items.id')
             ->select('items.*', 'item_stocks.*', DB::raw("DATE_FORMAT(MAX(item_stocks.created_at), '%M %d, %Y, %h:%i:%s %p') as created_at"), DB::raw("DATE_FORMAT(MAX(item_stocks.updated_at), '%M %d, %Y, %h:%i:%s %p') as updated_at"))->where('item_stocks.item_id', $id)
-            ->groupBy('item_stocks.id', 'item_stocks.item_id', 'item_stocks.stock_qty', 'item_stocks.exp_date', 'item_stocks.mode_acquisition', 'item_stocks.created_at', 'item_stocks.updated_at', 'items.id', 'items.name', 'items.category', 'items.description', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price', 'items.created_at', 'items.updated_at',)
+            ->where('item_stocks.status', 'active')
+            ->where('item_stocks.stock_qty', '>', 0)
+            ->groupBy(
+                'item_stocks.id',
+                'item_stocks.item_id',
+                'item_stocks.stock_qty',
+                'item_stocks.exp_date',
+                'item_stocks.mode_acquisition',
+                'item_stocks.lot_number',
+                'item_stocks.block_number',
+                'item_stocks.status',
+                'item_stocks.created_at',
+                'item_stocks.updated_at',
+                'items.id',
+                'items.name',
+                'items.category',
+                'items.description',
+                'items.unit',
+                'items.max_limit',
+                'items.warning_level',
+                'items.price',
+                'items.created_at',
+                'items.updated_at',
+            )
             ->orderByDesc('item_stocks.created_at');
 
         if ($pettyCash) { //if the petty-cash is clicked
@@ -124,7 +149,11 @@ class HomeController extends Controller
 
         $totalStocks = DB::table('item_stocks') //get the total stocks of the selected item
             ->join('items', 'item_stocks.item_id', '=', 'items.id')
-            ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))->where('item_stocks.item_id', $id)->get();
+            ->select(DB::raw('SUM(item_stocks.stock_qty) as total_stocks'))
+            ->where('item_stocks.status', 'active')
+            ->where('item_stocks.stock_qty', '>', 0)
+            ->where('item_stocks.item_id', $id)
+            ->get();
 
         if ($stocks) { //if there is a stock in an item return the add-to-stock view with the fetched data
             return view('auth.stocks.add-to-stock')->with([

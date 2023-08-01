@@ -49,6 +49,8 @@ use Illuminate\Support\Facades\Session
                                     <th scope="col" class="border">Update Date</th>
                                     <th scope="col" class="border">Quantity</th>
                                     <th scope="col" class="border">MOA</th>
+                                    <th scope="col" class="border">Lot #</th>
+                                    <th scope="col" class="border">Block #</th>
                                     <th scope="col" class="border">Exp Date</th>
                                 </tr>
 
@@ -62,9 +64,15 @@ use Illuminate\Support\Facades\Session
                                     <td class="border">{{ $stock->formated_created_at }}</td>
                                     <td class="border">{{ $stock->formated_updated_at }}</td>
                                     <td class="border">
-                                        <input type="number" min="0" name="stock_qty" id="stock_qty" class="form-control" style="max-width: 100px;" value="{{ $stock->stock_qty }}">
+                                        <input type="number" min="1" name="stock_qty" id="stock_qty" class="form-control" style="max-width: 100px;" value="{{ $stock->stock_qty }}" required>
                                     </td>
                                     <td class="border">{{ $stock->mode_acquisition }}</td>
+                                    <td class="border">
+                                        <input type="text" name="lot_num" id="lot_num" class="form-control" style="max-width: 100px;" value="{{ $stock->lot_number }}">
+                                    </td>
+                                    <td class="border">
+                                        <input type="text" name="block_num" id="block_num" class="form-control" style="max-width: 100px;" value="{{ $stock->block_number }}">
+                                    </td>
                                     <td class="border">{{ $stock->exp_date }}</td>
                                 </tr>
                             </tbody>
@@ -97,35 +105,45 @@ use Illuminate\Support\Facades\Session
         $("#update_btn").on("click", function() {
             event.preventDefault();
             var stockQty = $("#stock_qty").val();
+            var lotNumber = $("#lot_num").val();
+            var blockNumber = $("#block_num").val();
 
             // console.log(stockQty);
             if (!confirm("Are you sure you want to update the quantity of this stock batch?")) {
                 event.preventDefault();
             } else {
-                $.ajax({
-                    type: 'POST',
-                    url: '/admin/admin-update-stock/' + stockId,
-                    data: {
-                        stock_id: stockId,
-                        stock_qty: stockQty,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        // console.log(response.success);
-                        if (response.success) {
-                            $('#alert').removeClass('alert-danger').addClass('alert-success').css('display', 'block').text(response.success);
-                        } else {
-                            $('#alert').removeClass('alert-success').addClass('alert-danger').css('display', 'block').text(response.error);
-                        }
+                if (stockQty < 1) {
+                    alert('Stock quantity must be greater than 1')
+                } else {
 
-                        setTimeout(function() {
-                            $("#alert").css("display", "none");
-                        }, 3000);
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(xhr.responseText);
-                    }
-                });
+                    $.ajax({
+                        type: 'POST',
+                        url: '/admin/admin-update-stock/' + stockId,
+                        data: {
+                            stock_id: stockId,
+                            stock_qty: stockQty,
+                            lot_num: lotNumber,
+                            block_num: blockNumber,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            // console.log(response.success);
+                            if (response.success) {
+                                $('#alert').removeClass('alert-danger').addClass('alert-success').css('display', 'block').text(response.success);
+                            } else {
+                                $('#alert').removeClass('alert-success').addClass('alert-danger').css('display', 'block').text(response.error);
+                            }
+
+                            setTimeout(function() {
+                                $("#alert").css("display", "none");
+                            }, 3000);
+                        },
+                        error: function(xhr, status, error) {
+                            console.log(xhr.responseText);
+                        }
+                    });
+                }
+
             }
         });
     });

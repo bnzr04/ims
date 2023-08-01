@@ -38,6 +38,8 @@ class RequestController extends Controller
                 'item_stocks.stock_qty',
                 'item_stocks.exp_date',
                 'item_stocks.mode_acquisition',
+                'item_stocks.lot_number',
+                'item_stocks.block_number',
                 'item_stocks.created_at'
             ) //select this items and item_stocks columns
             ->where('item_stocks.exp_date', ">", $today) //select the item stock with the exp_date that not expired
@@ -249,6 +251,8 @@ class RequestController extends Controller
             $model->item_id = $item->item_id; //set the request_item.item_id from the passed or requested item id
             $model->stock_id = $item->stock_id; //set the request_item.stock_id from the passed or requested item stock_id
             $model->mode_acquisition = $item->mode_acquisition; //set the request_item.mode_acquisition from the passed or requested item mode_acquisition
+            $model->lot_number = $item->lot_number; //set the request_item.lot_number from the passed or requested item stock lot_number
+            $model->block_number = $item->block_number; //set the request_item.block_number from the passed or requested item stock block_number
             $model->exp_date = $item->exp_date; //set the request_item.exp_date from the passed or requested item exp_date
             $model->quantity = intval($item->quantity); //set the request_item.quantity from the passed or requested item quantity
             $model->save(); //save the setted data to request_items table

@@ -182,7 +182,7 @@ class ItemController extends Controller
                 DB::raw('SUM(item_stocks.stock_qty) as total_quantity')
             ) //sum the stock_qty from item_stocks table
             // ->where('item_stocks.stock_qty', '>', 0)
-            // ->where('item_stocks.status', 'active')
+            ->where('item_stocks.status', 'active')
             ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price') //group all selected items column information
             ->orderBy('items.name'); //order the items name in ascending
 
@@ -226,7 +226,7 @@ class ItemController extends Controller
             $item->hasExpiredStocks = $hasExpiredStocks;
             $item->isExpiringSoon = $isExpiringSoon;
 
-            if ($item->total_quantity == 0) {
+            if ($item->total_quantity <= 0) {
                 $item->total_quantity = null;
             }
         }

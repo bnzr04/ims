@@ -107,6 +107,19 @@ use Carbon\Carbon
                         <h4>Mode Of Acquisition: LGU</h4>
                         @endif
                     </div>
+
+                    @if(session('success'))
+                    <div class="alert alert-success" id="alert">
+                        {{ session('success') }}
+                    </div>
+                    @endif
+
+                    @if(session('error'))
+                    <div class="alert alert-danger" id="alert">
+                        {{ session('error') }}
+                    </div>
+                    @endif
+
                     <div class="container-fluid p-0 border overflow-auto" style="max-height: 300px;">
                         <table class="table">
 
@@ -117,13 +130,15 @@ use Carbon\Carbon
                             @else
                             <thead class="bg-secondary text-white" style="position:sticky;top:0;">
                                 <tr>
-                                    <th scope="col">Stock ID</th>
-                                    <th scope="col">Create Date</th>
-                                    <th scope="col">Update Date</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">MOA</th>
-                                    <th scope="col">Exp Date</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col" class="border">Stock ID</th>
+                                    <th scope="col" class="border">Create Date</th>
+                                    <th scope="col" class="border">Update Date</th>
+                                    <th scope="col" class="border">Quantity</th>
+                                    <th scope="col" class="border">MOA</th>
+                                    <th scope="col" class="border">Lot #</th>
+                                    <th scope="col" class="border">Block #</th>
+                                    <th scope="col" class="border">Exp Date</th>
+                                    <th scope="col" class="border">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -135,6 +150,8 @@ use Carbon\Carbon
                                     <td>{{ $stock->updated_at }}</td>
                                     <td>{{ $stock->stock_qty }}</td>
                                     <td>{{ $stock->mode_acquisition }}</td>
+                                    <td>{{ $stock->lot_number ?? "-" }}</td>
+                                    <td>{{ $stock->block_number ?? "-" }}</td>
                                     <td>{{ $stock->exp_date }}</td>
                                     <td>
                                         <a href="{{ route('admin.add-stock', ['id' => $stock->id]) }}" class="btn btn-primary">+</a>
@@ -152,7 +169,7 @@ use Carbon\Carbon
                 <hr>
 
                 <div class="container-fluid p-3 rounded shadow-lg" style="width: 100%;max-width: 500px;display:flex;flex-direction:column;align-items:center">
-                    <form action="{{ route('admin.save-stock') }}" method="post">
+                    <form action="{{ route('admin.save-stock') }}" method="post" id="save_stock_form">
                         @csrf
                         <div class="modal-body p-2" style="width:100%;max-width:300px">
                             <h5>ADD NEW STOCKS BATCH:</h5>
@@ -160,7 +177,7 @@ use Carbon\Carbon
 
                             <div class="container-sm mb-1">
                                 <label for="stock_qty">Quantity</label>
-                                <input type="number" min="1" class="form-control" name="stock_qty" id="stock_qty" required>
+                                <input type="number" min='1' class="form-control" name="stock_qty" id="stock_qty" required>
                             </div>
 
                             <div class="container-sm mb-1">
@@ -168,7 +185,7 @@ use Carbon\Carbon
                                 <input type="date" class="form-control" name="exp_date" id="exp_date" required>
                             </div>
 
-                            <div class="container-sm mt-1">
+                            <div class="container-sm mb-1">
                                 <label for="mode_acq">Mode of acquisition</label>
                                 <input type="text" class="form-control" name="mode_acq" id="mode_acq_input" list="mode_acq" required>
                                 <datalist id="mode_acq">
@@ -179,19 +196,17 @@ use Carbon\Carbon
 
                                 <div class="matching_options"></div>
                             </div>
-                        </div>
 
-                        @if(session('success'))
-                        <div class="alert alert-success" id="alert">
-                            {{ session('success') }}
-                        </div>
-                        @endif
+                            <div class="container-sm mb-1">
+                                <label for="lot_num">Lot Number</label>
+                                <input type="text" class="form-control" name="lot_num" id="lot_num">
+                            </div>
 
-                        @if(session('error'))
-                        <div class="alert alert-danger" id="alert">
-                            {{ session('error') }}
+                            <div class="container-sm mb-1">
+                                <label for="lot_num">Block Number</label>
+                                <input type="text" class="form-control" name="block_num" id="block_num">
+                            </div>
                         </div>
-                        @endif
 
                         <div class="container-sm mt-4">
                             <button type="submit" class="btn btn-primary" id="unique">Add Stock</button>
@@ -204,11 +219,11 @@ use Carbon\Carbon
     </div>
 </div>
 <script>
-    setTimeout(function() {
+    setTimeout(function() { //this function will set alert display to none after showing
         document.getElementById("alert").style.display = "none";
     }, 3000);
 
-    function deleteStock() {
+    function deleteStock() { //this function will prevent disposing stock batch if the user click 'cancel' on the confirm
         if (!confirm('Are you sure that you want to dispose this stock batch?\nThis will remove permanently to our database.')) {
             event.preventDefault();
         }
@@ -261,5 +276,20 @@ use Carbon\Carbon
     }
 
     threshold();
+
+    function preventZeroQuantity() {
+        const stockQty = document.getElementById('stock_qty');
+
+        const saveStockForm = document.getElementById("save_stock_form");
+
+        saveStockForm.addEventListener('submit', function(event) {
+            if (stockQty.value < 1) {
+                event.preventDefault();
+                alert('Quantity must be greater than or equal to 1')
+            }
+        });
+    }
+
+    preventZeroQuantity();
 </script>
 @endsection

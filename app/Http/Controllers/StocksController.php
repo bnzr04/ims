@@ -212,6 +212,8 @@ class StocksController extends Controller
                 'item_stocks.stock_qty',
                 'item_stocks.exp_date',
                 'item_stocks.mode_acquisition',
+                'item_stocks.lot_number',
+                'item_stocks.block_number',
                 'item_stocks.status',
                 'item_stocks.created_at',
                 'item_stocks.updated_at',
@@ -283,6 +285,8 @@ class StocksController extends Controller
         $stock->item_id = $request->item_id; //store the item_id to the item_stock item_id column
         $stock->stock_qty = $request->stock_qty; //store the stock_qty to the item_stock stock_qty column
         $stock->mode_acquisition = $request->mode_acq; //store the mode_acq to the item_stock mode_acquisition column
+        $stock->lot_number = $request->lot_num; //store the lot_num value to the item_stocks lot_number column
+        $stock->block_number = $request->block_num; //store the block_num value to the item_stocks block_num column
         $stock->exp_date = $request->exp_date; //store the exp_date to the item_stock exp_date column
         $stock->save(); //save the new stock batch 
 
@@ -353,49 +357,77 @@ class StocksController extends Controller
     {
         $stockId = $request->input('stock_id'); //store the value of stock_id input
         $stockQty = $request->input('stock_qty'); //store the value of stock_qty input
+        $inputedLotNumber = $request->input('lot_num'); //store the value of lot_num input
+        $inputedBlockNumber = $request->input('block_num'); //store the value of block_num input
 
         $stock = Stock::find($stockId); //get the data of stock batch
 
         $itemId = $stock->item_id; //store the value of item_id
-        $oldQty = $stock->stock_qty; //store the value of stock_qty
 
         $oldStockQty = Stock::where('item_id', $itemId)
             ->where('status', 'active') // select the stock batch with status 'active'
             ->sum('stock_qty'); //sum the stock_qty
 
-        if ($stock) { //if the stock is true
-            $newQty = $stockQty; //store the value of $stockQty
-            $stock->stock_qty = $newQty; //store the value of $newQty to the stock batch stock_qty
+        if ($stock) { //if the stock is true means its exist
+            $oldQty = $stock->stock_qty; //store the value of stock_qty
+            $oldLotNumber = $stock->lot_number; //store the current lot number of the stock batch
+            $oldBlockNumber = $stock->block_number; //store the current block number of the stock batch
 
-            list($user_id, $user_type, $user_dept) = $this->startLog(); // starting part of log
+            if ($stockQty != $oldQty || $inputedLotNumber != $oldLotNumber || $inputedBlockNumber != $oldBlockNumber) {
+                list($user_id, $user_type, $user_dept) = $this->startLog(); // starting part of log
 
-            if ($stock->save()) { //if the stock is saved
+                if ($stockQty != $oldQty) { //if the $stockQty is not equal or not match in $oldQty means the current quantity is changed 
+                    $stock->stock_qty = $stockQty; //store the value of $newQty to the stock batch stock_qty
+                    if (!$stock->save()) {
+                        return response()->json([
+                            'error' => 'Failed to update stock quantity',
+                        ]);
+                    }
 
-                $currentStockQty = Stock::where('item_id', $itemId)
-                    ->where('status', 'active') // select the stock batch with status 'active'
-                    ->sum('stock_qty'); //sum the stock_qty
+                    $message = "Stock batch id " . $stockId . " of Item id " . $itemId . " was updated the quantity from `" . $oldQty . "` to `" . $stockQty . "`"; //log message of the stock batch information update
+                    $this->endLog($user_id, $user_type, $user_dept, $message); //end of log that will get the log message and user details
 
-                $stock_log = new Stock_Log(); //get the stock_log
-                $stock_log->stock_id = $stock->id; //store the stock id to stock_log stock_id column
-                $stock_log->item_id = $stock->item_id; //store the stock item_id to stock_log item_id column
-                $stock_log->quantity = $oldQty < $newQty ? $newQty - $oldQty : $oldQty - $newQty; //if the $oldQty is less than $newQty subtract the $oldQty to $newQty else subtract the $newQty to $oldQty
-                $stock_log->mode_acquisition = $stock->mode_acquisition; //store the stock mode_acquisition to stock_log mode_acquisition column
-                $stock_log->transaction_type = $newQty > $oldQty ? 'add-stock' : 'deduct-stock'; //if the $newQty is greater than $oldQty, store 'addition' to stock_log transaction_type else store 'deduction'
-                $stock_log->current_quantity = $currentStockQty;
-                $stock_log->prev_quantity = $oldStockQty;
+                    $currentStockQty = Stock::where('item_id', $itemId)
+                        ->where('status', 'active') // select the stock batch with status 'active'
+                        ->sum('stock_qty'); //sum the stock_qty
 
-                $stock_log->save(); //save the data to stock_logs table
+                    $stock_log = new Stock_Log(); //get the stock_log
+                    $stock_log->stock_id = $stock->id; //store the stock id to stock_log stock_id column
+                    $stock_log->item_id = $stock->item_id; //store the stock item_id to stock_log item_id column
+                    $stock_log->quantity = $oldQty < $stockQty ? $stockQty - $oldQty : $oldQty - $stockQty; //if the $oldQty is less than $stockQty subtract the $oldQty to $stockQty else subtract the $stockQty to $oldQty
+                    $stock_log->mode_acquisition = $stock->mode_acquisition; //store the stock mode_acquisition to stock_log mode_acquisition column
+                    $stock_log->transaction_type = $stockQty > $oldQty ? 'add-stock' : 'deduct-stock'; //if the $newQty is greater than $oldQty, store 'addition' to stock_log transaction_type else store 'deduction'
+                    $stock_log->current_quantity = $currentStockQty;
+                    $stock_log->prev_quantity = $oldStockQty;
+                    $stock_log->save(); //save the data to stock_logs table
+                }
 
-                $message = "Stock batch id " . $stockId . " of Item id " . $itemId . " was updated the quantity from " . $oldQty . " to " . $newQty; //log message
+                if ($inputedLotNumber != $oldLotNumber) { //if the $inputedLotNumber is not equal or not match in $oldLotNumber means the current lot number is changed 
+                    $stock->lot_number = $inputedLotNumber; //store the value of $inputedLotNumber to the stock batch lot_number
+                    if (!$stock->save()) {
+                        return response()->json([
+                            'error' => 'Failed to update stock lot number',
+                        ]);
+                    }
 
-                $this->endLog($user_id, $user_type, $user_dept, $message); //end of log that will get the log message and user details
+                    $message = "Lot number of the stock batch: " . $stockId . ", is updated from `" . $oldLotNumber . "` to `" . $inputedLotNumber . "`."; //log message of the lot number that changed
+                    $this->endLog($user_id, $user_type, $user_dept, $message); //end of log that will get the log message and user details
+                }
+
+                if ($inputedBlockNumber != $oldBlockNumber) { //if the $inputedLotNumber is not equal or not match in $oldBlockNumber means the current block number is changed 
+                    $stock->block_number = $inputedBlockNumber; //store the value of $inputedBlockNumber to the stock batch lot_number
+                    if (!$stock->save()) {
+                        return response()->json([
+                            'error' => 'Failed to update stock block number',
+                        ]);
+                    }
+
+                    $message = "Block number of the stock batch: " . $stockId . ", is updated from `" . $oldBlockNumber . "` to `" . $inputedBlockNumber . "`."; //log message of the block number that changed
+                    $this->endLog($user_id, $user_type, $user_dept, $message); //end of log that will get the log message and user details
+                }
 
                 return response()->json([
                     'success' => 'Stock quantity updated successfully',
-                ]);
-            } else {
-                return response()->json([
-                    'error' => 'Failed to update stock quantity',
                 ]);
             }
         } else {
@@ -409,50 +441,97 @@ class StocksController extends Controller
     {
         $stock = Stock::find($id); //find the stock id to item_stock table 
 
-        $operation = $request->operation; //store the value of operation input
         $oldStockQty = $stock->stock_qty; //store the value of current stock quantity of the stock batch 
-        $toStockQty = $request->new_stock; //store the value of new_stock input
+        $oldLotNumber = $stock->lot_number; //store the current stock batch lot number
+        $oldBlockNumber = $stock->block_number; //store the current stock batch block number
+        $operation = $request->input("operation"); //store the value of operation input
+        $quantity = $request->input("quantity"); //store the value of new_stock input
+        $lotNumber = $request->input("lot_number"); //store the value of lot_number input
+        $blockNumber = $request->input("block_number"); //store the value of block_number input
 
         $oldStockQuantity = Stock::where('item_id', $stock->item_id)
             ->where('status', 'active') // select the stock batch with status 'active'
             ->sum('stock_qty'); //store the sum of the previous stock quantity if the item
 
         if ($operation == 'remove') { //if the operation value is 'remove'
-            $newStockQty = $oldStockQty - $toStockQty; //deduct the value of the $toStockQty to $oldStockQty
+            if ($quantity > $oldStockQty) {
+                return response()->json([
+                    'error' => 'Cannot remove quantity to stocks.'
+                ]);
+            } else {
+                $newStockQty = $oldStockQty - $quantity; //deduct the value of the $quantity to $oldStockQty
+            }
         } else { //else the operation value is 'return'
-            $newStockQty = $oldStockQty + $toStockQty; //add the value of the $toStockQty to $oldStockQty
+            $newStockQty = $oldStockQty + $quantity; //add the value of the $quantity to $oldStockQty
         }
-
-        $stock->stock_qty = $newStockQty; //store the value of $newStock to the stock stock_qty
 
         list($user_id, $user_type, $user_dept) = $this->startLog(); //start log
 
-        $stock->save(); //save the stock quantity changes
+        if ($oldLotNumber !== $lotNumber) {
+            $stock->lot_number = $lotNumber;
+            if (!$stock->save()) {
+                return response()->json([
+                    'error' => 'Updating lot number Failed.'
+                ]);
+            }
 
-        //Log Message
-        if ($operation == "return") {
-            $message = "Stock ID: " . $id . ",  returned: " . $toStockQty . ", prev quantity: " . $oldStockQty . ", current quantity: " . $newStockQty;
-        } else {
-            $message = "Stock ID: " . $id . ",  removed: " . $toStockQty . ", prev quantity: " . $oldStockQty . ", current quantity: " . $newStockQty;
+            $message = "Stock ID: " . $id . " lot number updated from `" . $oldLotNumber . "` to `" . $lotNumber . "`.";
+
+            $this->endLog($user_id, $user_type, $user_dept, $message); //end part of the log that will save the message
+
         }
 
-        $this->endLog($user_id, $user_type, $user_dept, $message); //end part of the log that will save the message
+        if ($oldBlockNumber !== $blockNumber) {
+            $stock->block_number = $blockNumber;
+            if (!$stock->save()) {
+                return response()->json([
+                    'error' => 'Updating block number Failed.'
+                ]);
+            }
 
-        $currentStockQuantity = Stock::where('item_id', $stock->item_id)
-            ->where('status', 'active')
-            ->sum('stock_qty'); //store the sum of the current stock quantity if the item
+            $message = "Stock ID: " . $id . " block number updated from `" . $oldBlockNumber . "` to `" . $blockNumber . "`.";
 
-        $stock_log = new Stock_Log(); //get the stock_log table
-        $stock_log->stock_id = $stock->id; //store the stock id to stock_log stock_id column
-        $stock_log->item_id = $stock->item_id; //store the stock item_id to stock_log item_id column
-        $stock_log->quantity = $toStockQty; //store the $toStockQty value to stock_log quantity column
-        $stock_log->mode_acquisition = $stock->mode_acquisition; //store the $toStockQty value to stock_log quantity column
-        $stock_log->transaction_type = $operation == 'remove' ? 'deduct-stock' : 'add-stock'; //if the $operation value is 'remove' store the value as 'deduction' else if the operation value is 'return' store the value as 'addition'
-        $stock_log->current_quantity = $currentStockQuantity;
-        $stock_log->prev_quantity = $oldStockQuantity;
-        $stock_log->save(); //save to stock_logs
+            $this->endLog($user_id, $user_type, $user_dept, $message); //end part of the log that will save the message
 
-        return back()->with('success', 'Stock Successfully Updated');
+        }
+
+        if ($quantity != '') {
+            $stock->stock_qty = $newStockQty; //store the value of $newStock to the stock stock_qty
+            if (!$stock->save()) {
+                return response()->json([
+                    'error' => 'Updating stock quantity Failed.'
+                ]);
+            }
+
+            //Log Message
+            if ($operation == "return") {
+                $message = "Stock ID: " . $id . ",  returned: " . $quantity . ", prev quantity: " . $oldStockQty . ", current quantity: " . $newStockQty;
+            } else {
+                $message = "Stock ID: " . $id . ",  removed: " . $quantity . ", prev quantity: " . $oldStockQty . ", current quantity: " . $newStockQty;
+            }
+
+            $this->endLog($user_id, $user_type, $user_dept, $message); //end part of the log that will save the message
+
+            $currentStockQuantity = Stock::where('item_id', $stock->item_id)
+                ->where('status', 'active')
+                ->sum('stock_qty'); //store the sum of the current stock quantity if the item
+
+            $stock_log = new Stock_Log(); //get the stock_log table
+            $stock_log->stock_id = $stock->id; //store the stock id to stock_log stock_id column
+            $stock_log->item_id = $stock->item_id; //store the stock item_id to stock_log item_id column
+            $stock_log->quantity = $quantity; //store the $quantity value to stock_log quantity column
+            $stock_log->mode_acquisition = $stock->mode_acquisition; //store the $mode_acquisition value to stock_log mode_acquisition column
+            $stock_log->transaction_type = $operation == 'remove' ? 'deduct-stock' : 'add-stock'; //if the $operation value is 'remove' store the value as 'deduction' else if the operation value is 'return' store the value as 'addition'
+            $stock_log->current_quantity = $currentStockQuantity;
+            $stock_log->prev_quantity = $oldStockQuantity;
+            $stock_log->save(); //save to stock_logs
+        }
+
+
+        return response()->json([
+            'new_quantity' => $newStockQty,
+            'success' => 'Stock quantity is successfully updated.'
+        ]);
     }
 
     public function deleteStock($id) //this function will delete the stock batch, the parameter $id is the stock batch id

@@ -98,12 +98,12 @@ class TransactionController extends Controller
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('created_at', [$from, $to])
                 ->where('accepted_by_user_id', $user_id)
-                ->orderBy('created_at', 'asc')
+                ->orderBy('created_at', 'desc')
                 ->get();
         } else { //else the user is admin
             $data = ModelsRequest::where('status', 'completed')
                 ->whereBetween('created_at', [$from, $to])
-                ->orderBy('created_at', 'asc')
+                ->orderBy('created_at', 'desc')
                 ->get();
         }
 
@@ -146,7 +146,7 @@ class TransactionController extends Controller
         //retrieve all the request but not the request with 'pending' status and filter it by the date period
         $query = ModelsRequest::where('status', '!=', 'pending')
             ->whereBetween('created_at', [$from, $to])
-            ->orderBy('created_at', 'asc'); //order the created_at by ascending
+            ->orderBy('created_at', 'desc'); //order the created_at by ascending
 
         $data = $query->get(); //get the query data
 
