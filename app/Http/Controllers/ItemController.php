@@ -169,7 +169,10 @@ class ItemController extends Controller
         $user = Auth::user();
 
         //left join the items and item_stocks and get all the items information and the total stocks of the item
-        $items = Item::leftJoin('item_stocks', 'items.id', '=', 'item_stocks.item_id')
+        $items = Item::leftJoin('item_stocks', function ($join) {
+            $join->on('items.id', '=', 'item_stocks.item_id')
+                ->where('item_stocks.status', '=', 'active');
+        })
             ->select(
                 'items.id',
                 'items.name',
@@ -179,12 +182,10 @@ class ItemController extends Controller
                 'items.max_limit',
                 'items.warning_level',
                 'items.price',
-                DB::raw('SUM(item_stocks.stock_qty) as total_quantity')
-            ) //sum the stock_qty from item_stocks table
-            // ->where('item_stocks.stock_qty', '>', 0)
-            ->where('item_stocks.status', 'active')
-            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price') //group all selected items column information
-            ->orderBy('items.name'); //order the items name in ascending
+                DB::raw('COALESCE(SUM(item_stocks.stock_qty), 0) as total_quantity')
+            )
+            ->groupBy('items.id', 'items.name', 'items.description', 'items.category', 'items.unit', 'items.max_limit', 'items.warning_level', 'items.price')
+            ->orderBy('items.name');
 
 
         if ($category) { //if the $category is true or filter the category
