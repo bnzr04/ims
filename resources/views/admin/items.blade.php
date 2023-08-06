@@ -108,18 +108,6 @@ use Illuminate\Support\Facades\Session
                     </div>
                 </div>
 
-                @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-                @endif
-
-                @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-                @endif
-
                 @if(request()->input('moa'))
                 <div class="container-fluid mt-2 p-1 bg-secondary">
                     @if(request()->input('moa') == 'petty-cash')
@@ -133,6 +121,18 @@ use Illuminate\Support\Facades\Session
                     @if(request()->input('moa') == 'lgu')
                     <h5 class="m-0 text-white">ITEMS WITH LGU STOCK BATCH:</h5>
                     @endif
+                </div>
+                @endif
+
+                @if(session('success'))
+                <div class="alert alert-success" id="alert">
+                    {{ session('success') }}
+                </div>
+                @endif
+
+                @if(session('error'))
+                <div class="alert alert-danger" id="alert">
+                    {{ session('error') }}
                 </div>
                 @endif
 
@@ -166,8 +166,12 @@ use Illuminate\Support\Facades\Session
                                 @endif
 
                                 <td class="d-flex border-0" style="flex-direction:column;">
-                                    <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary m-1" title="Add stocks">Stocks</a>
+                                    <a href="{{route('admin.add-to-stocks', ['id' => $item->id])}}" class="btn btn-secondary m-1">Stocks</a>
                                     <a href="{{route('admin.show-item', ['id' => $item->id])}}" class="btn btn-success m-1">Edit</a>
+                                    <form action="{{ route('admin.delete-item', ['id' => $item->id]) }}" class="m-0 p-0 px-1" method="post">
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger my-1" onclick="deleteItem()" style="width: 100%;">Delete</button>
+                                    </form>
                                 </td>
                             </tr>
                             @empty
@@ -185,8 +189,14 @@ use Illuminate\Support\Facades\Session
     </div>
 </div>
 <script>
-    function deleteUser() {
-        if (!confirm("Are you sure you want to delete this item?\nThis item will be deleted even in the stocks if it's added.")) {
+    const alertBox = document.getElementById('alert'); //get the alert box
+
+    setTimeout(function() { //alert box will set display to 'none' after 5 seconds of showing
+        alertBox.style.display = 'none';
+    }, 5000);
+
+    function deleteItem() { //this function will show a confirm after clicking the delete item button, if the confirm is clicked the cancel will prevent the form for submitting
+        if (!confirm("Are you sure you want to delete this item?\nThis item will be deleted permanently and its current stocks.")) {
             event.preventDefault();
         };
     }

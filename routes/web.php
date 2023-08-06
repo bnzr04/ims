@@ -114,6 +114,7 @@ Route::prefix('admin')->middleware(['auth', 'user-access:admin'])->group(functio
     Route::get('/new-item', [ItemController::class, 'newItem'])->name('admin.new-item'); //will show the module where you can add new item
     Route::get('/show-item/{id}', [ItemController::class, 'showItem'])->name('admin.show-item'); //will show the information of the item when you click the edit button of the item
     Route::post('/save-item', [ItemController::class, 'saveItem'])->name('admin.saveItem'); // will save the new item
+    Route::post('/delete-item/{id}', [ItemController::class, 'deleteItem'])->name('admin.delete-item'); // this will delete the selected item to the database
     Route::post('/update-item/{id}', [ItemController::class, 'updateItem'])->name('admin.update-item'); // will update the information of the item
     Route::post('/insert-items', [ItemController::class, 'import'])->name('admin.insert-items'); // to import items data using csv file
     Route::post('/export-items', [ItemController::class, 'export'])->name('admin.export-items'); // to export items information and generate excel file

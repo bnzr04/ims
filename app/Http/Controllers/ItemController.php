@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ItemImport;
 use App\Models\Stock;
 use Carbon\Carbon;
+use Svg\Tag\Rect;
 
 class ItemController extends Controller
 {
@@ -346,6 +347,48 @@ class ItemController extends Controller
         ]);
 
         return back()->with('success', 'Item successfully added.');
+    }
+
+    public function deleteItem(Request $request, $id) //this function will delete the selected item using the $id parameter in the database
+    {
+        // Enable query logging
+        DB::enableQueryLog();
+        $user = auth()->user(); //get the authenticated user information
+
+        $user_id = $user->id; // Get the ID of the authenticated user
+
+        $user_type = $user->type; //get the user type
+
+        $item = Item::find($id); //find the id of the item in items table
+
+        if ($item) { //if item is true means the item is exist
+            $item->delete(); //delete the selected item
+
+            // Get the SQL query being executed
+            $sql = DB::getQueryLog();
+            if (is_array($sql) && count($sql) > 0) {
+                $last_query = end($sql)['query'];
+            } else {
+                $last_query = 'No query log found.';
+            }
+
+            //Log Message
+            $message = "Item ID [" . $id . "] is deleted from the database.";
+
+            // Log the data to the logs table
+            Log::create([
+                'user_id' => $user_id,
+                'user_type' => $user_type,
+                'message' => $message,
+                'query' => $last_query,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            return back()->with('success', 'Item ID [' . $id . '] successfully deleted to the database.');
+        }
+
+        return back()->with('error', 'Item failed to delete.');
     }
 
     public function showItem($id) //this function will return the edit-item view module that will show the information of the item and can be edit its information, the parameter is the item id.
