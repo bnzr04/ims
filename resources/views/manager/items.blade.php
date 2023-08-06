@@ -98,7 +98,16 @@ use Illuminate\Support\Facades\Session
                         </div>
                     </div>
 
-                    <div class="container-fluid d-flex m-0 p-0" style="width:100%;flex-direction:row;align-items:center">
+                    <div class="container-lg p-0 mx-0 d-flex justify-content-between" style="width: 100%;max-width:300px;flex-direction:column-reverse">
+                        <div class="container-sm d-flex m-0 p-1">
+                            <form action="{{ route('manager.export-stocks') }}" method="post" class="m-0 d-flex">
+                                @csrf
+                                <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- <div class="container-fluid d-flex m-0 p-0" style="width:100%;flex-direction:row;align-items:center">
                         <form class="m-0" action="{{ route('manager.export-items') }}" method="post" style="display: flex;align-items:center">
                             @csrf
                             <label class="m-0" for="as_of_date">As of:</label>
@@ -106,7 +115,7 @@ use Illuminate\Support\Facades\Session
                             <input type="hidden" name="filter" value="{{ request('filter') }}">
                             <button class="btn btn-light border border-secondary" title="Download Report"><img src="{{ asset('/icons/excel-icon.png') }}" alt="excel-icon" width="20px"></button>
                         </form>
-                    </div>
+                    </div> -->
                 </div>
 
                 @if(session('success'))
